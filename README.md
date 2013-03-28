@@ -26,4 +26,6 @@ Then you have a PDF file you can view.
 You can edit the `.dot` file (it's just text) and comment out (using
 `//`) the "legend".
 
+Or, if you want a PNG:
 
+   /usr/local/GraphViz-2.30.1/bin/neato.exe -Tpng -osample-cluster-no-legend.png sample-cluster-no-legend.dot
