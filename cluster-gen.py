@@ -169,10 +169,11 @@ if (maxTech < 2):
         
 print( '''// Process with GraphViz neato.
 graph {
-graph [start=1
-      ,splines=true
-      ,overlap=false
-      ,esep="+15"
+graph [                    // Comma-separated key=value pairs.
+      start="random -1",   // Randomize layout.  Rerun to get a different layout.
+      splines=true,
+      overlap=false,
+      esep="+15"
       ]
 node [shape=circle, style=filled]
 ''')
