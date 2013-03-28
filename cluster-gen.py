@@ -206,7 +206,8 @@ print()
 
 for i in range(n-2):
     connectedThrow = fudgeThrow()
-    print("\tDEBUG: {0} ({1}): {2}".format(i, starSystems[i].getName(), connectedThrow), file=sys.stderr)
+    # print("\tDEBUG: {0} ({1}): {2}".format(i, starSystems[i].getName(), connectedThrow), file=sys.stderr)
+    print('\t\t// "Connect" throw from {0}: {1}'.format( starSystems[i].getName(), connectedThrow))
     print( "{0} -- {1}".format(starSystems[i].getName(), starSystems[i+1].getName()))
     j = i + 2
     if (connectedThrow >= 0):
@@ -223,8 +224,10 @@ for i in range(n-2):
             print("{0} -- {1}".format(starSystems[i].getName(), starSystems[j].getName()))
             connected[j] = 1
 
-print("\tDEBUG: {0} ({1}): Last".format(n-2, starSystems[n-2].getName()), file=sys.stderr)
+# print("\tDEBUG: {0} ({1}): Last".format(n-2, starSystems[n-2].getName()), file=sys.stderr)
 
+print('\t\t// "Connect" throw from {0}: {1}'.format( starSystems[n-2].getName(), connectedThrow))
 print("{0} -- {1}".format(starSystems[n-2].getName(), starSystems[n-1].getName()))
 
+print('\t\t// "Connect" throw from {0}: {1}'.format( starSystems[n-1].getName(), connectedThrow))
 print( "}")                             # graph
