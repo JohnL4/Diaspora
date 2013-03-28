@@ -1,0 +1,40 @@
+// Process with GraphViz neato.
+graph {
+graph [start=1
+      ,splines=true
+      ,overlap=false
+      ,esep="+15"
+      ]
+node [shape=circle, style=filled]
+
+All [label="\N\nT4 E4 R4", fillcolor="#ffffff"]
+Tech [label="\N\nT4 E-4 R-4", fillcolor="#5f5fff"]
+Environment [label="\N\nT-4 E4 R-4", fillcolor="#5fff5f"]
+Resources [label="\N\nT-4 E-4 R4", fillcolor="#ff5f5f"]
+None [label="\N\nT-4 E-4 R-4", fillcolor="#5f5f5f"]
+All -- Tech
+All -- Environment
+All -- Resources
+All -- None
+Tech -- Environment
+Tech -- Resources
+Tech -- None
+Environment -- Resources
+Environment -- None
+Resources -- None
+
+A [label="\N\nT1 E-1 R1", fillcolor="#c39bc3"]
+A -- B
+A -- C
+B [label="\N\nT-4 E-3 R0", fillcolor="#af735f"]
+B -- C
+C [label="\N\nT2 E2 R-1", fillcolor="#9bd7d7"]
+C -- D
+C -- E
+C -- F
+D [label="\N\nT-3 E0 R-1", fillcolor="#9baf73"]
+D -- E
+E [label="\N\nT-1 E2 R-1", fillcolor="#9bd79b"]
+E -- F
+F [label="\N\nT-1 E2 R0", fillcolor="#afd79b"]
+}
