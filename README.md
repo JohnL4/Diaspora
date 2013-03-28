@@ -6,6 +6,19 @@ Diaspora tools
 cluster-gen
 -----------
 
+'''
+usage: cluster-gen.py [-h] [--legend] ...
+
+Diaspora cluster generator
+
+positional arguments:
+  systemNames  Unique first letters of star system names
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --legend     Include a legend of colors in the generated graph
+'''
+
 A Python 3 script.
 
 Get Python at http://python.org.
