@@ -6,6 +6,8 @@ Diaspora tools
 cluster-gen
 -----------
 
+(In ClusterGenerator folder.)
+
 ```
 usage: cluster-gen.py [-h] [--legend] ...
 
