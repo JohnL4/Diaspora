@@ -1,0 +1,50 @@
+# -*- org -*-
+* Overview
+
+  Generate Diaspora clusters.
+
+* Flow (Storyboards?)
+   
+*** Initial Input
+
+    - Number of systems,
+    - option for slipknots high/low
+  
+*** Initial Output
+
+    List of systems (Tn En Rn).  If high/low slipknot option was chosen, specification of connection
+    to other systems.
+
+    Maybe Dot output (undirected graph)? *Save* is possible at this point.
+
+**** Output table
+
+     | *System* | *Stats*   | *Aspects*     | *Notes*        |
+     | A        | T2 E-1 R0 | Unified gov't | blah blah blah |
+    
+*** Load: skipping initial i/o
+
+    Load from local XML or cloud (with local cloud config), including partial text generated in
+    earlier iteration of following step ("Refine").
+
+*** Refine with text
+
+   - notes
+   - aspects
+
+*** Generate map with Mogensen?
+
+    Will require server to run generator executable, ability to upload images
+
+**** Image upload
+
+     Include filename on local system so user can find it again
+
+*** Save cluster
+
+**** local XML?
+
+**** save to cloud somewhere?
+
+***** Save cloud acct config data locally, XML maybe?
+      
