@@ -48,6 +48,8 @@ const barrels: string[] = [
   'app/shared',
   'app/tabs',
   'app/generator-params',
+  'app/xml',
+  'app/dot',
   /** @cli-barrel */
 ];
 

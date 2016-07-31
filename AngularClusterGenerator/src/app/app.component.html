@@ -1,6 +1,30 @@
-<h1>
-  {{title}}
-  <div><alert type="info">ng2-bootstrap hello world!</alert></div>
+<div class="container-fluid">
+
+<h1 style="text-align: center">{{title}}</h1>
+
+  <!-- <div><alert type="info">ng2-bootstrap hello world!</alert></div> -->
+
+  <!--
   <div><app-tabs></app-tabs></div>
   <div><app-generator-params></app-generator-params></div>
-</h1>
+  <div><app-xml></app-xml></div>
+  <div><app-dot></app-dot></div>
+  -->
+
+  <!--
+  <tabset>
+    <tab heading="Params">Params</tab>
+    <tab heading="XML">XML</tab>
+    <tab heading="Dot">Dot</tab>
+  </tabset>
+
+  <p></p>
+  -->
+  
+  <tabset>
+    <tab heading="Params"><app-generator-params></app-generator-params></tab>
+    <tab heading="XML"><app-xml></app-xml></tab>
+    <tab heading="Dot"><app-dot></app-dot></tab>
+  </tabset>
+
+</div>
