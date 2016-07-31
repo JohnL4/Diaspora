@@ -50,6 +50,7 @@ const barrels: string[] = [
   'app/generator-params',
   'app/xml',
   'app/dot',
+  'app/cluster-details',
   /** @cli-barrel */
 ];
 

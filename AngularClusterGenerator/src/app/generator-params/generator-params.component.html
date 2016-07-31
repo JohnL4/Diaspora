@@ -18,7 +18,11 @@
     </div>
   </div>
   <div class="form-group">
-    <button id="okBtn" class="btn btn-default col-sm-offset-6">Ok</button>
+    <button id="goBtn" (click)="generateCluster(numSystems)" class="btn btn-default col-sm-offset-6 btn-warning"
+            title="Obviously, this will hammer your existing cluster. Be sure you have it backed up or otherwise saved, or that you don't care."
+            >
+      Go!
+    </button>
     <button id="revertBtn" class="btn btn-default">Revert</button>
   </div>
 </div>
