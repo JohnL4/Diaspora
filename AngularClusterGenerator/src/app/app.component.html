@@ -26,6 +26,12 @@
     <tab heading="Cluster"><app-cluster-details></app-cluster-details></tab>
     <tab heading="XML"><app-xml></app-xml></tab>
     <tab heading="Dot"><app-dot></app-dot></tab>
+
+    <tab *ngFor="let tab of tabs"
+         [heading]="tab.heading">
+      {{tab.content}}
+    </tab>
+
   </tabset>
 
 </div>

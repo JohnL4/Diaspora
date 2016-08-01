@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { AlertComponent } from 'ng2-bootstrap/ng2-bootstrap';
 import { TAB_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
@@ -23,10 +23,26 @@ import { DotComponent } from './dot/dot.component';
       TabsComponent, GeneratorParamsComponent, ClusterDetailsComponent, XmlComponent, DotComponent
    ],
 })
-export class AppComponent {
+export class AppComponent implements OnInit
+{
   title = 'Diaspora Cluster Maintenance';
+
+   private tabs: Array<any>
+/*
+      = [
+      {heading: "Params", content: "params content"}, //new GeneratorParamsComponent()},
+      {heading: "Cluster", content: new ClusterDetailsComponent()},
+      {heading: "XML", content: new XmlComponent()},
+      {heading: "Dot", content: new DotComponent() },
+   ]
+*/
+   ;
 
    private DOT_TAB_IX = 3;
 
+   ngOnInit()
+   {
+      this.tabs = null;
+   }
    
 }
