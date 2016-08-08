@@ -6,7 +6,7 @@
       Number of systems in cluster
     </label>
     <div class="col-sm-1">
-      <input id="numSystems" type="text" maxlength="3" size="5"/>
+      <input id="numSystems" type="text" maxlength="3" size="5" value="{{strSystems}}"/>
     </div>
   </div>
   <div class="form-group">
@@ -18,11 +18,12 @@
     </div>
   </div>
   <div class="form-group">
-    <button id="goBtn" (click)="generateCluster(numSystems)" class="btn btn-default col-sm-offset-6 btn-warning"
+    <button id="goBtn" (click)="generateCluster()" class="btn btn-default col-sm-offset-6 btn-warning"
             title="Obviously, this will hammer your existing cluster. Be sure you have it backed up or otherwise saved, or that you don't care."
             >
       Go!
     </button>
-    <button id="revertBtn" class="btn btn-default">Revert</button>
+    <!-- click handler no work -->
+    <button id="revertBtn" class="btn btn-default" (click)="revertParams()">Revert</button> 
   </div>
 </div>

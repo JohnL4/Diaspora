@@ -10,16 +10,27 @@ import { Cluster } from '../cluster';
 })
 export class GeneratorParamsComponent implements OnInit {
 
+   public numSystems: number = 6;
+   public strSystems: string;
+   
    private cluster: Cluster;
    
-  constructor() { }
+  constructor()
+   {
+      this.strSystems = this.numSystems.toString();
+   }
 
   ngOnInit() {
   }
 
-   public generateCluster( n: string)
+   public generateCluster()
    {
-      this.cluster = new Cluster( 6);
-      this.cluster.generateSystems();
+      this.cluster = new Cluster( this.numSystems);
+      // this.cluster.generateSystems();
+   }
+
+   public revertParams()
+   {
+      this.strSystems = this.numSystems.toString();
    }
 }
