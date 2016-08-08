@@ -1,8 +1,11 @@
+import { Injectable } from '@angular/core';
+
 import { StarSystem } from './star-system';
 
 /**
  * A cluster of star systems.
  */
+@Injectable()
 export class Cluster {
    private _numSystems: number;
    
@@ -29,7 +32,7 @@ export class Cluster {
       return this._systems;
    }
    
-   public constructor( aNumSystems: number) {}
+   public constructor( /* aNumSystems: number */ ) {}
 
    // TODO: make public and hook up to "Ok" button on Params tab?  And only then transfer data from input field to
    // model?

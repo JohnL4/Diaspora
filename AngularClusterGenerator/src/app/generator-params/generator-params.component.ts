@@ -10,14 +10,15 @@ import { Cluster } from '../cluster';
 })
 export class GeneratorParamsComponent implements OnInit {
 
-   public numSystems: number = 6;
-   public strSystems: string;
+   public numSystems: string; // = "6";
    
-   private cluster: Cluster;
+   private _cluster: Cluster;
    
-  constructor()
+   constructor(aCluster: Cluster)
    {
-      this.strSystems = this.numSystems.toString();
+      this._cluster = aCluster;
+      // this.strSystems = this.numSystems.toString();
+      // this.numSystems = "6"; // aCluster.numSystems.toString();
    }
 
   ngOnInit() {
@@ -25,12 +26,13 @@ export class GeneratorParamsComponent implements OnInit {
 
    public generateCluster()
    {
-      this.cluster = new Cluster( this.numSystems);
+      // this._cluster = new Cluster( this.numSystems); // Don't new up, just update in place?
+      this._cluster.numSystems = Number( this.numSystems);
       // this.cluster.generateSystems();
    }
 
    public revertParams()
    {
-      this.strSystems = this.numSystems.toString();
+      this.numSystems = this._cluster.numSystems.toString();
    }
 }

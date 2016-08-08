@@ -9,11 +9,15 @@ import { ClusterDetailsComponent } from './cluster-details/cluster-details.compo
 import { XmlComponent } from './xml/xml.component';
 import { DotComponent } from './dot/dot.component';
 
+import { Cluster } from './cluster';
+
+
 @Component({
   moduleId: module.id,
   selector: 'app-root',
   templateUrl: 'app.component.html',
    styleUrls: ['app.component.css'],
+   providers: [Cluster],
    directives: [
 
       // ng2-bootstrap
@@ -26,6 +30,8 @@ import { DotComponent } from './dot/dot.component';
 export class AppComponent implements OnInit
 {
   title = 'Diaspora Cluster Maintenance';
+
+   private _cluster: Cluster;
 
    private tabs: Array<any>
 /*
@@ -40,8 +46,14 @@ export class AppComponent implements OnInit
 
    private DOT_TAB_IX = 3;
 
+//    constructor( aCluster: Cluster)
+//    {
+//       this._cluster = aCluster;
+//    }
+
    ngOnInit()
    {
+      this._cluster = new Cluster(0);
       this.tabs = null;
    }
    
