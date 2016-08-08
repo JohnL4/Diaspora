@@ -53,7 +53,7 @@ export class AppComponent implements OnInit
 
    ngOnInit()
    {
-      this._cluster = new Cluster(0);
+      // this._cluster = new Cluster(0);
       this.tabs = null;
    }
    
