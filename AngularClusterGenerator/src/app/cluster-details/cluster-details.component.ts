@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { Cluster } from '../cluster';
+
 @Component({
   moduleId: module.id,
   selector: 'app-cluster-details',
@@ -8,7 +10,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ClusterDetailsComponent implements OnInit {
 
-  constructor() { }
+   private _cluster: Cluster;
+
+   public get Cluster(): Cluster
+   {
+      return this._cluster;
+   }
+   
+   constructor( aCluster: Cluster)
+   {
+      this._cluster = aCluster;
+   }
 
   ngOnInit() {
   }

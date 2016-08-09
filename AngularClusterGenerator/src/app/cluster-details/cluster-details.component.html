@@ -1,3 +1,19 @@
 <p>
-  cluster-details works!
 </p>
+<p>
+  Cluster has {{Cluster.numSystems ? Cluster.numSystems : "no"}} systems.
+</p>
+<table class="table" *ngIf="Cluster && Cluster.numSystems">
+  <tr>
+    <th>System</th>
+    <th>Stats</th>
+    <th>Aspects</th>
+    <th>Notes</th>
+  </tr>
+  <tr *ngFor="let sys of Cluster.systems">
+    <td>{{sys.name}}</td>
+    <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>

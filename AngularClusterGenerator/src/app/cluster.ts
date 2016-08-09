@@ -38,6 +38,7 @@ export class Cluster {
    // model?
    private generateSystems()
    {
+      this._systems = new Array<StarSystem>(this._numSystems);
       for (let i = 0; i < this.numSystems; i++)
          this._systems[i] = new StarSystem("A", 1, -1, 1);
    }
