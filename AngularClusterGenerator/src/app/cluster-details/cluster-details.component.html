@@ -11,7 +11,7 @@
     <th>Notes</th>
   </tr>
   <tr *ngFor="let sys of Cluster.systems">
-    <td>{{sys.name}}</td>
+    <td><input [(ngModel)]="sys.name"/></td>
     <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
     <td></td>
     <td></td>
