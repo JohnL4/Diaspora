@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { StarSystem } from './star-system';
 
-import { dice } from './utils';
+import { dice, alphaBravo } from './utils';
 
 /**
  * A cluster of star systems.
@@ -43,7 +43,7 @@ export class Cluster {
       this._systems = new Array<StarSystem>(this._numSystems);
       for (let i = 0; i < this.numSystems; i++)
          this._systems[i] = new StarSystem(
-            `Sys${i+1}`,        // Name
+            alphaBravo( i + 1), // Name
             dice(4, 3) - 8,     // Tech (4d3 - 8 should give range [-4,4])
             dice(4, 3) - 8,     // Environment
             dice(4, 3) - 8);    // Resources

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<cluster> <!-- TODO: need an XSD -->
+  <starSystem id="Alpha" technology="1" environment="-1" resources="1">
+    <connection slipknot="high">Bravo</connection>
+    <connection slipknot="low">Charlie</connection>
+    <aspect>Balkanized</aspect>
+    <aspect>Desert world</aspect>
+    <notes>
+      Multiple religious cults battling with each other. Blah blah
+      blah.
+    </notes>
+  </starSystem>
+  <starSystem id="Bravo" technology="1" environment="-1" resources="1">
+    <connection slipknot="high">Delta</connection>
+  </starSystem>
+  <starSystem id="Charlie" technology="1" environment="-1" resources="1">
+    <connection slipknot="low">Delta</connection>
+  </starSystem>
+  <starSystem id="Delta" technology="1" environment="-1" resources="1">
+    <!-- no outgoing connections, but that's ok, all "incoming" connections are bidirectional -->
+  </starSystem>
+</cluster>

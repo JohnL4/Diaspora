@@ -8,3 +8,44 @@ export function dice(numDice: number, numSides: number): number
       t += Math.floor( Math.random() * numSides) + 1;
    return t;
 }
+
+let _alphaBravo: string[] =
+   [
+      "Alpha",
+      "Bravo",
+      "Charlie",
+      "Delta",
+      "Echo",
+      "Foxtrot",
+      "Golf",
+      "Hotel",
+      "India",
+      "Juliet",
+      "Kilo",
+      "Lima",
+      "Mike",
+      "November",
+      "Oscar",
+      "Papa",
+      "Quebec",
+      "Romeo",
+      "Sierra",
+      "Tango",
+      "Uniform",
+      "Victor",
+      "Whiskey",
+      "X-ray",
+      "Yankee",
+      "Zulu"
+   ];
+
+/**
+ * Returns the phonetic alphabet word for i in range [1..26], else null.
+ */
+export function alphaBravo( i: number): string
+{
+   if (i < 1 || i > 26)
+      return null;
+   else
+      return _alphaBravo[i-1];
+}
