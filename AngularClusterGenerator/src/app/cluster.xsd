@@ -1,0 +1,37 @@
+<!-- -*- xml -*- -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema">
+
+  <annotation>
+    <documentation>
+      Diaspora cluster schema
+    </documentation>
+  </annotation>
+
+  <element name="cluster">
+    <complexType>
+      <element name="starSystem" maxOccurs="unbounded">
+        <complexType>
+          <!-- Can I use <all> here? -->
+          <attribute name="id" type="string" minOccurs="1"/>
+          <attribute name="technology" type="fateThrowType" minOccurs="1"/>
+          <attribute name="environment" type="fateThrowType" minOccurs="1"/>
+          <attribute name="resources" type="fateThrowType" minOccurs="1"/>
+        </complexType>
+      </element>
+    </complexType>
+  </element>
+      
+  <simpleType name="fateThrowType">
+    <annotation>
+      <documentation>
+        A Fate throw in the range [-4,4]; equivalent to 4d3-8.
+      </documentation>
+    </annotation>
+    <restriction base="decimal">
+      <fractionDigits value="0"/>
+      <minInclusive value="-4"/>
+      <maxInclusive value="4"/>
+    </restriction>
+  </simpleType>
+  
+</schema>
