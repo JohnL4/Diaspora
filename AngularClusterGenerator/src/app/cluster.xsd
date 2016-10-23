@@ -1,5 +1,9 @@
 <!-- -*- xml -*- -->
-<schema xmlns="http://www.w3.org/2001/XMLSchema">
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:cluster="http://www.how-hard-can-it-be.com/diaspora"
+        targetNamespace="http://www.how-hard-can-it-be.com/diaspora"
+        elementFormDefault="qualified"
+        >
 
   <annotation>
     <documentation>
@@ -9,26 +13,26 @@
 
   <element name="cluster">
     <complexType>
+      <sequence>
       <element name="starSystem" maxOccurs="unbounded">
         <complexType>
-          <!-- Can I use <all> here? -->
-          <attribute name="id" type="string" minOccurs="1"/>
-          <attribute name="technology" type="fateThrowType" minOccurs="1"/>
-          <attribute name="environment" type="fateThrowType" minOccurs="1"/>
-          <attribute name="resources" type="fateThrowType" minOccurs="1"/>
+          <attribute name="id" type="ID" use="required"/>
+          <attribute name="technology" type="fateThrow" use="required"/>
+          <attribute name="environment" type="fateThrow" use="required"/>
+          <attribute name="resources" type="fateThrow" use="required"/>
         </complexType>
       </element>
+      </sequence>
     </complexType>
   </element>
       
-  <simpleType name="fateThrowType">
+  <simpleType name="fateThrow">
     <annotation>
       <documentation>
         A Fate throw in the range [-4,4]; equivalent to 4d3-8.
       </documentation>
     </annotation>
-    <restriction base="decimal">
-      <fractionDigits value="0"/>
+    <restriction base="integer">
       <minInclusive value="-4"/>
       <maxInclusive value="4"/>
     </restriction>

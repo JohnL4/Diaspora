@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<cluster> <!-- TODO: need an XSD -->
+<cluster xmlns:cluster="http://www.how-hard-can-it-be.com/diaspora"
+    >
   <starSystem id="Alpha" technology="1" environment="-1" resources="1">
     <connection slipknot="high">Bravo</connection>
     <connection slipknot="low">Charlie</connection>
