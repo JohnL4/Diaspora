@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<cluster xmlns="http://www.how-hard-can-it-be.com/diaspora"
+<cluster xmlns="http://www.how-hard-can-it-be.com/diaspora/cluster/1.0"
     >
   <starSystem id="Alpha" technology="1" environment="-1" resources="1">
     <connection slipknot="high">Bravo</connection>
@@ -11,7 +11,7 @@
       blah.
     </notes>
   </starSystem>
-  <starSystem id="Bravo" technology="1" environment="-1" resources="1">
+  <starSystem id="Bravo" name="Barnard's Star" technology="1" environment="-1" resources="1">
     <connection slipknot="high">Delta</connection>
   </starSystem>
   <starSystem id="Charlie" technology="1" environment="-1" resources="1">

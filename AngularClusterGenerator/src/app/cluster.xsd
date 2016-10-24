@@ -1,17 +1,24 @@
 <!-- -*- mode: xml; fill-column: 120 -*- -->
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-        xmlns:cluster="http://www.how-hard-can-it-be.com/diaspora"
-        targetNamespace="http://www.how-hard-can-it-be.com/diaspora"
+        xmlns:cluster="http://www.how-hard-can-it-be.com/diaspora/cluster/1.0"
+        targetNamespace="http://www.how-hard-can-it-be.com/diaspora/cluster/1.0"
         elementFormDefault="qualified"
         >
 
   <annotation>
     <documentation>
-      Diaspora cluster schema
+      Diaspora cluster schema.
+
+      Validated via https://www.corefiling.com/opensource/schemaValidate.html
     </documentation>
   </annotation>
 
   <element name="cluster">
+    <annotation>
+      <documentation>
+        Root element.
+      </documentation>
+    </annotation>
     <complexType>
       <sequence>
         <element name="starSystem" maxOccurs="unbounded" type="cluster:starSystem"/>
@@ -20,25 +27,38 @@
   </element>
       
   <complexType name="starSystem">
-            <sequence>
-              <choice minOccurs="0" maxOccurs="unbounded">
-                <element name="connection">
-                  <complexType>
-                    <simpleContent>
-                      <extension base="IDREF">
-                        <attribute name="slipknot" type="cluster:slipknotLocation"/>
-                      </extension>
-                    </simpleContent>
-                  </complexType>
-                </element>
-                <element name="aspect" type="string"/>
-              </choice>
-              <element name="notes" type="string" minOccurs="0"/>
-            </sequence>
-            <attribute name="id" type="ID" use="required"/>
-            <attribute name="technology" type="cluster:fateThrow" use="required"/>
-            <attribute name="environment" type="cluster:fateThrow" use="required"/>
-            <attribute name="resources" type="cluster:fateThrow" use="required"/>
+    <sequence>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element name="connection" type="cluster:starSystemConnection"/>
+        <element name="aspect" type="string"/>
+      </choice>
+      <element name="notes" type="string" minOccurs="0"/>
+    </sequence>
+    <attribute name="name" type="token">
+      <annotation>
+        <documentation>
+          The actual name of the system, in case it can't be expressed as an id. For example, the string
+          "Barnard's Star" is not an ID, but might the actual name of the star system.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="id" type="ID" use="required"/>
+    <attribute name="technology" type="cluster:fateThrow" use="required"/>
+    <attribute name="environment" type="cluster:fateThrow" use="required"/>
+    <attribute name="resources" type="cluster:fateThrow" use="required"/>
+  </complexType>
+
+  <complexType name="starSystemConnection">
+    <annotation>
+      <documentation>
+        A specification of a star system's connection to another star system.
+      </documentation>
+    </annotation>
+    <simpleContent>
+      <extension base="IDREF">
+        <attribute name="slipknot" type="cluster:slipknotLocation"/>
+      </extension>
+    </simpleContent>
   </complexType>
 
   <simpleType name="fateThrow">
