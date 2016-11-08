@@ -1,3 +1,5 @@
+import { browser, element, by } from 'protractor';
+
 export class AngularClusterGeneratorPage {
   navigateTo() {
     return browser.get('/');

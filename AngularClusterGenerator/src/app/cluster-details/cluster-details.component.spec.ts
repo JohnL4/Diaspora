@@ -1,14 +1,28 @@
 /* tslint:disable:no-unused-variable */
-
-import { By }           from '@angular/platform-browser';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
-import { addProviders, async, inject } from '@angular/core/testing';
-import { ClusterDetailsComponent } from './cluster-details.component';
-import { Cluster } from '../cluster';
 
-describe('Component: ClusterDetails', () => {
-  it('should create an instance', () => {
-     let component = new ClusterDetailsComponent( new Cluster());
+import { ClusterDetailsComponent } from './cluster-details.component';
+
+describe('ClusterDetailsComponent', () => {
+  let component: ClusterDetailsComponent;
+  let fixture: ComponentFixture<ClusterDetailsComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ ClusterDetailsComponent ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ClusterDetailsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

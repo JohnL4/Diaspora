@@ -3,10 +3,9 @@ import { ClusterSerializerXML } from '../cluster-serializer-xml';
 import { Cluster } from '../cluster';
 
 @Component({
-  moduleId: module.id,
   selector: 'app-xml',
-  templateUrl: 'xml.component.html',
-  styleUrls: ['xml.component.css']
+  templateUrl: './xml.component.html',
+  styleUrls: ['./xml.component.css']
 })
 export class XmlComponent implements OnInit {
 
