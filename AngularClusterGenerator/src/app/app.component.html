@@ -21,25 +21,29 @@
   <p></p>
   -->
   
-<!--  <tabset> -->
-    <!-- <tab heading="Params"> -->
-      <app-generator-params></app-generator-params>
-    <!-- </tab> -->
-    <!-- <tab heading="Cluster"> -->
-      <app-cluster-details></app-cluster-details>
-    <!-- </tab> -->
-    <!-- <tab heading="XML"> -->
-      <app-xml></app-xml>
-    <!-- </tab> -->
-    <!-- <tab heading="Dot"> -->
-      <app-dot></app-dot>
-    <!-- </tab> -->
+<!--
+   So... the tabs are just a bunch of links.  The trick is to do something useful with those links, like maybe feed them
+   through the Angular router.  There's no magic to the list-item contents, it's just a visual presentation of links.
+-->
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a routerLink="/params" href="#">Params</a></li>
+    <li role="presentation"><a routerLink="/details" href="#">Cluster</a></li>
+    <li role="presentation"><a routerLink="/xml" href="#">XML</a></li>
+    <li role="presentation"><a routerLink="/dot" href="#">Dot</a></li>
+</ul>
+<router-outlet></router-outlet>
 
-<!--    <tab *ngFor="let tab of tabs"
-         [heading]="tab.heading">
-      {{tab.content}}
-    </tab> -->
-
-<!--  </tabset> -->
+<!--
+<app-generator-params></app-generator-params>
+<app-cluster-details></app-cluster-details>
+<app-xml></app-xml>
+<app-dot></app-dot>
+-->
 
 </div>
+
+<!--
+Local Variables:
+fill-column: 120
+End:
+-->
