@@ -25,13 +25,21 @@
    So... the tabs are just a bunch of links.  The trick is to do something useful with those links, like maybe feed them
    through the Angular router.  There's no magic to the list-item contents, it's just a visual presentation of links.
 -->
-<ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a routerLink="/params" href="#">Params</a></li>
-    <li role="presentation"><a routerLink="/details" href="#">Cluster</a></li>
-    <li role="presentation"><a routerLink="/xml" href="#">XML</a></li>
-    <li role="presentation"><a routerLink="/dot" href="#">Dot</a></li>
-</ul>
-<router-outlet></router-outlet>
+<nav>
+  <ul class="nav nav-tabs" id="tabs">
+    <li role="presentation" class="active"><a routerLink="/params" href="#tabPane" role="tab" data-toggle="tab">Params</a></li>
+    <li role="presentation"><a routerLink="/details" href="#tabPane" role="tab" data-toggle="tab">Cluster</a></li>
+    <li role="presentation"><a routerLink="/xml" href="#tabPane" role="tab" data-toggle="tab">XML</a></li>
+    <li role="presentation"><a routerLink="/dot" href="#tabPane" role="tab" data-toggle="tab">Dot</a></li>
+  </ul>
+</nav>
+
+<div class="tab-content">       <!-- TODO: can merge with child div and assign class to that div? -->
+  <div role="tabpanel" id="tabPane" class="tab-pane fade in active">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
 
 <!--
 <app-generator-params></app-generator-params>
@@ -41,6 +49,18 @@
 -->
 
 </div>
+
+    <script>
+$(document).ready( function() {
+
+    $('#tabs a').click( function( evt) {
+        console.log( "Calling evt.preventDefault()");
+        evt.preventDefault();   // Omit for Angular2?
+        console.log( "Calling $(this).tab('show')");
+        $(this).tab('show');
+    });
+})
+    </script>
 
 <!--
 Local Variables:

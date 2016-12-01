@@ -26,6 +26,10 @@ import { XmlComponent } from './xml/xml.component';
       HttpModule,
       RouterModule.forRoot([
          {
+            path: '',           // Initial load.
+            component: GeneratorParamsComponent
+         },
+         {
             path: 'params',
             component: GeneratorParamsComponent
          },
