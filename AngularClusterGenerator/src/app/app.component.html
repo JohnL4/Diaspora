@@ -27,10 +27,10 @@
 -->
 <nav>
   <ul class="nav nav-tabs" id="tabs">
-    <li role="presentation" class="active"><a routerLink="/params" href="#tabPane" role="tab" data-toggle="tab">Params</a></li>
-    <li role="presentation"><a routerLink="/details" href="#tabPane" role="tab" data-toggle="tab">Cluster</a></li>
-    <li role="presentation"><a routerLink="/xml" href="#tabPane" role="tab" data-toggle="tab">XML</a></li>
-    <li role="presentation"><a routerLink="/dot" href="#tabPane" role="tab" data-toggle="tab">Dot</a></li>
+    <li role="presentation" routerLinkActive="active"><a routerLink="/params"  role="tab" >Params</a></li>
+    <li role="presentation" routerLinkActive="active"><a routerLink="/details"  role="tab" >Cluster</a></li>
+    <li role="presentation" routerLinkActive="active"><a routerLink="/xml"  role="tab" >XML</a></li>
+    <li role="presentation" routerLinkActive="active"><a routerLink="/dot"  role="tab" >Dot</a></li>
   </ul>
 </nav>
 
@@ -49,18 +49,6 @@
 -->
 
 </div>
-
-    <script>
-$(document).ready( function() {
-
-    $('#tabs a').click( function( evt) {
-        console.log( "Calling evt.preventDefault()");
-        evt.preventDefault();   // Omit for Angular2?
-        console.log( "Calling $(this).tab('show')");
-        $(this).tab('show');
-    });
-})
-    </script>
 
 <!--
 Local Variables:
