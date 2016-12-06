@@ -9,13 +9,19 @@ import { Cluster } from '../cluster';
 })
 export class GeneratorParamsComponent implements OnInit {
 
-   public numSystems: string; // = "6";
+   private _numSystems: string; // = "6";
+   get numSystems() : string { return this._numSystems; }
+   set numSystems( value: string) { this._numSystems = value; }
+   
    
    private _cluster: Cluster;
    
    constructor(aCluster: Cluster)
    {
       this._cluster = aCluster;
+      if (aCluster.numSystems == null) {}
+      else
+         this._numSystems = aCluster.numSystems.toString();
       // this.strSystems = this.numSystems.toString();
       // this.numSystems = "6"; // aCluster.numSystems.toString();
    }
