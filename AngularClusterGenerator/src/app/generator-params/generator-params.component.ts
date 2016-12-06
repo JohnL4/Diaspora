@@ -9,9 +9,9 @@ import { Cluster } from '../cluster';
 })
 export class GeneratorParamsComponent implements OnInit {
 
-   private _numSystems: string; // = "6";
-   get numSystems() : string { return this._numSystems; }
-   set numSystems( value: string) { this._numSystems = value; }
+   private numSystems: string; // = "6";
+//   get numSystems() : string { return this._numSystems; }
+//   set numSystems( value: string) { this._numSystems = value; }
    
    
    private _cluster: Cluster;
@@ -19,9 +19,8 @@ export class GeneratorParamsComponent implements OnInit {
    constructor(aCluster: Cluster)
    {
       this._cluster = aCluster;
-      if (aCluster.numSystems == null) {}
-      else
-         this._numSystems = aCluster.numSystems.toString();
+      if (aCluster && aCluster.numSystems)
+         this.numSystems = aCluster.numSystems.toString();
       // this.strSystems = this.numSystems.toString();
       // this.numSystems = "6"; // aCluster.numSystems.toString();
    }
