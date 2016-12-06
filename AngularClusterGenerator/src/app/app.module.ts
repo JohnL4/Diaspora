@@ -27,7 +27,8 @@ import { XmlComponent } from './xml/xml.component';
       RouterModule.forRoot([
          {
             path: '',           // Initial load.
-            component: GeneratorParamsComponent
+            redirectTo: '/params',
+            pathMatch: 'full'
          },
          {
             path: 'params',
