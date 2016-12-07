@@ -1,1 +1,3 @@
+# Consider using 'git config --system --add core.safecrlf true' to make sure non-text files don't get completely bollixed.
+
 *	text=auto
