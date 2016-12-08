@@ -9,7 +9,7 @@ import { Cluster } from '../cluster';
 })
 export class GeneratorParamsComponent implements OnInit {
 
-   private numSystems: string; // = "6";
+   private _numSystems: string; // = "6";
 //   get numSystems() : string { return this._numSystems; }
 //   set numSystems( value: string) { this._numSystems = value; }
    
@@ -20,7 +20,7 @@ export class GeneratorParamsComponent implements OnInit {
    {
       this._cluster = aCluster;
       if (aCluster && aCluster.numSystems)
-         this.numSystems = aCluster.numSystems.toString();
+         this._numSystems = aCluster.numSystems.toString();
       // this.strSystems = this.numSystems.toString();
       // this.numSystems = "6"; // aCluster.numSystems.toString();
    }
@@ -31,12 +31,12 @@ export class GeneratorParamsComponent implements OnInit {
    public generateCluster()
    {
       // this._cluster = new Cluster( this.numSystems); // Don't new up, just update in place?
-      this._cluster.numSystems = Number( this.numSystems);
+      this._cluster.numSystems = Number( this._numSystems);
       // this.cluster.generateSystems();
    }
 
    public revertParams()
    {
-      this.numSystems = this._cluster.numSystems.toString();
+      this._numSystems = this._cluster.numSystems.toString();
    }
 }
