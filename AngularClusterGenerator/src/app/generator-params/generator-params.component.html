@@ -1,12 +1,13 @@
 <p></p>
 
+<form>
 <div class="form-horizontal">
   <div class="form-group">
     <label for="numSystems" class="col-sm-6 control-label">
       Number of systems in cluster
     </label>
     <div class="col-sm-1">
-      <input id="numSystems" type="text" maxlength="3" size="5" [(ngModel)]="numSystems"/>
+      <input id="numSystems" name="numSystems" type="text" class="form-control" required maxlength="2" size="5" [(ngModel)]="numSystems"/>
     </div>
   </div>
   <div class="form-group">
@@ -14,7 +15,7 @@
       Slipstreams Differentiated Between High & Low Slipknots
     </label>
     <div class="col-sm-1">
-      <input id="slipstreamsHighLow" type="checkbox"/>
+      <input id="slipstreamsHighLow" name="slipstreamsHighLow" type="checkbox" class="form-control"/>
     </div>
   </div>
   <div class="form-group">
@@ -27,3 +28,4 @@
     <button id="revertBtn" class="btn btn-default" (click)="revertParams()">Revert</button> 
   </div>
 </div>
+</form>
