@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
 
 import { Cluster } from '../cluster';
 
@@ -13,6 +14,19 @@ export class GeneratorParamsComponent implements OnInit {
 //   get numSystems() : string { return this._numSystems; }
 //   set numSystems( value: string) { this._numSystems = value; }
    
+   parmsForm: NgForm;
+   @ViewChild( 'parmsForm') currentForm: NgForm;
+   
+   formErrors = {
+      'numSystems': ''
+   };
+
+   validationMessages = {
+      'numSystems': {
+         'required': "A number of systems is required",
+         'allowedNumericValues': "Value must be one of the allowed numeric values"
+      }
+   };
    
    private _cluster: Cluster;
    
@@ -25,8 +39,16 @@ export class GeneratorParamsComponent implements OnInit {
       // this.numSystems = "6"; // aCluster.numSystems.toString();
    }
 
-  ngOnInit() {
-  }
+   ngOnInit()
+   {
+   }
+
+   /** See form validation cookbook "recipe"
+    */
+   ngAfterViewChecked()
+   {
+      this.formChanged();
+   }
 
    public generateCluster()
    {
@@ -38,5 +60,33 @@ export class GeneratorParamsComponent implements OnInit {
    public revertParams()
    {
       this.numSystems = this._cluster.numSystems.toString();
+   }
+
+   formChanged()
+   {
+      if (this.currentForm === this.parmsForm) return;
+      this.parmsForm = this.currentForm;
+      if (this.parmsForm)
+         this.parmsForm.valueChanges.subscribe( data => this.onValueChanged( data));
+   }
+
+   onValueChanged( data?: any)
+   {
+      if (!this.parmsForm) return;
+      const form = this.parmsForm.form;
+
+      for (const field in this.formErrors)
+      {
+         this.formErrors[field] = '';
+         const control = form.get( field);
+         if (control && control.dirty && !control.valid)
+         {
+            const messages = this.validationMessages[field];
+            for (const key in control.errors)
+            {
+               this.formErrors[field] += messages[key] + ' ';
+            }
+         }
+      }
    }
 }

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule }   from '@angular/router';
 
+import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 import { ClusterDetailsComponent } from './cluster-details/cluster-details.component';
 import { DotComponent } from './dot/dot.component';
@@ -24,6 +25,7 @@ import { XmlComponent } from './xml/xml.component';
       BrowserModule,
       FormsModule,
       HttpModule,
+      SharedModule,
       RouterModule.forRoot([
          {
             path: '',           // Initial load.

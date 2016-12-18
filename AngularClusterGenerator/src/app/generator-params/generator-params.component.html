@@ -1,18 +1,22 @@
 <p></p>
 
-<form class="form-horizontal">
-  <div class="form-group">
-    <label for="numSystems" class="col-sm-3 control-label">
+<form #parmsForm="ngForm" class="form-horizontal">  <!-- "form-horizontal" is Bootstrap class -->
+  <div class="form-group">                           <!-- "form-group" is Bootstrap class -->
+    <label for="numSystems" class="col-sm-3 control-label"> <!-- "control-label" is the class for labels in HORIZONTAL forms. -->
       Number of systems in cluster
     </label>
     <div class="col-sm-2">
-      <input id="numSystems" name="numSystems" type="text" class="form-control" required maxlength="2" size="5"
+      <input id="numSystems" name="numSystems" type="text" class="form-control"
+             required maxlength="2" allowedNumericValues="1-26"
              [(ngModel)]="numSystems"/>
+    </div>
+    <div *ngIf="formErrors.numSystems" class="col-sm-6 alert alert-danger">
+      {{ formErrors.numSystems }}
     </div>
   </div>
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9">
-      <div class="checkbox">
+      <div class="checkbox">    <!-- "checkbox" is Bootstrap class -->
         <label for="slipstreamsHighLow">
           <input id="slipstreamsHighLow" name="slipstreamsHighLow" type="checkbox" />
           Slipstreams Differentiated Between High & Low Slipknots
@@ -26,7 +30,6 @@
             >
       Go!
     </button>
-    <!-- click handler no work -->
     <button id="revertBtn" class="btn btn-default" (click)="revertParams()">Revert</button>
     </div>
   </div>
