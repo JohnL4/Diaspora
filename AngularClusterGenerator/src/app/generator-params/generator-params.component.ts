@@ -24,7 +24,8 @@ export class GeneratorParamsComponent implements OnInit {
    validationMessages = {
       'numSystems': {
          'required': "A number of systems is required",
-         'allowedNumericValues': "Value must be one of the allowed numeric values"
+         'allowedNumericValues': "Value must be one of the allowed numeric values",
+         'pattern': "Value must be an integer"
       }
    };
    
@@ -84,10 +85,18 @@ export class GeneratorParamsComponent implements OnInit {
             const messages = this.validationMessages[field];
             for (const failedValidator in control.errors) // Note: 'in' operator iterates over object property names.
             {
-               if (failedValidator == "allowedNumericValues")
+               switch (failedValidator)
+               {
+               case "allowedNumericValues":
                   this.formErrors[field] += `${messages[failedValidator]} (${control.errors[failedValidator].allowedValues}); `;
-               else
+                  break;
+               // case "pattern":
+               //    this.formErrors[field] += `${messages[failedValidator]} (${control.errors[failedValidator].requiredPattern}); `;
+               //    break;
+               default:
                   this.formErrors[field] += messages[failedValidator] + '; ';
+                  break;
+               }
             }
          }
       }

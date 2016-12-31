@@ -21,11 +21,11 @@ class Range
 
 /**
  * Validate numbers given an "allowed-values specification" in the form "i;j;[k,m];(n,p);[,q);[r,]".
- * Return of validator call is null if valid or object in following form:
+ * Return of validator call is null if valid or an object in following form (see errorReturnValue()):
  *
  * <pre>
  *    { allowedNumericValues:    // Note that this property is the value of SELECTOR, defined above.
- *       { valueInError: (the original user input),
+ *       { actualValue: (the original user input),
  *         allowedValues: (the original allowed-values specification)
  *       }
  *    }
@@ -125,7 +125,7 @@ export function allowedNumericValuesValidator( anAllowedValuesSpec: string): Val
 function errorReturnValue( aValue: any, anAllowedValuesSpec: string): Object
 {
    // [SELECTOR]: ES6 computed property name
-   return {[SELECTOR]: {valueInError: aValue, allowedValues: anAllowedValuesSpec}};
+   return {[SELECTOR]: {actualValue: aValue, allowedValues: anAllowedValuesSpec}};
 }
 
 /**

@@ -6,9 +6,12 @@
       Number of systems in cluster
     </label>
     <div class="col-sm-2">
-      <!-- TODO: use regex pattern to force integers ([0-9]+) -->
+      <!-- Strictly speaking, maxLength=2 and allowNumericValues 1-26 will prevent inputs like ".5" or "2.5" (although
+        there's nothing wrong with "2."), and we don't need a regexp like 'pattern="[0-9]{1,2}"'.  Alternatively, we
+        could use the regexp pattern to force integers and allowedNumericValues to restrict the range.
+        -->
       <input id="numSystems" name="numSystems" type="text" class="form-control"
-             required maxlength="4" allowedNumericValues="[1,26];30;40;[-5,-1];[90,100);[,-20];[200,]"
+             pattern="[0-9]{1,2}" allowedNumericValues="[1,26]" 
              [(ngModel)]="numSystems"/>
     </div>
     <div *ngIf="formErrors.numSystems" class="col-sm-6 alert alert-danger">
