@@ -5,7 +5,8 @@ let anv_me = "allowed-numeric-values.directive.ts";
 
 console.log( anv_me + ": loading");
 
-const SELECTOR: string = 'allowedNumericValues';
+const SELECTOR: string = 'allowedNumericValues'; // TODO: figure out if this is in some namespace or if it's going to
+                                                 // collide with some other module's SELECTOR.
 
 class Range
 {
@@ -59,7 +60,7 @@ export function allowedNumericValuesValidator( anAllowedValuesSpec: string): Val
             break;
          }
       }
-      return isGood ? null : {SELECTOR: {numberToBeValidated}};
+      return isGood ? null : {[SELECTOR]: {numberToBeValidated}}; // [SELECTOR]: ES6 computed property name
    };
 }
 

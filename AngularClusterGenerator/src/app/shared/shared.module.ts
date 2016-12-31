@@ -7,6 +7,7 @@ import { AllowedNumericValuesDirective } from './allowed-numeric-values.directiv
   imports: [
     CommonModule
   ],
+   exports: [ AllowedNumericValuesDirective ],
   declarations: [SharedComponent, AllowedNumericValuesDirective]
 })
 export class SharedModule { }
