@@ -2,17 +2,24 @@
 
 <form #parmsForm="ngForm" class="form-horizontal">  <!-- "form-horizontal" is Bootstrap class -->
   <div class="form-group">                           <!-- "form-group" is Bootstrap class -->
-    <label for="numSystems" class="col-sm-3 control-label"> <!-- "control-label" is the class for labels in HORIZONTAL forms. -->
-      Number of systems in cluster
+    <div class=" control-label col-sm-3"> <!-- "control-label" is the class for labels in HORIZONTAL forms. -->
+    <label for="numSystems"> 
+      Number of systems in cluster<span class="sr-only"> (required)</span>
     </label>
+    <!-- <span class="glyphicon glyphicon-asterisk required" aria-hidden="true"></span> -->
+    <label class="required">*</label>
+    </div>
     <div class="col-sm-2">
       <!-- Strictly speaking, maxLength=2 and allowNumericValues 1-26 will prevent inputs like ".5" or "2.5" (although
         there's nothing wrong with "2."), and we don't need a regexp like 'pattern="[0-9]{1,2}"'.  Alternatively, we
         could use the regexp pattern to force integers and allowedNumericValues to restrict the range.
         -->
+      <div class="has-feedback">
       <input id="numSystems" name="numSystems" type="text" class="form-control"
-             pattern="[0-9]{1,2}" allowedNumericValues="[1,26]" 
+             required pattern="[0-9]{1,2}" allowedNumericValues="[1,26]" 
              [(ngModel)]="numSystems"/>
+      <!-- <span class="glyphicon glyphicon-remove form-control-feedback"></span> -->
+      </div>
     </div>
     <div *ngIf="formErrors.numSystems" class="col-sm-6 alert alert-danger">
       {{ formErrors.numSystems }}
