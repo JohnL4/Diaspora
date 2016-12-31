@@ -6,6 +6,7 @@
       Number of systems in cluster
     </label>
     <div class="col-sm-2">
+      <!-- TODO: use regex pattern to force integers ([0-9]+) -->
       <input id="numSystems" name="numSystems" type="text" class="form-control"
              required maxlength="2" allowedNumericValues="1-26"
              [(ngModel)]="numSystems"/>

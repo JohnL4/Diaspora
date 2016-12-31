@@ -80,7 +80,7 @@ My validator looks like this:
     }
 
     @Directive({
-       selector: SELECTOR,
+       selector: '[' + SELECTOR + ']',
        providers: [{provide: NG_VALIDATORS, useExisting: AllowedNumericValuesDirective, multi: true}]
     })
     export class AllowedNumericValuesDirective implements Validator, OnChanges
