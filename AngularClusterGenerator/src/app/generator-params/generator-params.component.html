@@ -30,6 +30,7 @@
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9">
     <button id="goBtn" (click)="generateCluster()" class="btn btn-default btn-warning"
+            [disabled]="! parmsForm.form.valid"
             title="Obviously, this will hammer your existing cluster. Be sure you have it backed up or otherwise saved, or that you don't care."
             >
       Go!
