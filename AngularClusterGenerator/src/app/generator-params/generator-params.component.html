@@ -8,7 +8,7 @@
     <div class="col-sm-2">
       <!-- TODO: use regex pattern to force integers ([0-9]+) -->
       <input id="numSystems" name="numSystems" type="text" class="form-control"
-             required maxlength="2" allowedNumericValues="[1,26];30;40;[-5,-1];(90,100)"
+             required maxlength="4" allowedNumericValues="[1,26];30;40;[-5,-1];[90,100);[,-20];[200,]"
              [(ngModel)]="numSystems"/>
     </div>
     <div *ngIf="formErrors.numSystems" class="col-sm-6 alert alert-danger">

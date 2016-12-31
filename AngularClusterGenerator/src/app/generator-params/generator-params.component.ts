@@ -82,9 +82,12 @@ export class GeneratorParamsComponent implements OnInit {
          if (control && control.dirty && !control.valid)
          {
             const messages = this.validationMessages[field];
-            for (const key in control.errors)
+            for (const failedValidator in control.errors) // Note: 'in' operator iterates over object property names.
             {
-               this.formErrors[field] += messages[key] + ' ';
+               if (failedValidator == "allowedNumericValues")
+                  this.formErrors[field] += `${messages[failedValidator]} (${control.errors[failedValidator].allowedValues}); `;
+               else
+                  this.formErrors[field] += messages[failedValidator] + '; ';
             }
          }
       }
