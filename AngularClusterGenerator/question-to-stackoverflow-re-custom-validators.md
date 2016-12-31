@@ -10,6 +10,12 @@ that takes an arbitrary list of numbers and ranges (e.g.,
 "1,3,5,7,11-19,100-200"), and checks to see that the given value is
 one of the allowed values.
 
+My problem is that the custom validator (the anonymous function
+returned by `allowedNumericValuesValidator`?) is never being called.
+For that matter, nor are any of the methods defined in
+`AllowedNumericValuesDirective` being called.  The validator source
+code itself gets loaded, but that's as far as things go.
+
 Using Angular 2.2.3, angular-cli 1.0.0-beta.22-1.
 Browser is Chrome 55.0.2883.95 (64-bit)
 
