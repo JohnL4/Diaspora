@@ -12,7 +12,8 @@ one of the allowed values.
 
 My problem is that the custom validator (the anonymous function
 returned by `allowedNumericValuesValidator`?) is never being called.
-For that matter, nor are any of the methods defined in
+(But note that the built `required` validator runs just fine.)  For
+that matter, nor are any of the methods defined in
 `AllowedNumericValuesDirective` being called.  The validator source
 code itself gets loaded, but that's as far as things go.
 
@@ -25,6 +26,8 @@ the relevant parts here.
 Here's what I've done:
 
 My validator looks like this:
+
+<!-- language: typescript -->
 
     import { Directive, Input, OnChanges, SimpleChanges } from '@angular/core';
     import { AbstractControl, NG_VALIDATORS, Validator, ValidatorFn, Validators } from '@angular/forms';
@@ -86,7 +89,7 @@ My validator looks like this:
     }
 
     @Directive({
-       selector: '[' + SELECTOR + ']',
+       selector: '[' + SELECTOR + ']', // Note: not using extra '[ngForm]' or '[ngModel]' here because the cookbook example doesn't.
        providers: [{provide: NG_VALIDATORS, useExisting: AllowedNumericValuesDirective, multi: true}]
     })
     export class AllowedNumericValuesDirective implements Validator, OnChanges
@@ -120,6 +123,8 @@ nor do any `console.log()` statements I put in get called.
 My `shared.module.ts`, in the same `shared` directory as the
 validator, looks like this:
 
+<!-- language: typescript -->
+
     import { NgModule } from '@angular/core';
     import { CommonModule } from '@angular/common';
     import { SharedComponent } from './shared.component'; // angular-cli stuck this in here; I'm not sure I need it.
@@ -135,6 +140,8 @@ validator, looks like this:
 
 My `app.module.ts` looks like this (I have 4 components, but I'm only
 concerned with the "params" one and the other three are working fine):
+
+<!-- language: typescript -->
 
     import { BrowserModule } from '@angular/platform-browser';
     import { NgModule } from '@angular/core';
@@ -195,6 +202,8 @@ concerned with the "params" one and the other three are working fine):
 
 `generator-params.component.html` looks like this:
 
+<!-- language: lang-html -->
+
     <p></p>
 
     <form #parmsForm="ngForm" class="form-horizontal">  <!-- "form-horizontal" is Bootstrap class -->
@@ -233,6 +242,8 @@ concerned with the "params" one and the other three are working fine):
     </form>
 
 And finally, `generator-params.component.ts` looks like this:
+
+<!-- language: typescript -->
 
     import { Component, OnInit, ViewChild } from '@angular/core';
     import { FormsModule, NgForm } from '@angular/forms';
