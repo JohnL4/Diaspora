@@ -23,11 +23,7 @@
             there's nothing wrong with "2."), and we don't need a regexp like 'pattern="[0-9]{1,2}"'.  Alternatively, we
             could use the regexp pattern to force integers and allowedNumericValues to restrict the range.
         -->
-        <!-- Note: Cannot give the template reference variable ("numSysCtl") the name "numSystems" because that collides
-            with something else (I don't know what it collides with at this point, maybe the same property of the
-            component?).  Actually, for the "required" star, I don't think we need a template ref. variable at all.
-        -->
-        <input id="numSystems" name="numSystems" [(ngModel)]="numSystems" #numSysCtl="ngModel"
+        <input id="numSystems" name="numSystems" [(ngModel)]="numSystems" #numSystemsInput
                type="text" class="form-control"
                required pattern="[0-9]{1,2}" allowedNumericValues="[1,26]" 
                />

@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, AfterViewChecked, ViewChild, Renderer, ElementRef } from '@angular/core';
+import { FormsModule, NgForm, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FormsModule, NgForm } from '@angular/forms';
 
 import { Cluster } from '../cluster';
 
@@ -9,7 +9,7 @@ import { Cluster } from '../cluster';
   templateUrl: './generator-params.component.html',
   styleUrls: ['./generator-params.component.css']
 })
-export class GeneratorParamsComponent implements OnInit {
+export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
    private numSystems: string; // = "6";
 //   get numSystems() : string { return this._numSystems; }
@@ -17,6 +17,7 @@ export class GeneratorParamsComponent implements OnInit {
    
    parmsForm: NgForm;
    @ViewChild( 'parmsForm') currentForm: NgForm;
+   @ViewChild( 'numSystemsInput') numSystemsInput: ElementRef;
    
    formErrors = {
       'numSystems': ''
@@ -34,7 +35,7 @@ export class GeneratorParamsComponent implements OnInit {
 
    private _router: Router;
    
-   constructor(aCluster: Cluster, aRouter: Router)
+   constructor(aCluster: Cluster, aRouter: Router, private _renderer: Renderer)
    {
       this._cluster = aCluster;
       this._router = aRouter;
@@ -48,6 +49,14 @@ export class GeneratorParamsComponent implements OnInit {
    {
    }
 
+   ngAfterViewInit()
+   {
+      console.log( "ngAfterViewInit()");
+      // This is the safe way to invoke DOM element methods.
+      // See http://angularjs.blogspot.com/2016/04/5-rookie-mistakes-to-avoid-with-angular.html
+      this._renderer.invokeElementMethod( this.numSystemsInput.nativeElement, 'focus');
+   }
+   
    /** See form validation cookbook "recipe"
     */
    ngAfterViewChecked()
