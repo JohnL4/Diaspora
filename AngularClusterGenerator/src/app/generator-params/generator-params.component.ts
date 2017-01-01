@@ -63,6 +63,32 @@ export class GeneratorParamsComponent implements OnInit {
       this.numSystems = this._cluster.numSystems.toString();
    }
 
+   /**
+    * Returns true if the given control (by name) has a required value missing (i.e., 'required' validator has failed).
+    * Also returns true if given control name isn't found.
+    */
+   isRequiredValueMissing( aFieldName: string): boolean
+   {
+      let retval: boolean;
+      const control = this.parmsForm
+         && this.parmsForm.form
+         && this.parmsForm.form.get( aFieldName)
+         || null;
+      if (control)
+      {
+         if (control.errors && control.errors['required'])
+            retval = true;
+         else
+            retval = false;
+      }
+      else
+      {
+         console.log( `Warning: unable to determine whether control "${aFieldName}" has a required value missing`);
+         retval = true;
+      }
+      return retval;
+   }
+
    formChanged()
    {
       if (this.currentForm === this.parmsForm) return;
@@ -100,5 +126,5 @@ export class GeneratorParamsComponent implements OnInit {
             }
          }
       }
-   }
+   }   
 }
