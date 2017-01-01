@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { Cluster } from '../cluster';
@@ -30,10 +31,13 @@ export class GeneratorParamsComponent implements OnInit {
    };
    
    private _cluster: Cluster;
+
+   private _router: Router;
    
-   constructor(aCluster: Cluster)
+   constructor(aCluster: Cluster, aRouter: Router)
    {
       this._cluster = aCluster;
+      this._router = aRouter;
       if (aCluster && aCluster.numSystems)
          this.numSystems = aCluster.numSystems.toString();
       // this.strSystems = this.numSystems.toString();
@@ -53,6 +57,7 @@ export class GeneratorParamsComponent implements OnInit {
 
    public generateCluster()
    {
+      console.log( "generateCluster()");
       // this._cluster = new Cluster( this.numSystems); // Don't new up, just update in place?
       this._cluster.numSystems = Number( this.numSystems);
       // this.cluster.generateSystems();
@@ -60,7 +65,25 @@ export class GeneratorParamsComponent implements OnInit {
 
    public revertParams()
    {
-      this.numSystems = this._cluster.numSystems.toString();
+      console.log( "revertParams()");
+      this.numSystems = this._cluster
+         && this._cluster.numSystems
+         && this._cluster.numSystems.toString()
+         || "";
+   }
+
+   onSubmit()
+   {
+      console.log( "onSubmit()");
+      // Note: If we were submitting form contents to a server for generation on the server side, I think I'd not do a
+      // local navigation, but would instead wait for the server's response.  Maybe.  Need to make sure server updates
+      // browser nav history properly so deep-linking works.  Don't know how to do that yet.
+      this.gotoDetails();
+   }
+
+   gotoDetails()
+   {
+      this._router.navigate(['/details']);
    }
 
    /**

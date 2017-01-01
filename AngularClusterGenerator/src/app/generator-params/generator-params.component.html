@@ -1,6 +1,8 @@
 <p></p>
 
-<form #parmsForm="ngForm" class="form-horizontal">  <!-- "form-horizontal" is Bootstrap class -->
+<form #parmsForm="ngForm"
+      (ngSubmit)="onSubmit()"
+      class="form-horizontal">  <!-- "form-horizontal" is Bootstrap class -->
   <div class="form-group">                           <!-- "form-group" is Bootstrap class -->
     <div class=" control-label col-sm-3"> <!-- "control-label" is the class for labels in HORIZONTAL forms. -->
     <label for="numSystems"> 
@@ -13,7 +15,9 @@
     <!-- <label class="required">*</label> -->
     </div>
     <div class="col-sm-2">
-      <!-- "Required" indicator: The sopheesteecated approach, part (a): conditional Bootstrap class. -->
+      <!-- "Required" indicator: The sopheesteecated approach, part (a): conditional Bootstrap class.  I got this from
+         http://juristr.com/blog/2016/01/learning-ng2-dynamic-styles/, but it's probably all over the place.
+      -->
       <div [class.has-feedback]="isRequiredValueMissing('numSystems')">
         <!-- Strictly speaking, maxLength=2 and allowNumericValues 1-26 will prevent inputs like ".5" or "2.5" (although
             there's nothing wrong with "2."), and we don't need a regexp like 'pattern="[0-9]{1,2}"'.  Alternatively, we
@@ -43,6 +47,18 @@
       {{ formErrors.numSystems }}
     </div>
   </div>
+  <!-- Does adding another input field prevent enter key from running first button on form? No.
+  <div class="form-group">
+    <div class="control-label col-sm-3">
+      <label for="randomOtherInput">Some random other input</label>
+    </div>
+    <div class="col-sm-2">
+      <input id="someRandomOtherInput" name="someRandomOtherInput"
+             type="text" class="form-control"
+             />
+    </div>
+  </div>
+  -->
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9">
       <div class="checkbox">    <!-- "checkbox" is Bootstrap class -->
@@ -54,6 +70,10 @@
   </div></div>
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9">
+      <!-- Note: default button type is "submit", per html spec, not "button".  For this reason, the enter key in a form
+         element will submit the form by simulating a click on the first submit button in the form.  The rules are a
+         little complicated; see "Implicit Submission" in the actual HTML spec.
+      -->
     <button id="goBtn" (click)="generateCluster()" class="btn btn-default btn-warning"
             [disabled]="! parmsForm.form.valid"
             title="Obviously, this will hammer your existing cluster. Be sure you have it backed up or otherwise saved, or that you don't care."
