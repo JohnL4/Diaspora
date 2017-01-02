@@ -15,14 +15,6 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 //   get numSystems() : string { return this._numSystems; }
 //   set numSystems( value: string) { this._numSystems = value; }
    
-   parmsForm: NgForm;
-   @ViewChild( 'parmsForm') currentForm: NgForm;
-   @ViewChild( 'numSystemsInput') numSystemsInput: ElementRef;
-   
-   formErrors = {
-      'numSystems': ''
-   };
-
    validationMessages = {
       'numSystems': {
          'required': "A number of systems is required",
@@ -31,9 +23,17 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       }
    };
    
-   private _cluster: Cluster;
+   formErrors = {
+      'numSystems': ''
+   };
 
+   parmsForm: NgForm;
+   @ViewChild( 'parmsForm') currentForm: NgForm;
+   @ViewChild( 'numSystemsInput') numSystemsInput: ElementRef;
+   
+   private _cluster: Cluster;
    private _router: Router;
+   public highLowHelpShowing: boolean = false;
    
    constructor(aCluster: Cluster, aRouter: Router, private _renderer: Renderer)
    {
@@ -95,6 +95,13 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       this._router.navigate(['/details']);
    }
 
+   showHighLowHelp()
+   {
+      console.log( "showHighLowHelp()");
+      this.highLowHelpShowing = ! this.highLowHelpShowing;
+      return false;
+   }
+   
    /**
     * Returns true if the given control (by name) has a required value missing (i.e., 'required' validator has failed).
     * Also returns true if given control name isn't found.

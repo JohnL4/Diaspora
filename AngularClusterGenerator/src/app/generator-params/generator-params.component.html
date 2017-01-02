@@ -62,21 +62,40 @@
           <input id="slipstreamsHighLow" name="slipstreamsHighLow" type="checkbox" />
           Slipstreams Differentiated Between High & Low Slipknots
         </label>
+        <a href="#" (click)="showHighLowHelp()"><span class="glyphicon glyphicon-info-sign"></span></a>
       </div>
-  </div></div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-4 col-sm-8"
+         *ngIf="highLowHelpShowing"
+         >
+      <p>
+        In our campaign, we added the extra twist of randomly assigning slipstreams incoming to a system to either the
+        "high" or "low" slipknots (or north or south, if you prefer).  That has the effect of forcing travellers to
+        traverse the entire system about half the time, instead of simply popping out of a slipstream, realigning, and
+        re-entering slipspace at the same slipknot.  If you want that feature in your cluster, check the box.
+      </p>
+    </div>
+  </div>
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9">
       <!-- Note: default button type is "submit", per html spec, not "button".  For this reason, the enter key in a form
-         element will submit the form by simulating a click on the first submit button in the form.  The rules are a
-         little complicated; see "Implicit Submission" in the actual HTML spec.
-      -->
-    <button id="goBtn" (click)="generateCluster()" class="btn btn-default btn-warning"
-            [disabled]="! parmsForm.form.valid"
-            title="Obviously, this will hammer your existing cluster. Be sure you have it backed up or otherwise saved, or that you don't care."
-            >
-      Go!
-    </button>
-    <button id="revertBtn" class="btn btn-default" (click)="revertParams()">Revert</button>
+           element will submit the form by simulating a click on the first submit button in the form.  The rules are a
+           little complicated; see "Implicit Submission" in the actual HTML spec.
+        -->
+      <button id="goBtn" (click)="generateCluster()" class="btn btn-default btn-warning"
+              [disabled]="! parmsForm.form.valid"
+              title="Obviously, this will hammer your existing cluster. Be sure you have it backed up or otherwise saved, or that you don't care."
+              >
+        Go!
+      </button>
+      <button id="revertBtn" type="button"
+              class="btn btn-default"
+              (click)="revertParams()"
+              >
+        Revert
+      </button>
     </div>
   </div>
 </form>
