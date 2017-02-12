@@ -4,9 +4,9 @@
 
    #+BEGIN_SRC xml
      <?xml version="1.0"?>
-     <cluster xmlns="http://www.how-hard-can-it-be.com/diaspora/cluster"
+     <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:schemaLocation="http://www.how-hard-can-it-be.com/diaspora/cluster/cluster.xsd">
+              xsi:schemaLocation="http://how-hard-can-it-be.com/diaspora cluster.xsd">
        <starSystem id="Alpha" technology="2" environment="1" resources="-1"/>
        <starSystem id="Bravo" technology="1" environment="-1" resources="-2"/>
        <starSystem id="Charlie" technology="-3" environment="-1" resources="-3"/>
@@ -19,8 +19,8 @@
    #+BEGIN_SRC xml
      <?xml version="1.0"?>
      <schema xmlns="http://www.w3.org/2001/XMLSchema"
-             xmlns:cluster="http://www.how-hard-can-it-be.com/diaspora/cluster"
-             targetNamespace="http://www.how-hard-can-it-be.com/diaspora/cluster"
+             xmlns:cluster="http://how-hard-can-it-be.com/diaspora"
+             targetNamespace="http://how-hard-can-it-be.com/diaspora"
              elementFormDefault="qualified"
              >
 
@@ -44,7 +44,7 @@
            </sequence>
          </complexType>
        </element>
-      
+
        <simpleType name="fateThrow">
          <annotation>
            <documentation>
@@ -56,11 +56,92 @@
            <maxInclusive value="4"/>
          </restriction>
        </simpleType>
-  
+
      </schema>
    #+END_SRC 
 
 ** Validation
 
+   I used http://www.utilities-online.info/xsdvalidation/.
+
+   Paste in the XML and the schema to be validated against.  You can check each one to ensure well-formedness, and then
+   validate one against the other.
+
 * Writing a schema
+
+  Breakdown of the initial part of the schema:
+
+  #+BEGIN_SRC xml
+    <schema xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:cluster="http://www.how-hard-can-it-be.com/diaspora/cluster"
+            targetNamespace="http://www.how-hard-can-it-be.com/diaspora/cluster"
+            elementFormDefault="qualified"
+            >
+      :
+      :
+      <element name="cluster">
+        :
+        :
+               <element name="starSystem" maxOccurs="unbounded">
+                 :
+                 :
+               <attribute name="technology" type="cluster:fateThrow" use="required"/>
+               :
+               :
+       <simpleType name="fateThrow">
+         :
+         :
+             <restriction base="integer">
+  #+END_SRC
+
+** Default namespace: XMLSchema
+   
+   We make the default namespace =XMLSchema= so we don't have to prefix everything with =xs:= or some such.
+
+   This means that things that are outside of the =XMLSchema= namespace /must/ be prefixed.  So, for example, the
+   =fateThrow= simple type must be prefixed (when it is referred to, not when it is defined), since it is a type that is
+   not in the XMLSchema namespace (counterexample:  type =integer= /is/ in the XML namespace, and so does not need to be
+   prefixed).
+
+   Note, however, that the element name =cluster= does not get prefixed because we are /declaring/ (defining?) it, not
+   referring to it.  I'm going to guess that if we referred to it elsewhere in this schema, we'd have to prefix it.
+
+** Target namespace: diaspora/cluster
+   
+   We specify the =targetNamespace= so that instances/documents will "know" they are validating against that namespace.
+   It's not enough to declare a default namespace, since that's really just a mechanical convenience (as far as I can
+   tell).
+
+   Note that we could leave =cluster= off the namespace (and we probably should, actually), since we could declare other
+   elements (e.g., "ship" or "character") in other schema definition documents, and they're really all in the =diaspora=
+   namespace (at least, how-hard-can-it-be.com's idea of that namespace).
+
+** elementFormDefault: qualified
+   
+   Note that =elementFormDefault= is =qualified=, meaning elements that are occur in schema /instances/ ("instance"
+   seems to be a term for an actual /instance/ of the schema, i.e., a /document/) will, by default, be /qualified/, even
+   if they are not /prefixed/.  So, for example, the element "starSystem", when it occurs, will be qualified (by the
+   default namespace, I guess), as opposed to being unqualified (i.e., in a sort of "global", unqualified namespace (or
+   "no namespace", might be a better way to put it).
+
 * Using a schema
+
+  Simplicity itself, after all that:
+
+  #+BEGIN_SRC xml
+    <?xml version="1.0"?>
+    <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://how-hard-can-it-be.com/diaspora/cluster/cluster.xsd">
+      <starSystem id="Alpha" technology="2" environment="1" resources="-1"/>
+  #+END_SRC
+
+  ...and off to the races.
+
+  We set the default namespace so we don't have to prefix all our elements (cluster, starSystem, etc.) with something.
+  The namespace matches the target namespace of the schema definition.  =schemaLocation= is really just a hint to
+  whatever processors there are about how to download the schema.  That URL should /probably/ resolve to the actual
+  resource, but it might not be /that/ important, especially if the validators have access to the schema definition in
+  other ways (e.g., by having it as a local resource, or pasted in to a text window or something).  Plus, I probably got
+  it wrong in the examples above, if I don't have space-delimited pairs of urls.
+  

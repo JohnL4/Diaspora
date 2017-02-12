@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-        xmlns:cluster="http://www.how-hard-can-it-be.com/diaspora/cluster"
-        targetNamespace="http://www.how-hard-can-it-be.com/diaspora/cluster"
+        xmlns:cluster="http://how-hard-can-it-be.com/diaspora"
+        targetNamespace="http://how-hard-can-it-be.com/diaspora"
         elementFormDefault="qualified"
         >
 
