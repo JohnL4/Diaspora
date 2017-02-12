@@ -47,3 +47,7 @@
 **** save to cloud somewhere?
 
 ***** Save cloud acct config data locally, XML maybe?
+* Use of XML
+
+  See [[file:xml.org][xml.org]]
+  
