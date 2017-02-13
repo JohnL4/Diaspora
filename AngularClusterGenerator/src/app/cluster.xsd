@@ -16,6 +16,17 @@
       <sequence>
       <element name="starSystem" maxOccurs="unbounded">
         <complexType>
+          <sequence>
+            <element name="slipstream" maxOccurs="unbounded">
+              <complexType>
+                <attribute name="to" type="IDREF" use="required"/>
+                <attribute name="leave" type="cluster:slipknotPositionType"/>
+                <attribute name="arrive" type="cluster:slipknotPositionType"/>
+              </complexType>
+            </element>
+            <element name="aspect" minOccurs="0" maxOccurs="unbounded"/> <!-- Diaspora rules say 2, but let's not bake that in here. -->
+            <element name="notes" minOccurs="0" maxOccurs="1"/>
+          </sequence>
           <attribute name="id" type="ID" use="required"/>
           <attribute name="technology" type="cluster:fateThrow" use="required"/>
           <attribute name="environment" type="cluster:fateThrow" use="required"/>
@@ -37,5 +48,17 @@
       <maxInclusive value="4"/>
     </restriction>
   </simpleType>
-  
+
+  <simpleType name="slipknotPositionType">
+    <annotation>
+      <documentation>
+        Whether a particular slipstream connects to a system at the "high" or "low" position.
+      </documentation>
+    </annotation>
+    <restriction base="token">
+      <enumeration value="low"/>
+      <enumeration value="high"/>
+    </restriction>
+  </simpleType>
+    
 </schema>

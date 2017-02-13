@@ -2,8 +2,22 @@
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://how-hard-can-it-be.com/diaspora cluster.xsd">
-  <starSystem id="Alpha" technology="0" environment="2" resources="-1"/>
-  <starSystem id="Bravo" technology="-1" environment="-3" resources="-1"/>
-  <starSystem id="Charlie" technology="2" environment="-1" resources="0"/>
-  <starSystem id="Delta" technology="2" environment="-1" resources="-1"/>
+  <starSystem id="Alpha" technology="0" environment="2" resources="-1">
+    <slipstream to="Bravo" leave="high" arrive="low"/> <!-- to: idref (limitation: max one occurrence of destination per system); leave/arrive: enumerations -->
+    <slipstream to="Charlie" leave="low" arrive="low"/>
+    <aspect>Gentlemen, I give you the Pencarrow Endeavor!</aspect>
+    <aspect>You're not from around here, are you?</aspect>
+    <notes>
+      Arbitrary text, multi-line, multi-paragraph, possibly with some limited HTML markup, or possibly some markdown.
+    </notes>
+  </starSystem>
+  <starSystem id="Bravo" technology="-1" environment="-3" resources="-1">
+    <slipstream to="Charlie" leave="low" arrive="low"/>
+  </starSystem>
+  <starSystem id="Charlie" technology="2" environment="-1" resources="0">
+    <slipstream to="Charlie" leave="low" arrive="low"/>
+  </starSystem>
+  <starSystem id="Delta" technology="2" environment="-1" resources="-1">
+    <slipstream to="Charlie" leave="low" arrive="low"/>
+  </starSystem>
 </cluster>
