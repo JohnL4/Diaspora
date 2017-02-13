@@ -19,8 +19,8 @@
           <sequence>
             <element name="slipstream" maxOccurs="unbounded">
               <complexType>
-                <attribute name="to" type="IDREF" use="required"/>
-                <attribute name="leave" type="cluster:slipknotPositionType"/>
+                <attribute name="to" type="IDREF" use="required"/> <!-- "to" must be unique per system (or must it?) -->
+                <attribute name="leave" type="cluster:slipknotPositionType"/> <!-- leave/arrive must occur together or not at all -->
                 <attribute name="arrive" type="cluster:slipknotPositionType"/>
               </complexType>
             </element>
