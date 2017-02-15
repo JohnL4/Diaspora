@@ -3,3 +3,8 @@
 .required { color: magenta; }
 
 label.required { font-size: larger; }
+
+/* Hack for Bootstrap table-responsive. */
+@-moz-document url-prefix() {
+  fieldset { display: table-cell; }
+}

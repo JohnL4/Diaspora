@@ -3,6 +3,7 @@
 <p>
   Cluster has {{Cluster.numSystems ? Cluster.numSystems : "no"}} systems.
 </p>
+<div class="table-responsive">
 <table class="table" *ngIf="Cluster && Cluster.numSystems">
   <tr>
     <th>System</th>
@@ -17,3 +18,4 @@
     <td></td>
   </tr>
 </table>
+</div>
