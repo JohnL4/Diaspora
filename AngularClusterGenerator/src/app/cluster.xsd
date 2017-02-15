@@ -19,12 +19,30 @@
           <sequence>
             <element name="slipstream" maxOccurs="unbounded">
               <complexType>
-                <attribute name="to" type="IDREF" use="required"/> <!-- "to" must be unique per system (or must it?) -->
-                <attribute name="leave" type="cluster:slipknotPositionType"/> <!-- leave/arrive must occur together or not at all -->
+                <attribute name="to" type="IDREF" use="required"> 
+                  <annotation>
+                    <documentation>
+                      "to" must be unique per system (or must it?)
+                    </documentation>
+                  </annotation>
+                </attribute>
+                <attribute name="leave" type="cluster:slipknotPositionType">
+                  <annotation>
+                    <documentation>
+                      leave/arrive must occur together or not at all
+                    </documentation>
+                  </annotation>
+                </attribute>
                 <attribute name="arrive" type="cluster:slipknotPositionType"/>
               </complexType>
             </element>
-            <element name="aspect" minOccurs="0" maxOccurs="unbounded"/> <!-- Diaspora rules say 2, but let's not bake that in here. -->
+            <element name="aspect" minOccurs="0" maxOccurs="unbounded">
+              <annotation>
+                <documentation>
+                  Diaspora rules say 2, but let's not bake that in here.
+                </documentation>
+              </annotation>
+            </element>
             <element name="notes" minOccurs="0" maxOccurs="1"/>
           </sequence>
           <attribute name="id" type="ID" use="required"/>
