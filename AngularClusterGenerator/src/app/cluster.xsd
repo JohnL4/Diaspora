@@ -14,47 +14,53 @@
   <element name="cluster">
     <complexType>
       <sequence>
-      <element name="starSystem" maxOccurs="unbounded">
-        <complexType>
-          <sequence>
-            <element name="slipstream" maxOccurs="unbounded">
-              <complexType>
-                <attribute name="to" type="IDREF" use="required"> 
-                  <annotation>
-                    <documentation>
-                      "to" must be unique per system (or must it?)
-                    </documentation>
-                  </annotation>
-                </attribute>
-                <attribute name="leave" type="cluster:slipknotPositionType">
-                  <annotation>
-                    <documentation>
-                      leave/arrive must occur together or not at all
-                    </documentation>
-                  </annotation>
-                </attribute>
-                <attribute name="arrive" type="cluster:slipknotPositionType"/>
-              </complexType>
-            </element>
-            <element name="aspect" minOccurs="0" maxOccurs="unbounded">
-              <annotation>
-                <documentation>
-                  Diaspora rules say 2, but let's not bake that in here.
-                </documentation>
-              </annotation>
-            </element>
-            <element name="notes" minOccurs="0" maxOccurs="1"/>
-          </sequence>
-          <attribute name="id" type="ID" use="required"/>
-          <attribute name="technology" type="cluster:fateThrow" use="required"/>
-          <attribute name="environment" type="cluster:fateThrow" use="required"/>
-          <attribute name="resources" type="cluster:fateThrow" use="required"/>
-        </complexType>
-      </element>
+        <element name="starSystem" type="cluster:starSystemWithSlipstreams" maxOccurs="unbounded"/>
       </sequence>
     </complexType>
   </element>
       
+  <complexType name="starSystemWithSlipstreams">
+    <sequence>
+      <element name="slipstream" type="cluster:slipstreamWithHighLowSlipknots" maxOccurs="unbounded"/>
+      <element name="aspect" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>
+            Diaspora rules say 2, but let's not bake that in here.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="notes" minOccurs="0" maxOccurs="1"/>
+    </sequence>
+    <attribute name="id" type="ID" use="required"/>
+    <attribute name="technology" type="cluster:fateThrow" use="required"/>
+    <attribute name="environment" type="cluster:fateThrow" use="required"/>
+    <attribute name="resources" type="cluster:fateThrow" use="required"/>
+  </complexType>
+
+  <complexType name="slipstreamWithHighLowSlipknots">
+    <all minOccurs="0">
+      <element name="leave" type="cluster:slipknotPosition"/>
+      <element name="arrive" type="cluster:slipknotPosition"/>
+    </all>
+    <!--
+    <attribute name="leave" type="cluster:slipknotPosition">
+      <annotation>
+        <documentation>
+          leave/arrive must occur together or not at all
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="arrive" type="cluster:slipknotPosition"/>
+    -->
+    <attribute name="to" type="IDREF" use="required"> 
+      <annotation>
+        <documentation>
+          "to" must be unique per system (or must it?)
+        </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
   <simpleType name="fateThrow">
     <annotation>
       <documentation>
@@ -67,7 +73,7 @@
     </restriction>
   </simpleType>
 
-  <simpleType name="slipknotPositionType">
+  <simpleType name="slipknotPosition">
     <annotation>
       <documentation>
         Whether a particular slipstream connects to a system at the "high" or "low" position.
@@ -78,5 +84,5 @@
       <enumeration value="high"/>
     </restriction>
   </simpleType>
-    
+
 </schema>
