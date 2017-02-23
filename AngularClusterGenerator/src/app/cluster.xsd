@@ -14,47 +14,63 @@
   <element name="cluster">
     <complexType>
       <sequence>
-      <element name="starSystem" maxOccurs="unbounded">
-        <complexType>
-          <sequence>
-            <element name="slipstream" maxOccurs="unbounded">
-              <complexType>
-                <attribute name="to" type="IDREF" use="required"> 
-                  <annotation>
-                    <documentation>
-                      "to" must be unique per system (or must it?)
-                    </documentation>
-                  </annotation>
-                </attribute>
-                <attribute name="leave" type="cluster:slipknotPositionType">
-                  <annotation>
-                    <documentation>
-                      leave/arrive must occur together or not at all
-                    </documentation>
-                  </annotation>
-                </attribute>
-                <attribute name="arrive" type="cluster:slipknotPositionType"/>
-              </complexType>
-            </element>
-            <element name="aspect" minOccurs="0" maxOccurs="unbounded">
-              <annotation>
-                <documentation>
-                  Diaspora rules say 2, but let's not bake that in here.
-                </documentation>
-              </annotation>
-            </element>
-            <element name="notes" minOccurs="0" maxOccurs="1"/>
-          </sequence>
-          <attribute name="id" type="ID" use="required"/>
-          <attribute name="technology" type="cluster:fateThrow" use="required"/>
-          <attribute name="environment" type="cluster:fateThrow" use="required"/>
-          <attribute name="resources" type="cluster:fateThrow" use="required"/>
-        </complexType>
-      </element>
+        <element name="starSystem" type="cluster:starSystem" maxOccurs="unbounded"/>
       </sequence>
+      <attribute name="usesHighLow" type="boolean">
+        <annotation>
+          <documentation>
+            True if and only if the cluster uses the "high/low" concept of slipstream arrival points within a star
+            system, meaning a given slipstream connects to a starsystem at either the "high" or "low" slipknots.
+          </documentation>
+        </annotation>
+      </attribute>
     </complexType>
   </element>
       
+  <complexType name="starSystem">
+    <sequence>
+      <element name="slipstream" type="cluster:slipstream" maxOccurs="unbounded"/>
+      <element name="aspect" minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>
+            Diaspora rules say 2, but let's not bake that in here.
+          </documentation>
+        </annotation>
+      </element>
+      <element name="notes" minOccurs="0" maxOccurs="1"/>
+    </sequence>
+    <attribute name="id" type="ID" use="required"/>
+    <attribute name="technology" type="cluster:fateThrow" use="required"/>
+    <attribute name="environment" type="cluster:fateThrow" use="required"/>
+    <attribute name="resources" type="cluster:fateThrow" use="required"/>
+  </complexType>
+
+  <complexType name="slipstream">
+    <attribute name="to" type="IDREF" use="required"> 
+      <annotation>
+        <documentation>
+          "to" must be unique per system (or must it?)
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="leave" type="cluster:slipknotPositionType">
+      <annotation>
+        <documentation>
+          Leave/arrive must occur together or not at all. Note also that, if cluster usesHighLow attribute
+          is "true", then leave/arrive must occur on every slipstream in the cluster; otherwise,
+          leave/arrive (if they occur) will be ignored on every slipstream.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="arrive" type="cluster:slipknotPositionType">
+      <annotation>
+        <documentation>
+          See documentation for attribute "leave".
+        </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
   <simpleType name="fateThrow">
     <annotation>
       <documentation>
