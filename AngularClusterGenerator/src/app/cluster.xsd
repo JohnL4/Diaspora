@@ -59,6 +59,20 @@
           Leave/arrive must occur together or not at all. Note also that, if cluster usesHighLow attribute
           is "true", then leave/arrive must occur on every slipstream in the cluster; otherwise,
           leave/arrive (if they occur) will be ignored on every slipstream.
+
+          A further note on attributes and XML schema: it is not possible, with attributes, to specify that two
+          attributes must occur together or not at all.  If I was truly, truly serious about enforcing this requirement
+          in the schema, I'd make the attributes ELEMENTS instead (which could be placed in an ALL group), but then I'd
+          have another problem, which is: all slipstreams in the document must be high/low or none of them must be.
+          Sounds good, but the non-ambiguity requirement of XML validation requires (I think) that the incoming
+          "slipstream" element (or possibly the "cluster" element) must be recognizable, WITHOUT LOOKAHEAD, as one
+          having high/low connections or not, so that's kind of a problem.
+
+          So, rather than try to solve that problem (which might require having a "clusterHighLow" and a "cluster"
+          element, differentiating between the two aspects, and then what happens if we make another aspect like this
+          that needs differentiation?  Do we multiple the "cluster" element types?), I'm going to just leave this as
+          attributes and rely on the receiving app to handle things properly (probably balk if cluster usesHighLow is
+          true and not everything has an arrive/leave attribute pair).
         </documentation>
       </annotation>
     </attribute>
