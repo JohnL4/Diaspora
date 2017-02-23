@@ -53,7 +53,7 @@
         </documentation>
       </annotation>
     </attribute>
-    <attribute name="leave" type="cluster:slipknotPositionType">
+    <attribute name="leave" type="cluster:slipknotPosition">
       <annotation>
         <documentation>
           Leave/arrive must occur together or not at all. Note also that, if cluster usesHighLow attribute
@@ -76,7 +76,7 @@
         </documentation>
       </annotation>
     </attribute>
-    <attribute name="arrive" type="cluster:slipknotPositionType">
+    <attribute name="arrive" type="cluster:slipknotPosition">
       <annotation>
         <documentation>
           See documentation for attribute "leave".
@@ -97,7 +97,7 @@
     </restriction>
   </simpleType>
 
-  <simpleType name="slipknotPositionType">
+  <simpleType name="slipknotPosition">
     <annotation>
       <documentation>
         Whether a particular slipstream connects to a system at the "high" or "low" position.
