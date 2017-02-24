@@ -9,6 +9,8 @@ import { ClusterDetailsComponent } from './cluster-details/cluster-details.compo
 import { XmlComponent } from './xml/xml.component';
 import { DotComponent } from './dot/dot.component';
 
+import { ClusterPersistenceService } from './cluster-persistence.service';
+
 import { Cluster } from './cluster';
 
 
@@ -16,44 +18,18 @@ import { Cluster } from './cluster';
   selector: 'app-root',
   templateUrl: './app.component.html',
    styleUrls: ['./app.component.css'],
-   providers: [Cluster],
-//    directives: [
-// 
-//       // ng2-bootstrap
-//       // AlertComponent, TAB_DIRECTIVES,
-// 
-//       // app
-//       TabsComponent, GeneratorParamsComponent, ClusterDetailsComponent, XmlComponent, DotComponent
-//    ],
+   providers: [Cluster, ClusterPersistenceService],
 })
 export class AppComponent implements OnInit
 {
   title = 'Diaspora Cluster Maintenance';
 
-   private _cluster: Cluster;
+   private _cluster: Cluster; // Not at all sure this is used.  HOW DO WE DEBUG??
 
-   private tabs: Array<any>
-/*
-      = [
-      {heading: "Params", content: "params content"}, //new GeneratorParamsComponent()},
-      {heading: "Cluster", content: new ClusterDetailsComponent()},
-      {heading: "XML", content: new XmlComponent()},
-      {heading: "Dot", content: new DotComponent() },
-   ]
-*/
-   ;
-
-   private DOT_TAB_IX = 3;
-
-//    constructor( aCluster: Cluster)
-//    {
-//       this._cluster = aCluster;
-//    }
+   constructor( private _clusterPersistenceService: ClusterPersistenceService) {}
 
    ngOnInit()
    {
-      // this._cluster = new Cluster(0);
-      this.tabs = null;
    }
    
 }
