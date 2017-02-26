@@ -9,19 +9,13 @@ import { dice, alphaBravo } from './utils';
  */
 @Injectable()
 export class Cluster {
-   private _numSystems: number;
    
    private _systems: StarSystem[];
    
    /**
     * The number of systems in this cluster. Setting this value will cause the cluster to be regenerated.
     */
-   public get numSystems(): number { return this._numSystems; }
-   public set numSystems( aNumSystems: number)
-   {
-      this._numSystems = aNumSystems;
-      this._systems = null;
-   }
+   public get numSystems(): number { return this._systems == null ? 0 : this._systems.length }
 
    /**
     * Systems in cluster. Returns reference to 'systems' array. Do not modify the array itself, please, but feel free to
@@ -29,8 +23,6 @@ export class Cluster {
     */
    public get systems()
    {
-      if (this._systems == null || this._systems.length != this._numSystems)
-         this.generateSystems();
       return this._systems;
    }
 
@@ -39,13 +31,11 @@ export class Cluster {
       this._systems = aSystemsArray;
    }
    
-   public constructor( /* aNumSystems: number */ ) {}
+   public constructor( ) {}
 
-   // TODO: make public and hook up to "Ok" button on Params tab?  And only then transfer data from input field to
-   // model?
-   private generateSystems()
+   generateSystems( aNumSystems: number)
    {
-      this._systems = new Array<StarSystem>(this._numSystems);
+      this._systems = new Array<StarSystem>( aNumSystems);
       for (let i = 0; i < this.numSystems; i++)
          this._systems[i] = new StarSystem(
             alphaBravo( i + 1), // Name

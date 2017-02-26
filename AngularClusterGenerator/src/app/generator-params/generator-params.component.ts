@@ -11,9 +11,8 @@ import { Cluster } from '../cluster';
 })
 export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
+   /** User's input, not necessarily valid. */
    private numSystems: string; // = "6";
-//   get numSystems() : string { return this._numSystems; }
-//   set numSystems( value: string) { this._numSystems = value; }
    
    validationMessages = {
       'numSystems': {
@@ -41,8 +40,6 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       this._router = aRouter;
       if (aCluster && aCluster.numSystems)
          this.numSystems = aCluster.numSystems.toString();
-      // this.strSystems = this.numSystems.toString();
-      // this.numSystems = "6"; // aCluster.numSystems.toString();
    }
 
    ngOnInit()
@@ -67,9 +64,12 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    public generateCluster()
    {
       console.log( "generateCluster()");
-      // this._cluster = new Cluster( this.numSystems); // Don't new up, just update in place?
-      this._cluster.numSystems = Number( this.numSystems);
-      // this.cluster.generateSystems();
+      if (this.parmsForm.form.valid)
+         // Note that we don't simly new up a new Cluster, because the injector is managing the one we were passed.
+         // Instead, we modify the existing one in place.
+         this._cluster.generateSystems( Number( this.numSystems));
+      else
+         console.log( "form invalid; not generating cluster");
    }
 
    public revertParams()
