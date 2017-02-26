@@ -1,3 +1,11 @@
-<pre>
-{{xml}}
-</pre>
+<div *ngIf="! parserExists" class="alert-danger">
+  There is no XML parser in this browser.  Try a different browser.
+</div>
+
+<form #xmlForm="ngForm">
+  <!-- Textarea and ngModel seem to work w/out "id" attribute, but "name" is required. -->
+  <textarea class="form-control" rows="20" [(ngModel)]="xml" name="xml"></textarea>
+</form>
+
+<div id="parseErrorDisplay" #parseErrorDisplay>
+</div>

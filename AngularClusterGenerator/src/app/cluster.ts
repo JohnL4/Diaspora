@@ -33,6 +33,11 @@ export class Cluster {
          this.generateSystems();
       return this._systems;
    }
+
+   public set systems( aSystemsArray: Array<StarSystem>)
+   {
+      this._systems = aSystemsArray;
+   }
    
    public constructor( /* aNumSystems: number */ ) {}
 
