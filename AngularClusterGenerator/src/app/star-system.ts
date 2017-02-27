@@ -11,12 +11,15 @@ export class StarSystem {
     */
    public slipstreams: Array<Slipstream> = new Array<Slipstream>();
    
-   public constructor( public name: string,
+   public constructor( private _id: string,
+                       public name: string,
                        public tech: number,
                        public environment: number,
                        public resources: number)
    {};
 
+   public get id() { return this._id; }
+   
    /**
     * Adds a new slipstream between this system and aTo system.
     */

@@ -12,45 +12,59 @@ import { dice, fateThrow, alphaBravo } from './utils';
 @Injectable()
 export class Cluster {
    
-   private _systems: StarSystem[];
+   /**
+    * Map from system id to StarSystem.
+    */
+   private _system: Map<string,StarSystem>;
+   
+   public constructor( ) {}
 
    /**
     * The number of systems in this cluster. Setting this value will cause the cluster to be regenerated.
     */
-   public get numSystems(): number { return this._systems == null ? 0 : this._systems.length }
+   public get numSystems(): number { return this._system == null ? 0 : this._system.size }
 
    /**
-    * Systems in cluster. Returns reference to 'systems' array. Do not modify the array itself, please, but feel free to
-    * modify the individual systems.
+    * Systems in cluster, sorted in id order. 
     */
-   public get systems()
+   public get systems(): Array<StarSystem>
    {
-      return this._systems;
+      let sysv = new Array<StarSystem>();
+      this._system.forEach(function( v: StarSystem, k: string, m: Map<string,StarSystem>) { sysv.push( v); });
+      sysv.sort( function( sa: StarSystem, sb: StarSystem)
+                 {
+                    if (sa.id < sb.id) return -1;
+                    else if (sa.id > sb.id) return 1;
+                    else return 0;
+                 });
+      return sysv;
    }
 
-   public set systems( aSystemsArray: Array<StarSystem>)
-   {
-      this._systems = aSystemsArray;
-   }
+//   public set systems( aSystemsArray: Array<StarSystem>)
+//   {
+//      this._systems = aSystemsArray;
+//   }
    
-   public constructor( ) {}
-
    generate( aNumSystems: number)
    {
+      let sysv = new Array<StarSystem>(); // Temporary, rather than constantly rebuilding, sorted (by id), because IE 11 is stoopid.
       let slipstreamGuaranteeMet : boolean = false;
       
-      this._systems = new Array<StarSystem>( aNumSystems);
+      this._system = new Map<string,StarSystem>();
       
       // Systems
-      for (let i = 0; i < this.numSystems; i++)
+      for (let i = 0; i < aNumSystems; i++)
       {
-         this._systems[i] = new StarSystem(
-            alphaBravo( i + 1), // Name
+         let sys = new StarSystem(
+            alphaBravo( i + 1), // Id
+            alphaBravo( i + 1), // Name, same as id, initially.
             fateThrow(),        // Technology
             fateThrow(),        // Environment
             fateThrow());       // Resources
-         if (this._systems[i].tech >= 2)
+         if (sys.tech >= 2)
             slipstreamGuaranteeMet = true;
+         this._system[sys.id] = sys;
+         sysv.push( sys);
       }
 
       if (! slipstreamGuaranteeMet)
@@ -60,10 +74,9 @@ export class Cluster {
          let maxAttrSum = (3 * -4) - 1;
          let minIx: number; // Indices of systems with lowest and highest attribute sums.
          let maxIx: number;
-         for (let i = 0; i < this.numSystems; i++)
+         for (let i = 0; i < aNumSystems; i++)
          {
-            let s = this._systems[i];
-            let sum = s.tech + s.environment + s.resources;
+            let sum = sysv[i].tech + sysv[i].environment + sysv[i].resources;
             if (sum < minAttrSum)
             {
                minAttrSum = sum;
@@ -75,40 +88,40 @@ export class Cluster {
                maxIx = i;
             }
          }
-         this._systems[minIx].tech = 2;
-         this._systems[maxIx].tech = 2;
+         this._system[sysv[minIx].id].tech = 2;
+         this._system[sysv[maxIx].id].tech = 2;
       }
       
       // Slipstreams
-      for (let i = 0; i < this.numSystems - 1; i++)
+      for (let i = 0; i < aNumSystems - 1; i++)
       {
-         this._systems[i].addNewDestination( this._systems[i+1]); // Unconditional (equivalent to negative throw in rules).
+         sysv[i].addNewDestination( sysv[i+1]); // Unconditional (equivalent to negative throw in rules).
 
          let t = fateThrow();
          if (t >= 0)
-            this.connectToUnconnectedSystem( i);
+            this.connectToUnconnectedSystem( i, sysv);
          if (t > 0)
-            this.connectToUnconnectedSystem( i);
+            this.connectToUnconnectedSystem( i, sysv);
       }
    }
 
    /**
-    * Connect the system at aStartIx to a higher-indexed system which is not yet connected.
+    * Connect the system at aStartIx in aSysv to a higher-indexed system which is not yet connected.
     */
-   private connectToUnconnectedSystem( aStartIx: number)
+   private connectToUnconnectedSystem( aStartIx: number, aSysv: Array<StarSystem>)
    {
       // Find the next unconnected system
       let j = aStartIx + 1;
       for (; j < this.numSystems; j++)
       {
-         let connections = this._systems[j].slipstreams;
+         let connections = aSysv[j].slipstreams;
          if (! connections || connections.length == 0)
             break;        // Found an unconnectd system.
       }
       if (j < this.numSystems)
       {
          // hook up
-         this._systems[aStartIx].addNewDestination( this._systems[j]); // TODO: add high/low here, later.
+         aSysv[aStartIx].addNewDestination( aSysv[j]); // TODO: add high/low here, later.
       }
    }
 }
