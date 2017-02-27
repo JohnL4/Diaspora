@@ -51,6 +51,14 @@ export class Cluster {
          this._system.set(sys.id, sys);
       }
    }
+
+   /**
+    * Add a StarSystem to the cluster.  Use this instead of building a temporary array and setting it via "systems".
+    */
+   public addSystem( aSystem: StarSystem): void
+   {
+      this._system.set( aSystem.id, aSystem);
+   }
    
    generate( aNumSystems: number)
    {

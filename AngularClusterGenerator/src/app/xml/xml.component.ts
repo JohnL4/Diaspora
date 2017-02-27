@@ -73,7 +73,8 @@ export class XmlComponent implements OnInit {
          {
             for (let i = 0; i < parserErrors.length; i++)
             {
-               displayElt.appendChild( parserErrors[i]);
+               displayElt.appendChild( parserErrors[i]); // TODO: when this gets moved to ClusterSerializerXml, this should be
+               // a return value from deserialize() (collection of parserErrors).
             }
          }
       }
