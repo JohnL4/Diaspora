@@ -40,10 +40,17 @@ export class Cluster {
       return sysv;
    }
 
-//   public set systems( aSystemsArray: Array<StarSystem>)
-//   {
-//      this._systems = aSystemsArray;
-//   }
+   /**
+    * Clears existing map of systems and inserts the contents of the given array (keyed by id).
+    */
+   public set systems( aSystemv: Array<StarSystem>)
+   {
+      if (this._system) this._system.clear();
+      for (let sys of aSystemv)
+      {
+         this._system.set(sys.id, sys);
+      }
+   }
    
    generate( aNumSystems: number)
    {
@@ -63,7 +70,7 @@ export class Cluster {
             fateThrow());       // Resources
          if (sys.tech >= 2)
             slipstreamGuaranteeMet = true;
-         this._system[sys.id] = sys;
+         this._system.set(sys.id, sys);
          sysv.push( sys);
       }
 

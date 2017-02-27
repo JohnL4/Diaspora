@@ -88,6 +88,7 @@ export class XmlComponent implements OnInit {
                let starSysElt: Element = starSysNodes[i] as Element;
                starSystems.push( new StarSystem(
                   starSysElt.getAttribute( "id"),
+                  starSysElt.getAttribute( "id"), // TODO: name
                   Number( starSysElt.getAttribute( "technology")),
                   Number( starSysElt.getAttribute( "environment")),
                   Number( starSysElt.getAttribute( "resources"))
