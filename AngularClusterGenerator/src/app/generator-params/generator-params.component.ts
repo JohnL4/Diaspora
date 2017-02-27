@@ -67,7 +67,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       if (this.parmsForm.form.valid)
          // Note that we don't simly new up a new Cluster, because the injector is managing the one we were passed.
          // Instead, we modify the existing one in place.
-         this._cluster.generateSystems( Number( this.numSystems));
+         this._cluster.generate( Number( this.numSystems));
       else
          console.log( "form invalid; not generating cluster");
    }

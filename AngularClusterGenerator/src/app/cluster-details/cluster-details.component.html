@@ -8,12 +8,18 @@
   <tr>
     <th>System</th>
     <th>Stats</th>
+    <th>Connections</th>
     <th>Aspects</th>
     <th>Notes</th>
   </tr>
   <tr *ngFor="let sys of Cluster.systems">
     <td><input [(ngModel)]="sys.name"/></td>
     <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
+    <td>
+      <span *ngFor="let ss of sys.slipstreams">
+        {{ss.otherEndPoint( sys).name}},
+      </span>
+    </td>
     <td></td>
     <td></td>
   </tr>

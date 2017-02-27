@@ -11,11 +11,14 @@ export class ClusterSerializerXML implements Serializer
    private _callCount: number = 0;
 
    private _space: String = new String(" ");
-   
+
+   /**
+    * Serialize this.cluster to XML.
+    */
    serialize() : string
    {
       this._callCount++;
-      console.log( `Serializer called ${this._callCount} times`); // TODO: we get called WAY too many times.
+      console.log( `Serializer called ${this._callCount} times`); 
       let xml: string = `<?xml version="1.0"?>
 <cluster xmlns="http://www.how-hard-can-it-be.com/diaspora/cluster"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -24,7 +27,13 @@ export class ClusterSerializerXML implements Serializer
       indent++;
       for (let sys of this.cluster.systems)
       {
-         xml += `\n${this.indentStr(indent)}<starSystem id="${sys.name}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}"/>`;
+         xml += `\n${this.indentStr(indent)}<starSystem id="${sys.name}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
+         for (let ss of sys.slipstreams)
+         {
+            if (ss.from == sys)
+               xml += `\n${this.indentStr(indent+1)}<slipstream to="${ss.to.name}"/>`;
+         }
+         xml += `\n${this.indentStr(indent)}</starSystem>`;
       }
       xml += "\n</cluster>";
       return xml;
@@ -32,7 +41,7 @@ export class ClusterSerializerXML implements Serializer
 
    deserialize(aString: string)
    {
-      this.cluster = null;
+      this.cluster = null;      // TODO: transfer from xml component?
    }
 
    private indentStr( anIndent: number): string

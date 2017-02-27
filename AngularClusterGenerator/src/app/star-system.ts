@@ -1,8 +1,29 @@
+import { Slipstream } from './slipstream';
+import { SlipknotPosition } from './slipknot-position';
+
 /**
  * A single star system, with stats Tn Em Rp, where n, m, p are each in range [-4..4].
  */
 export class StarSystem {
-   public neighbors: StarSystem[];
 
-   public constructor( public name: string, public tech: number, public environment: number, public resources: number) {};
+   /**
+    * The slipstreams at this system.
+    */
+   public slipstreams: Array<Slipstream> = new Array<Slipstream>();
+   
+   public constructor( public name: string,
+                       public tech: number,
+                       public environment: number,
+                       public resources: number)
+   {};
+
+   /**
+    * Adds a new slipstream between this system and aTo system.
+    */
+   public addNewDestination( aTo: StarSystem, aLeave?: SlipknotPosition, anArrive?: SlipknotPosition)
+   {
+      let ss = new Slipstream( this, aTo, aLeave, anArrive);
+      this.slipstreams.push( ss);
+      aTo.slipstreams.push( ss);
+   }
 }

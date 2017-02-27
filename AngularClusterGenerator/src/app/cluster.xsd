@@ -33,7 +33,7 @@
       <element name="aspect" minOccurs="0" maxOccurs="unbounded">
         <annotation>
           <documentation>
-            Diaspora rules say 2, but let's not bake that in here.
+            Diaspora rules say 3, but let's not bake that in here.
           </documentation>
         </annotation>
       </element>

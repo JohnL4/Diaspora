@@ -79,26 +79,29 @@ export class XmlComponent implements OnInit {
       }
       else
       {
-      let starSystems = new Array<StarSystem>();
-      for (let i = 0; i < starSysNodes.length; i++)
-      {
-         if (starSysNodes[i].nodeType == Node.ELEMENT_NODE
-             && starSysNodes[i].nodeName == "starSystem")
+         let starSystems = new Array<StarSystem>();
+         for (let i = 0; i < starSysNodes.length; i++)
          {
-            let starSysElt: Element = starSysNodes[i] as Element;
-            starSystems.push( new StarSystem(
-               starSysElt.getAttribute( "id"),
-               Number( starSysElt.getAttribute( "technology")),
-               Number( starSysElt.getAttribute( "environment")),
-               Number( starSysElt.getAttribute( "resources"))
-            ));
+            if (starSysNodes[i].nodeType == Node.ELEMENT_NODE
+                && starSysNodes[i].nodeName == "starSystem")
+            {
+               let starSysElt: Element = starSysNodes[i] as Element;
+               starSystems.push( new StarSystem(
+                  starSysElt.getAttribute( "id"),
+                  Number( starSysElt.getAttribute( "technology")),
+                  Number( starSysElt.getAttribute( "environment")),
+                  Number( starSysElt.getAttribute( "resources"))
+               ));
+            }
+            // TODO: deserialize slipstreams here, BUT: slipstreams will refer to starsystems that have not yet been
+            // deserialized (and for which there are no objects yet).  So maybe it's time to separate starsystem ID
+            // (which can be non-negative integer (an array index)) from starsystem NAME, which can contain arbitrary
+            // characters.
          }
-      }
-      if (starSystems.length > 0)
-      {
-         this._cluster.systems = starSystems;
-         this._cluster.numSystems = starSystems.length; // TODO: this maybe should not be a standalone value.
-      }
+         if (starSystems.length > 0)
+         {
+            this._cluster.systems = starSystems;
+         }
       }
    }
 

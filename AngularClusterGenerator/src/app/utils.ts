@@ -9,6 +9,14 @@ export function dice(numDice: number, numSides: number): number
    return t;
 }
 
+/**
+ * A fate dice throw; a value in the range [-4,4].
+ */
+export function fateThrow()
+{
+   return dice(4, 3) - 8;
+}
+
 let _alphaBravo: string[] =
    [
       "Alpha",
