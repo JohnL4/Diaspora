@@ -1,7 +1,15 @@
 <div *ngIf="! parserExists" class="alert-danger">
   There is no XML parser in this browser.  Try a different browser.
 </div>
-
+<p></p>
+<p>
+  Until a backend is available (and possibly even after that), this is how you will be able to save and restore your cluster.
+</p>
+<p>
+  Copy the XML text below into a text file on your computer (using a simple text editor such as NotePad), and save it.
+  Later, when you run this web app again, you can come straight to this tab and paste in your saved XML to resotre your
+  system. 
+</p>
 <form #xmlForm="ngForm">
   <!-- Textarea and ngModel seem to work w/out "id" attribute, but "name" is required. -->
   <textarea class="form-control" rows="20" [(ngModel)]="xml" name="xml"></textarea>

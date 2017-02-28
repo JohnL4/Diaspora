@@ -20,13 +20,13 @@ export class StarSystem {
 
    public get id() { return this._id; }
    
-   /**
-    * Adds a new slipstream between this system and aTo system.
-    */
-   public addNewDestination( aTo: StarSystem, aLeave?: SlipknotPosition, anArrive?: SlipknotPosition)
-   {
-      let ss = new Slipstream( this, aTo, aLeave, anArrive);
-      this.slipstreams.push( ss);
-      aTo.slipstreams.push( ss);
-   }
+//   /**
+//    * Adds a new slipstream between this system and aTo system.
+//    */
+//   public addNewDestination( aTo: StarSystem, aLeave?: SlipknotPosition, anArrive?: SlipknotPosition)
+//   {
+//      let ss = new Slipstream( this, aTo, aLeave, anArrive);
+//      this.slipstreams.push( ss);
+//      aTo.slipstreams.push( ss);
+//   }
 }

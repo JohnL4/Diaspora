@@ -28,12 +28,16 @@ export class ClusterSerializerXML implements Serializer
       for (let sys of this.cluster.systems)
       {
          xml += `\n${this.indentStr(indent)}<starSystem id="${sys.name}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
-         for (let ss of sys.slipstreams)
-         {
-            if (ss.from == sys)
-               xml += `\n${this.indentStr(indent+1)}<slipstream to="${ss.to.name}"/>`;
-         }
+//         for (let ss of sys.slipstreams)
+//         {
+//            if (ss.from == sys)
+//               xml += `\n${this.indentStr(indent+1)}<slipstream to="${ss.to.name}"/>`;
+//         }
          xml += `\n${this.indentStr(indent)}</starSystem>`;
+      }
+      for (let ss of this.cluster.slipstreams)
+      {
+         xml += `\n${this.indentStr(indent)}<slipstream from="${ss.from.id}" to="${ss.to.id}"/>`;
       }
       xml += "\n</cluster>";
       return xml;

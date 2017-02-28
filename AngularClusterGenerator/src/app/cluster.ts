@@ -15,14 +15,19 @@ export class Cluster {
    /**
     * Map from system id to StarSystem.
     */
-   private _system: Map<string,StarSystem>;
+   public systemMap: Map<string,StarSystem>;
+
+   /**
+    * The slipstreams in the cluster.  No connection is expected to be represented more than once.
+    */
+   public slipstreams: Array<Slipstream>;
    
    public constructor( ) {}
 
    /**
     * The number of systems in this cluster. Setting this value will cause the cluster to be regenerated.
     */
-   public get numSystems(): number { return this._system == null ? 0 : this._system.size }
+   public get numSystems(): number { return this.systemMap == null ? 0 : this.systemMap.size }
 
    /**
     * Systems in cluster, sorted in id order. 
@@ -30,7 +35,7 @@ export class Cluster {
    public get systems(): Array<StarSystem>
    {
       let sysv = new Array<StarSystem>();
-      this._system.forEach(function( v: StarSystem, k: string, m: Map<string,StarSystem>) { sysv.push( v); });
+      this.systemMap.forEach(function( v: StarSystem, k: string, m: Map<string,StarSystem>) { sysv.push( v); });
       sysv.sort( function( sa: StarSystem, sb: StarSystem)
                  {
                     if (sa.id < sb.id) return -1;
@@ -45,10 +50,10 @@ export class Cluster {
     */
    public set systems( aSystemv: Array<StarSystem>)
    {
-      if (this._system) this._system.clear();
+      if (this.systemMap) this.systemMap.clear();
       for (let sys of aSystemv)
       {
-         this._system.set(sys.id, sys);
+         this.systemMap.set(sys.id, sys);
       }
    }
 
@@ -57,7 +62,7 @@ export class Cluster {
     */
    public addSystem( aSystem: StarSystem): void
    {
-      this._system.set( aSystem.id, aSystem);
+      this.systemMap.set( aSystem.id, aSystem);
    }
    
    generate( aNumSystems: number)
@@ -65,7 +70,7 @@ export class Cluster {
       let sysv = new Array<StarSystem>(); // Temporary, rather than constantly rebuilding, sorted (by id), because IE 11 is stoopid.
       let slipstreamGuaranteeMet : boolean = false;
       
-      this._system = new Map<string,StarSystem>();
+      this.systemMap = new Map<string,StarSystem>();
       
       // Systems
       for (let i = 0; i < aNumSystems; i++)
@@ -78,7 +83,7 @@ export class Cluster {
             fateThrow());       // Resources
          if (sys.tech >= 2)
             slipstreamGuaranteeMet = true;
-         this._system.set(sys.id, sys);
+         this.systemMap.set(sys.id, sys);
          sysv.push( sys);
       }
 
@@ -103,14 +108,18 @@ export class Cluster {
                maxIx = i;
             }
          }
-         this._system[sysv[minIx].id].tech = 2;
-         this._system[sysv[maxIx].id].tech = 2;
+         this.systemMap.get(sysv[minIx].id).tech = 2;
+         this.systemMap.get(sysv[maxIx].id).tech = 2;
       }
       
       // Slipstreams
+      this.slipstreams = new Array<Slipstream>();
       for (let i = 0; i < aNumSystems - 1; i++)
       {
-         sysv[i].addNewDestination( sysv[i+1]); // Unconditional (equivalent to negative throw in rules).
+         let ss = new Slipstream( sysv[i], sysv[i+1]);
+         this.slipstreams.push( ss);
+         sysv[i].slipstreams.push( ss);
+         sysv[i+1].slipstreams.push( ss);
 
          let t = fateThrow();
          if (t >= 0)
@@ -136,7 +145,10 @@ export class Cluster {
       if (j < this.numSystems)
       {
          // hook up
-         aSysv[aStartIx].addNewDestination( aSysv[j]); // TODO: add high/low here, later.
+         let ss = new Slipstream( aSysv[ aStartIx], aSysv[ j]);
+         this.slipstreams.push( ss);
+         aSysv[ aStartIx].slipstreams.push( ss);
+         aSysv[ j].slipstreams.push( ss);
       }
    }
 }
