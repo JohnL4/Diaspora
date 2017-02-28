@@ -22,7 +22,7 @@ export class ClusterSerializerXML implements Serializer
       let xml: string = `<?xml version="1.0"?>
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://s3.amazonaws.com/JohnLuskPublic/cluster.xsd cluster.xsd">`;
+         xsi:schemaLocation="https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd cluster.xsd">`;
       let indent: number = 0; // Indent level
       indent++;
       for (let sys of this.cluster.systems)
