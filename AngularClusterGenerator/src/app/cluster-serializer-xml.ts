@@ -20,9 +20,9 @@ export class ClusterSerializerXML implements Serializer
       this._callCount++;
       console.log( `Serializer called ${this._callCount} times`); 
       let xml: string = `<?xml version="1.0"?>
-<cluster xmlns="http://www.how-hard-can-it-be.com/diaspora/cluster"
+<cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.how-hard-can-it-be.com/diaspora/cluster/cluster.xsd">`;
+         xsi:schemaLocation="https://s3.amazonaws.com/JohnLuskPublic/cluster.xsd cluster.xsd">`;
       let indent: number = 0; // Indent level
       indent++;
       for (let sys of this.cluster.systems)

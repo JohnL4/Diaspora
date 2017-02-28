@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://how-hard-can-it-be.com/diaspora cluster.xsd"
+         xsi:schemaLocation="https://s3.amazonaws.com/JohnLuskPublic/cluster.xsd cluster.xsd"
          usesHighLow="true"
          >
   <starSystem id="Alpha" technology="0" environment="2" resources="-1">
