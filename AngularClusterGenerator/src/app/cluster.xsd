@@ -15,6 +15,7 @@
     <complexType>
       <sequence>
         <element name="starSystem" type="cluster:starSystem" maxOccurs="unbounded"/>
+        <element name="slipstream" type="cluster:slipstream" maxOccurs="unbounded"/>
       </sequence>
       <attribute name="usesHighLow" type="boolean">
         <annotation>
@@ -29,7 +30,7 @@
       
   <complexType name="starSystem">
     <sequence>
-      <element name="slipstream" type="cluster:slipstream" maxOccurs="unbounded"/>
+      <!-- <element name="slipstream" type="cluster:slipstream" maxOccurs="unbounded"/> -->
       <element name="aspect" minOccurs="0" maxOccurs="unbounded">
         <annotation>
           <documentation>
@@ -46,13 +47,14 @@
   </complexType>
 
   <complexType name="slipstream">
-    <attribute name="to" type="IDREF" use="required"> 
+    <attribute name="from" type="IDREF" use="required"> 
       <annotation>
         <documentation>
-          "to" must be unique per system (or must it?)
+          "from" and "to" must be unique per system (or must they?)
         </documentation>
       </annotation>
     </attribute>
+    <attribute name="to" type="IDREF" use="required"/>
     <attribute name="leave" type="cluster:slipknotPosition">
       <annotation>
         <documentation>

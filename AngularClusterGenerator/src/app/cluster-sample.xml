@@ -5,8 +5,6 @@
          usesHighLow="true"
          >
   <starSystem id="Alpha" technology="0" environment="2" resources="-1">
-    <slipstream to="Bravo" leave="high" arrive="low"/> <!-- to: idref (limitation: max one occurrence of destination per system); leave/arrive: enumerations -->
-    <slipstream to="Charlie" leave="low" arrive="low"/>
     <aspect>Gentlemen, I give you the Pencarrow Endeavor!</aspect>
     <aspect>You're not from around here, are you?</aspect>
     <notes>
@@ -14,12 +12,12 @@
     </notes>
   </starSystem>
   <starSystem id="Bravo" technology="-1" environment="-3" resources="-1">
-    <slipstream to="Charlie" leave="low" arrive="low"/>
   </starSystem>
   <starSystem id="Charlie" technology="2" environment="-1" resources="0">
-    <slipstream to="Charlie" leave="low" arrive="low"/>
   </starSystem>
   <starSystem id="Delta" technology="2" environment="-1" resources="-1">
-    <slipstream to="Charlie" leave="low" arrive="low"/>
   </starSystem>
+
+  <slipstream from="Alpha" to="Bravo" leave="high" arrive="low"/> <!-- to: idref (limitation: max one occurrence of destination per system); leave/arrive: enumerations -->
+  <slipstream from="Bravo" to="Charlie" leave="low" arrive="low"/>
 </cluster>
