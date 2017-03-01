@@ -21,6 +21,11 @@ export class Cluster {
     * The slipstreams in the cluster.  No connection is expected to be represented more than once.
     */
    public slipstreams: Array<Slipstream>;
+
+   /**
+    * True iff the cluster's slipstreams are specified as connection to each star system's "high" or "low" slipknots.
+    */
+   public usesHighLowSlipstreams?: boolean;
    
    public constructor( ) {}
 
@@ -79,8 +84,9 @@ export class Cluster {
       this.slipstreams = aCluster.slipstreams;
    }
 
-   generate( aNumSystems: number)
+   generate( aNumSystems: number, aUseHighLowSlipstreams: boolean)
    {
+      this.usesHighLowSlipstreams = aUseHighLowSlipstreams;
       let sysv = new Array<StarSystem>(); // Temporary, rather than constantly rebuilding, sorted (by id), because IE 11 is stoopid.
       let slipstreamGuaranteeMet : boolean = false;
       

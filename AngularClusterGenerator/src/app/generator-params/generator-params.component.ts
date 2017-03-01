@@ -11,9 +11,6 @@ import { Cluster } from '../cluster';
 })
 export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
-   /** User's input, not necessarily valid. */
-   private numSystems: string; // = "6";
-   
    validationMessages = {
       'numSystems': {
          'required': "A number of systems is required",
@@ -26,20 +23,30 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       'numSystems': ''
    };
 
+   /** User's input, not necessarily valid. */
+   private numSystems: string; // = "6";
+   
+   private _useHighLowSlipstreams: boolean;
+
+   // TODO: Should the following be private or something?
    parmsForm: NgForm;
    @ViewChild( 'parmsForm') currentForm: NgForm;
    @ViewChild( 'numSystemsInput') numSystemsInput: ElementRef;
    
    private _cluster: Cluster;
    private _router: Router;
-   public highLowHelpShowing: boolean = false;
+   private _highLowHelpShowing: boolean = false;
    
    constructor(aCluster: Cluster, aRouter: Router, private _renderer: Renderer)
    {
       this._cluster = aCluster;
       this._router = aRouter;
-      if (aCluster && aCluster.numSystems)
-         this.numSystems = aCluster.numSystems.toString();
+      if (aCluster)
+      {
+         this._useHighLowSlipstreams = aCluster && aCluster.usesHighLowSlipstreams;
+         if (aCluster.numSystems)
+            this.numSystems = aCluster.numSystems.toString();
+      }
    }
 
    ngOnInit()
@@ -67,7 +74,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       if (this.parmsForm.form.valid)
          // Note that we don't simly new up a new Cluster, because the injector is managing the one we were passed.
          // Instead, we modify the existing one in place.
-         this._cluster.generate( Number( this.numSystems));
+         this._cluster.generate( Number( this.numSystems), this._useHighLowSlipstreams);
       else
          console.log( "form invalid; not generating cluster");
    }
@@ -79,6 +86,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
          && this._cluster.numSystems
          && this._cluster.numSystems.toString()
          || "";
+      this._useHighLowSlipstreams = this._cluster && this._cluster.usesHighLowSlipstreams;
    }
 
    onSubmit()
@@ -98,7 +106,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    showHighLowHelp()
    {
       console.log( "showHighLowHelp()");
-      this.highLowHelpShowing = ! this.highLowHelpShowing;
+      this._highLowHelpShowing = ! this._highLowHelpShowing;
       return false;
    }
    

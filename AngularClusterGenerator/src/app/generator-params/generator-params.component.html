@@ -59,7 +59,8 @@
     <div class="col-sm-offset-3 col-sm-9">
       <div class="checkbox">    <!-- "checkbox" is Bootstrap class -->
         <label for="slipstreamsHighLow">
-          <input id="slipstreamsHighLow" name="slipstreamsHighLow" type="checkbox" />
+          <!-- TODO: don't tie this directly to the model.  Only xfer to model when user hits "Go" button. -->
+          <input id="slipstreamsHighLow" name="slipstreamsHighLow" [(ngModel)]="_useHighLowSlipstreams" type="checkbox" />
           Slipstreams Differentiated Between High & Low Slipknots
         </label>
         <a href="#" (click)="showHighLowHelp()"><span class="glyphicon glyphicon-info-sign"></span></a>
@@ -68,7 +69,7 @@
   </div>
   <div class="form-group">
     <div class="col-sm-offset-4 col-sm-8"
-         *ngIf="highLowHelpShowing"
+         *ngIf="_highLowHelpShowing"
          >
       <p>
         In our campaign, we added the extra twist of randomly assigning slipstreams incoming to a system to either the
