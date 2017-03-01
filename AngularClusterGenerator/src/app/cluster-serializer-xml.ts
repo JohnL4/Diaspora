@@ -1,5 +1,7 @@
 import { Serializer } from './serializer';
 import { Cluster } from './cluster';
+import { StarSystem } from './star-system';
+import { Slipstream } from './slipstream';
 
 /**
  * Serializes/deserializes cluster to/from XML.
@@ -12,6 +14,14 @@ export class ClusterSerializerXML implements Serializer
 
    private _space: String = new String(" ");
 
+   private _parser: DOMParser;
+
+   constructor()
+   {
+      if ((<any>window).DOMParser)
+         this._parser = new (<any>window).DOMParser();
+   }
+   
    /**
     * Serialize this.cluster to XML.
     */
@@ -43,10 +53,59 @@ export class ClusterSerializerXML implements Serializer
       return xml;
    }
 
-   deserialize(aString: string)
-   {
-      this.cluster = null;      // TODO: transfer from xml component?
-   }
+   deserialize(aString: string): NodeListOf<Element>
+      {
+         this.cluster = new Cluster();
+
+         let clusterDom : Document = this._parser.parseFromString( aString, "text/xml");
+         let clusterElt = clusterDom.documentElement;
+         let clusterChildNodes = clusterElt.childNodes;
+         let parserErrors = clusterElt.getElementsByTagName( "parsererror");
+         if (parserErrors.length > 0)
+         {
+            return parserErrors;
+         }
+
+         let starSystems = new Array<StarSystem>();
+         for (let i = 0; i < clusterChildNodes.length; i++)
+         {
+            if (clusterChildNodes[i].nodeType == Node.ELEMENT_NODE
+                && clusterChildNodes[i].nodeName == "starSystem")
+            {
+               let starSysElt: Element = clusterChildNodes[i] as Element;
+               starSystems.push( new StarSystem(
+                  starSysElt.getAttribute( "id"),
+                  starSysElt.getAttribute( "id"), // TODO: name
+                  Number( starSysElt.getAttribute( "technology")),
+                  Number( starSysElt.getAttribute( "environment")),
+                  Number( starSysElt.getAttribute( "resources"))
+               ));
+            }
+         }
+         if (starSystems.length > 0)
+         {
+            this.cluster.systems = starSystems;
+         }
+
+         this.cluster.slipstreams = new Array<Slipstream>();
+         for (let i = 0; i < clusterChildNodes.length; i++)
+         {
+            if (clusterChildNodes[i].nodeType == Node.ELEMENT_NODE
+                && clusterChildNodes[i].nodeName == "slipstream")
+            {
+               let slipstreamElt = clusterChildNodes[i] as Element;
+               let from = slipstreamElt.getAttribute( "from");
+               let to = slipstreamElt.getAttribute( "to");
+               let fromSys = this.cluster.systemMap.get( from);
+               let toSys = this.cluster.systemMap.get( to);
+               let ss = new Slipstream( fromSys, toSys );
+               this.cluster.slipstreams.push( ss);
+               fromSys.slipstreams.push( ss);
+               toSys.slipstreams.push( ss);
+            }
+         }
+         return null;              // No errors.
+      }
 
    private indentStr( anIndent: number): string
    {

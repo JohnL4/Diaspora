@@ -61,11 +61,12 @@ export class XmlComponent implements OnInit {
       // parse on every input event.
 
       this.clearErrorDisplay();
-      let clusterDom : Document = this._parser.parseFromString( newXml, "text/xml");
-      let clusterElt = clusterDom.documentElement;
-      let clusterChildNodes = clusterElt.childNodes;
-      let parserErrors = clusterElt.getElementsByTagName( "parsererror");
-      if (parserErrors.length > 0)
+      let parserErrors = this._serializer.deserialize( newXml);
+      if (parserErrors == null || parserErrors.length == 0)
+      {
+         this._cluster.copyFrom( this._serializer.cluster);
+      }
+      else
       {
          // Root doc element isn't "cluster" (unexpected), but is "html".  Might be an error return, so attempt to display.
          // Reference through nativeElement is a nasty hack.  May return null if direct access to DOM is not possible.
@@ -76,49 +77,6 @@ export class XmlComponent implements OnInit {
             {
                displayElt.appendChild( parserErrors[i]); // TODO: when this gets moved to ClusterSerializerXml, this should be
                // a return value from deserialize() (collection of parserErrors).
-            }
-         }
-      }
-      else
-      {
-         let starSystems = new Array<StarSystem>();
-         for (let i = 0; i < clusterChildNodes.length; i++)
-         {
-            if (clusterChildNodes[i].nodeType == Node.ELEMENT_NODE
-                && clusterChildNodes[i].nodeName == "starSystem")
-            {
-               let starSysElt: Element = clusterChildNodes[i] as Element;
-               starSystems.push( new StarSystem(
-                  starSysElt.getAttribute( "id"),
-                  starSysElt.getAttribute( "id"), // TODO: name
-                  Number( starSysElt.getAttribute( "technology")),
-                  Number( starSysElt.getAttribute( "environment")),
-                  Number( starSysElt.getAttribute( "resources"))
-               ));
-            }
-            if (starSystems.length > 0)
-            {
-               this._cluster.systems = starSystems;
-            }
-         }
-         // TODO: deserialize slipstreams here, BUT: slipstreams will refer to starsystems that have not yet been
-         // deserialized (and for which there are no objects yet).  So maybe it's time to separate starsystem ID (which
-         // can be non-negative integer (an array index)) from starsystem NAME, which can contain arbitrary characters.
-         this._cluster.slipstreams = new Array<Slipstream>();
-         for (let i = 0; i < clusterChildNodes.length; i++)
-         {
-            if (clusterChildNodes[i].nodeType == Node.ELEMENT_NODE
-                && clusterChildNodes[i].nodeName == "slipstream")
-            {
-               let slipstreamElt = clusterChildNodes[i] as Element;
-               let from = slipstreamElt.getAttribute( "from");
-               let to = slipstreamElt.getAttribute( "to");
-               let fromSys = this._cluster.systemMap.get( from);
-               let toSys = this._cluster.systemMap.get( to);
-               let ss = new Slipstream( fromSys, toSys );
-               this._cluster.slipstreams.push( ss);
-               fromSys.slipstreams.push( ss);
-               toSys.slipstreams.push( ss);
             }
          }
       }

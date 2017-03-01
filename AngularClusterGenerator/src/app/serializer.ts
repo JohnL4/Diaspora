@@ -10,7 +10,8 @@ export interface Serializer
    serialize(): string;
 
    /**
-    * Read the given string, generating a corresponding object.
+    * Read the given string, generating a corresponding object.  Return value is errors incurred during
+    * parse/deserialization.  Interpretation is up to the caller.
     */
-   deserialize( aString: string);
+   deserialize( aString: string): any;
 }

@@ -50,21 +50,35 @@ export class Cluster {
     */
    public set systems( aSystemv: Array<StarSystem>)
    {
-      if (this.systemMap) this.systemMap.clear();
+      if (this.systemMap)
+         this.systemMap.clear();
+      else
+         this.systemMap = new Map<string, StarSystem>();
       for (let sys of aSystemv)
       {
          this.systemMap.set(sys.id, sys);
       }
    }
 
+//   /**
+//    * Add a StarSystem to the cluster.  Use this instead of building a temporary array and setting it via "systems".
+//    */
+//   public addSystem( aSystem: StarSystem): void
+//   {
+//      this.systemMap.set( aSystem.id, aSystem);
+//   }
+
    /**
-    * Add a StarSystem to the cluster.  Use this instead of building a temporary array and setting it via "systems".
+    * Copy the data from the given cluster into this cluster, overwriting existing data.
+    * I'm not yet sure how injection works, but I don't think I can just replace one Cluster reference with another.
+    * Hence, this method.
     */
-   public addSystem( aSystem: StarSystem): void
+   public copyFrom( aCluster: Cluster): void
    {
-      this.systemMap.set( aSystem.id, aSystem);
+      this.systemMap = aCluster.systemMap;
+      this.slipstreams = aCluster.slipstreams;
    }
-   
+
    generate( aNumSystems: number)
    {
       let sysv = new Array<StarSystem>(); // Temporary, rather than constantly rebuilding, sorted (by id), because IE 11 is stoopid.
