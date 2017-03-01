@@ -68,15 +68,12 @@ export class XmlComponent implements OnInit {
       }
       else
       {
-         // Root doc element isn't "cluster" (unexpected), but is "html".  Might be an error return, so attempt to display.
-         // Reference through nativeElement is a nasty hack.  May return null if direct access to DOM is not possible.
          let displayElt : HTMLDivElement = this._parseErrorDisplay.nativeElement;
          if (displayElt)
          {
             for (let i = 0; i < parserErrors.length; i++)
             {
-               displayElt.appendChild( parserErrors[i]); // TODO: when this gets moved to ClusterSerializerXml, this should be
-               // a return value from deserialize() (collection of parserErrors).
+               displayElt.appendChild( parserErrors[i]); 
             }
          }
       }
@@ -86,8 +83,6 @@ export class XmlComponent implements OnInit {
     */
    private clearErrorDisplay(): void
    {
-      // Root doc element isn't "cluster" (unexpected), but is "html".  Might be an error return, so attempt to display.
-      // Reference through nativeElement is a nasty hack.  May return null if direct access to DOM is not possible.
       let displayElt : HTMLDivElement = this._parseErrorDisplay.nativeElement;
       if (displayElt)
       {

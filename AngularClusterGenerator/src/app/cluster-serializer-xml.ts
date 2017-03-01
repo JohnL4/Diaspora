@@ -53,6 +53,9 @@ export class ClusterSerializerXML implements Serializer
       return xml;
    }
 
+   /**
+    * Parse XML string into this.cluster, returning list of errors, if any.  Otherwise, returns null.
+    */
    deserialize(aString: string): NodeListOf<Element>
       {
          this.cluster = new Cluster();
