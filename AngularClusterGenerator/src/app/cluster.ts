@@ -84,6 +84,9 @@ export class Cluster {
       this.slipstreams = aCluster.slipstreams;
    }
 
+   /**
+    * Generate the starsystems and slipstreams that define the cluster.
+    */
    generate( aNumSystems: number, aUseHighLowSlipstreams: boolean)
    {
       this.usesHighLowSlipstreams = aUseHighLowSlipstreams;
@@ -136,10 +139,7 @@ export class Cluster {
       this.slipstreams = new Array<Slipstream>();
       for (let i = 0; i < aNumSystems - 1; i++)
       {
-         let ss = new Slipstream( sysv[i], sysv[i+1]);
-         this.slipstreams.push( ss);
-         sysv[i].slipstreams.push( ss);
-         sysv[i+1].slipstreams.push( ss);
+         this.addNewSlipstream( sysv[i], sysv[i+1], this.usesHighLowSlipstreams);
 
          let t = fateThrow();
          if (t >= 0)
@@ -164,11 +164,26 @@ export class Cluster {
       }
       if (j < this.numSystems)
       {
-         // hook up
-         let ss = new Slipstream( aSysv[ aStartIx], aSysv[ j]);
-         this.slipstreams.push( ss);
-         aSysv[ aStartIx].slipstreams.push( ss);
-         aSysv[ j].slipstreams.push( ss);
+         this.addNewSlipstream( aSysv[ aStartIx], aSysv[j], this.usesHighLowSlipstreams);
       }
+   }
+
+   /**
+    * Add a new slipstream between the given starsystems, possibly with high and low slipknot positions, depending on
+    * aUseHighLow.
+    */
+   private addNewSlipstream( aFrom: StarSystem, aTo: StarSystem, aUseHighLow: boolean): void
+   {
+      let leave, arrive: SlipknotPosition;
+      
+      if (aUseHighLow)
+      {
+         leave = (dice(1,2) == 1) ? SlipknotPosition.Low : SlipknotPosition.High;
+         arrive = (dice(1,2) == 1) ? SlipknotPosition.Low : SlipknotPosition.High;
+      }
+      let ss = new Slipstream( aFrom, aTo, leave, arrive);
+      this.slipstreams.push( ss);
+      aFrom.slipstreams.push( ss);
+      aTo.slipstreams.push( ss);
    }
 }
