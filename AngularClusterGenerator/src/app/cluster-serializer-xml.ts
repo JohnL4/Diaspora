@@ -37,7 +37,9 @@ export class ClusterSerializerXML implements Serializer
       indent++;
       for (let sys of this.cluster.systems)
       {
-         xml += `\n${this.indentStr(indent)}<starSystem id="${sys.name}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
+         // TODO: sys.name really should be xml-encoded to escape double quotes.  Or maybe just the double quotes need
+         // to be escaped?
+         xml += `\n${this.indentStr(indent)}<starSystem id="${sys.id}" name="${sys.name}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
 //         for (let ss of sys.slipstreams)
 //         {
 //            if (ss.from == sys)
@@ -78,7 +80,7 @@ export class ClusterSerializerXML implements Serializer
                let starSysElt: Element = clusterChildNodes[i] as Element;
                starSystems.push( new StarSystem(
                   starSysElt.getAttribute( "id"),
-                  starSysElt.getAttribute( "id"), // TODO: name
+                  starSysElt.getAttribute( "name"), 
                   Number( starSysElt.getAttribute( "technology")),
                   Number( starSysElt.getAttribute( "environment")),
                   Number( starSysElt.getAttribute( "resources"))

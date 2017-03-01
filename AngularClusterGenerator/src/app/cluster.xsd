@@ -41,6 +41,7 @@
       <element name="notes" minOccurs="0" maxOccurs="1"/>
     </sequence>
     <attribute name="id" type="ID" use="required"/>
+    <attribute name="name" type="string" use="required"/>
     <attribute name="technology" type="cluster:fateThrow" use="required"/>
     <attribute name="environment" type="cluster:fateThrow" use="required"/>
     <attribute name="resources" type="cluster:fateThrow" use="required"/>

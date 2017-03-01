@@ -4,18 +4,18 @@
          xsi:schemaLocation="https://s3.amazonaws.com/JohnLuskPublic/cluster.xsd cluster.xsd"
          usesHighLow="true"
          >
-  <starSystem id="Alpha" technology="0" environment="2" resources="-1">
+  <starSystem id="Alpha" name="Alpha Name" technology="0" environment="2" resources="-1">
     <aspect>Gentlemen, I give you the Pencarrow Endeavor!</aspect>
     <aspect>You're not from around here, are you?</aspect>
     <notes>
       Arbitrary text, multi-line, multi-paragraph, possibly with some limited HTML markup, or possibly some markdown.
     </notes>
   </starSystem>
-  <starSystem id="Bravo" technology="-1" environment="-3" resources="-1">
+  <starSystem id="Bravo" name="Bravo Name" technology="-1" environment="-3" resources="-1">
   </starSystem>
-  <starSystem id="Charlie" technology="2" environment="-1" resources="0">
+  <starSystem id="Charlie" name="Charlie Name" technology="2" environment="-1" resources="0">
   </starSystem>
-  <starSystem id="Delta" technology="2" environment="-1" resources="-1">
+  <starSystem id="Delta" name="Delta Name" technology="2" environment="-1" resources="-1">
   </starSystem>
 
   <slipstream from="Alpha" to="Bravo" leave="high" arrive="low"/> <!-- to: idref (limitation: max one occurrence of destination per system); leave/arrive: enumerations -->
