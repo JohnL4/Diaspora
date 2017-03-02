@@ -25,7 +25,7 @@ export class Cluster {
    /**
     * True iff the cluster's slipstreams are specified as connection to each star system's "high" or "low" slipknots.
     */
-   public usesHighLowSlipstreams?: boolean;
+   public usesHighLowSlipstreams: boolean;
    
    public constructor( ) {}
 
@@ -80,6 +80,7 @@ export class Cluster {
     */
    public copyFrom( aCluster: Cluster): void
    {
+      this.usesHighLowSlipstreams = aCluster.usesHighLowSlipstreams;
       this.systemMap = aCluster.systemMap;
       this.slipstreams = aCluster.slipstreams;
    }
@@ -178,8 +179,8 @@ export class Cluster {
       
       if (aUseHighLow)
       {
-         leave = (dice(1,2) == 1) ? SlipknotPosition.Low : SlipknotPosition.High;
-         arrive = (dice(1,2) == 1) ? SlipknotPosition.Low : SlipknotPosition.High;
+         leave = (dice(1,2) == 1) ? SlipknotPosition.LOW : SlipknotPosition.HIGH;
+         arrive = (dice(1,2) == 1) ? SlipknotPosition.LOW : SlipknotPosition.HIGH;
       }
       let ss = new Slipstream( aFrom, aTo, leave, arrive);
       this.slipstreams.push( ss);

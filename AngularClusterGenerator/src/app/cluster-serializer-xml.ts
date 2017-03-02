@@ -2,6 +2,7 @@ import { Serializer } from './serializer';
 import { Cluster } from './cluster';
 import { StarSystem } from './star-system';
 import { Slipstream } from './slipstream';
+import { SlipknotPosition } from './slipknot-position';
 
 /**
  * Serializes/deserializes cluster to/from XML.
@@ -32,7 +33,8 @@ export class ClusterSerializerXML implements Serializer
       let xml: string = `<?xml version="1.0"?>
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd cluster.xsd">`;
+         xsi:schemaLocation="https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd cluster.xsd"
+         usesHighLowSlipstreams="${this.cluster.usesHighLowSlipstreams}">`;
       let indent: number = 0; // Indent level
       indent++;
       for (let sys of this.cluster.systems)
@@ -40,16 +42,14 @@ export class ClusterSerializerXML implements Serializer
          // TODO: sys.name really should be xml-encoded to escape double quotes.  Or maybe just the double quotes need
          // to be escaped?
          xml += `\n${this.indentStr(indent)}<starSystem id="${sys.id}" name="${sys.name}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
-//         for (let ss of sys.slipstreams)
-//         {
-//            if (ss.from == sys)
-//               xml += `\n${this.indentStr(indent+1)}<slipstream to="${ss.to.name}"/>`;
-//         }
          xml += `\n${this.indentStr(indent)}</starSystem>`;
       }
       for (let ss of this.cluster.slipstreams)
       {
-         xml += `\n${this.indentStr(indent)}<slipstream from="${ss.from.id}" to="${ss.to.id}"/>`;
+         xml += `\n${this.indentStr(indent)}<slipstream from="${ss.from.id}" to="${ss.to.id}"`;
+         if (this.cluster.usesHighLowSlipstreams)
+            xml += ` leave="${SlipknotPosition[ ss.leave]}" arrive="${SlipknotPosition[ ss.arrive]}"`;
+         xml += `/>`;
       }
       xml += "\n</cluster>";
       return xml;
@@ -71,6 +71,10 @@ export class ClusterSerializerXML implements Serializer
             return parserErrors;
          }
 
+         let usesHighLowAttr: string = clusterElt.getAttribute( "usesHighLowSlipstreams");
+         if (usesHighLowAttr.length > 0)
+            this.cluster.usesHighLowSlipstreams = Boolean( usesHighLowAttr);
+         
          let starSystems = new Array<StarSystem>();
          for (let i = 0; i < clusterChildNodes.length; i++)
          {
@@ -103,7 +107,23 @@ export class ClusterSerializerXML implements Serializer
                let to = slipstreamElt.getAttribute( "to");
                let fromSys = this.cluster.systemMap.get( from);
                let toSys = this.cluster.systemMap.get( to);
-               let ss = new Slipstream( fromSys, toSys );
+
+               let leave: SlipknotPosition = null;
+               let arrive: SlipknotPosition = null;
+               if (this.cluster.usesHighLowSlipstreams)
+               {
+                  let leaveAttr: string = slipstreamElt.getAttribute( "leave");
+                  let arriveAttr: string = slipstreamElt.getAttribute( "arrive");
+                  if (leaveAttr.length > 0 && arriveAttr.length > 0)
+                  {
+                     leave = SlipknotPosition[ leaveAttr];
+                     arrive = SlipknotPosition[ arriveAttr];
+                  }
+                  else
+                     throw "Cluster uses high/low slipknot positions, but XML doesn't specify values for slipstreams";
+               }
+               
+               let ss = new Slipstream( fromSys, toSys, leave, arrive );
                this.cluster.slipstreams.push( ss);
                fromSys.slipstreams.push( ss);
                toSys.slipstreams.push( ss);

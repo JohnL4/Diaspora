@@ -17,7 +17,7 @@
         <element name="starSystem" type="cluster:starSystem" maxOccurs="unbounded"/>
         <element name="slipstream" type="cluster:slipstream" maxOccurs="unbounded"/>
       </sequence>
-      <attribute name="usesHighLow" type="boolean">
+      <attribute name="usesHighLowSlipstreams" type="boolean">
         <annotation>
           <documentation>
             True if and only if the cluster uses the "high/low" concept of slipstream arrival points within a star
@@ -107,8 +107,8 @@
       </documentation>
     </annotation>
     <restriction base="token">
-      <enumeration value="low"/>
-      <enumeration value="high"/>
+      <enumeration value="LOW"/>
+      <enumeration value="HIGH"/>
     </restriction>
   </simpleType>
     

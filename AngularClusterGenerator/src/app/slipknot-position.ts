@@ -4,6 +4,6 @@
  */
 export enum SlipknotPosition
 {
-    Low = 1,
-    High
+    LOW = 1,
+    HIGH
 }

@@ -2,7 +2,7 @@
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://s3.amazonaws.com/JohnLuskPublic/cluster.xsd cluster.xsd"
-         usesHighLow="true"
+         usesHighLowSlipstreams="true"
          >
   <starSystem id="Alpha" name="Alpha Name" technology="0" environment="2" resources="-1">
     <aspect>Gentlemen, I give you the Pencarrow Endeavor!</aspect>
@@ -18,6 +18,6 @@
   <starSystem id="Delta" name="Delta Name" technology="2" environment="-1" resources="-1">
   </starSystem>
 
-  <slipstream from="Alpha" to="Bravo" leave="high" arrive="low"/> <!-- to: idref (limitation: max one occurrence of destination per system); leave/arrive: enumerations -->
-  <slipstream from="Bravo" to="Charlie" leave="low" arrive="low"/>
+  <slipstream from="Alpha" to="Bravo" leave="HIGH" arrive="LOW"/> <!-- to: idref (limitation: max one occurrence of destination per system); leave/arrive: enumerations -->
+  <slipstream from="Bravo" to="Charlie" leave="LOW" arrive="LOW"/>
 </cluster>
