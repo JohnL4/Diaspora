@@ -3,25 +3,77 @@
 <p>
   Cluster has {{Cluster.numSystems ? Cluster.numSystems : "no"}} systems.
 </p>
+<!--a
 <div class="table-responsive">
-<table class="table" *ngIf="Cluster && Cluster.numSystems">
-  <tr>
-    <th>System</th>
-    <th>Stats</th>
-    <th>Connections</th>
-    <th>Aspects</th>
-    <th>Notes</th>
-  </tr>
-  <tr *ngFor="let sys of Cluster.systems">
-    <td><input [(ngModel)]="sys.name"/></td>
-    <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
-    <td>
-      <span *ngFor="let ss of sys.slipstreams">
-        {{ss.otherEndPoint( sys).name}},
-      </span>
-    </td>
-    <td></td>
-    <td></td>
-  </tr>
-</table>
+  <table class="table" *ngIf="Cluster && Cluster.numSystems">
+    <tr>
+      <th>System</th>
+      <th>Stats</th>
+      <th>Connections</th>
+      <!-- <th>Aspects</th> -->
+      <!-- <th>Notes</th> -->
+<!--
+    </tr>
+    <ng-container *ngFor="let sys of Cluster.systems">
+      <tr>
+        <td><input [(ngModel)]="sys.name"/></td>
+        <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
+        <td>
+          <span *ngFor="let ss of sys.slipstreams">
+            {{ss.otherEndPoint( sys).name}},
+          </span>
+        </td>
+        <!-- <td></td> -->
+        <!-- <td></td> -->
+<!--
+      </tr>
+      <tr>
+        <td colspan="3">
+          <table class="table">
+            <tr>
+              <td><strong>Aspects:</strong></td>
+              <td><input/></td>
+              <td><input/></td>
+              <td><input/></td>
+            </tr>
+            <tr>
+              <td><strong>Notes:</strong></td>
+              <td colspan="3"><textarea rows="5" style="width: 100%"></textarea></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </ng-container>
+  </table>
 </div>
+-->
+<div class="row">
+  <div class="col-sm-2"><label>System</label></div>
+  <div class="col-sm-1"><label>Stats</label></div>
+  <div class="col-sm-2"><label>Connections</label></div>
+</div>
+<ng-container *ngFor="let sys of Cluster.systems">
+  <div class="row">
+    <div class="col-sm-2"><input [(ngModel)]="sys.name"/></div>
+    <div class="col-sm-1">T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</div>
+    <div class="col-sm-2"><ng-container *ngFor="let ss of sys.slipstreams">{{ss.otherEndPoint( sys).name}},</ng-container></div>
+  </div>
+  <div class="row">
+    <div class="col-sm-offset-1 col-sm-1">
+      <label>Aspects:</label>
+    </div>
+    <div class="col-sm-10">
+      <input/>
+      <input/>
+      <input/>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-offset-1 col-sm-1">
+      <label>Notes:</label>
+    </div>
+    <div class="col-sm-10">
+      <textarea rows="5" style="width: 100%"></textarea>
+    </div>
+  </div>
+</ng-container>
