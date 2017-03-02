@@ -33,8 +33,13 @@ export class ClusterSerializerXML implements Serializer
       let xml: string = `<?xml version="1.0"?>
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd cluster.xsd"
-         usesHighLowSlipstreams="${this.cluster.usesHighLowSlipstreams}">`;
+         xsi:schemaLocation="https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd cluster.xsd"`;
+      if (this.cluster.usesHighLowSlipstreams)
+      {
+         xml += `
+         usesHighLowSlipstreams="${this.cluster.usesHighLowSlipstreams}"`;
+      }
+      xml += '>';
       let indent: number = 0; // Indent level
       indent++;
       for (let sys of this.cluster.systems)
@@ -72,7 +77,7 @@ export class ClusterSerializerXML implements Serializer
          }
 
          let usesHighLowAttr: string = clusterElt.getAttribute( "usesHighLowSlipstreams");
-         if (usesHighLowAttr.length > 0)
+         if (usesHighLowAttr != null && usesHighLowAttr.length > 0)
             this.cluster.usesHighLowSlipstreams = Boolean( usesHighLowAttr);
          
          let starSystems = new Array<StarSystem>();
@@ -114,7 +119,7 @@ export class ClusterSerializerXML implements Serializer
                {
                   let leaveAttr: string = slipstreamElt.getAttribute( "leave");
                   let arriveAttr: string = slipstreamElt.getAttribute( "arrive");
-                  if (leaveAttr.length > 0 && arriveAttr.length > 0)
+                  if (leaveAttr != null && leaveAttr.length > 0 && arriveAttr != null && arriveAttr.length > 0)
                   {
                      leave = SlipknotPosition[ leaveAttr];
                      arrive = SlipknotPosition[ arriveAttr];
