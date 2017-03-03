@@ -21,8 +21,19 @@ export class ClusterDetailsComponent implements OnInit {
       this._cluster = aCluster;
    }
 
-   ngOnInit() {
-      let cytoscape = require('cytoscape');
+   ngOnInit()
+   {
+      let cytoscape = require( 'cytoscape');
+
+      // Can't figure out how to get cytoscape-cola in here.
+      // let cycola = require( 'cytoscape-cola');
+      // cycola( cytoscape);
+      // cytoscape( 'layout', 'cola', cycola);
+      
+      // Neither does cose-bilkent work w/webpack and angular-cli. :(
+      // let cose_bilkent = require( 'cytoscape-cose-bilkent');
+      // cose_bilkent( cytoscape);
+
       let cyDiv = document.getElementById( 'cytoscapeDiv');
       let cy = cytoscape({
          container: cyDiv,
