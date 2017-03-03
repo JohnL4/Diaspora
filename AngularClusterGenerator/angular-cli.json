@@ -21,7 +21,8 @@
           "styles.css",
           "../node_modules/bootstrap/dist/css/bootstrap.css"
       ],
-      "scripts": [
+        "scripts": [
+            "../node_modules/cytoscape/dist/cytoscape.js"
       ],
       "environments": {
         "source": "environments/environment.ts",

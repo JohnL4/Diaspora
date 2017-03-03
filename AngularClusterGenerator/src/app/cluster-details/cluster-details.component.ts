@@ -21,7 +21,54 @@ export class ClusterDetailsComponent implements OnInit {
       this._cluster = aCluster;
    }
 
-  ngOnInit() {
+   ngOnInit() {
+      let cytoscape = require('cytoscape');
+      let cyDiv = document.getElementById( 'cytoscapeDiv');
+      let cy = cytoscape({
+         container: cyDiv,
+         elements: [
+            { data: {id: 'Alpha'}},
+            { data: {id: 'Bravo'}},
+            { data: {id: 'Charlie'}},
+            { data: {id: 'Delta'}},
+            { data: {id: 'Echo'}},
+
+            { data: {id: 'ab', source: 'Alpha', target: 'Bravo'}},
+            { data: {id: 'bc', source: 'Bravo', target: 'Charlie'}},
+            { data: {id: 'ac', source: 'Alpha', target: 'Charlie'}},
+            { data: {id: 'cd', source: 'Charlie', target: 'Delta'}},
+            { data: {id: 'da', source: 'Delta', target: 'Alpha'}},
+            { data: {id: 'db', source: 'Delta', target: 'Bravo'}},
+
+            // { data: {id: 'ae', source: 'Alpha', target: 'Echo'}},
+            // { data: {id: 'be', source: 'Bravo', target: 'Echo'}},
+            { data: {id: 'ce', source: 'Charlie', target: 'Echo'}},
+            { data: {id: 'de', source: 'Delta', target: 'Echo'}},
+         ],
+         style: [
+            {
+               selector: 'node',
+               style: {
+                  label: 'data(id)'
+               }
+            },
+            {
+               selector: 'edge',
+               style: {
+                  'line-color': 'hsl(240, 100%, 80%)',
+                  'curve-style': 'bezier',
+                  'control-point-step-size': 20,
+                  'source-label': '+',
+                  'target-label': '-',
+                  'source-text-offset': 10,
+                  'target-text-offset': 10,
+               }
+            }
+         ]
+         // layout: {name: 'cose'}
+      });
+      cy.layout({name: 'cose'});
+      console.log( `loaded cytoscape; cyDiv = ${cyDiv}; cy = ${cy} `);
   }
 
 }
