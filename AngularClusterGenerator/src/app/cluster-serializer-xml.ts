@@ -46,12 +46,18 @@ export class ClusterSerializerXML implements Serializer
       {
          // TODO: sys.name really should be xml-encoded to escape double quotes.  Or maybe just the double quotes need
          // to be escaped?
-         xml += `\n${this.indentStr(indent)}<starSystem id="${sys.id}" name="${sys.name}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
+         let nameEsc = encodeURIComponent(sys.name);
+         console.log( `nameEsc = "${nameEsc}"`);
+         xml += `\n${this.indentStr(indent)}<starSystem id="${sys.id}" name="${nameEsc}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
          for (let i = 0; i < 3; i++)
          {
-            xml += `\n${this.indentStr(indent+1)}<aspect>${sys.aspects[i] ? sys.aspects[i] : ""}</aspect>`;
+            let aspectEsc = sys.aspects[i] ? encodeURIComponent( sys.aspects[i]) : "";
+            console.log( `aspectEsc[${i}] = "${aspectEsc}"`);
+            xml += `\n${this.indentStr(indent+1)}<aspect>${aspectEsc}</aspect>`;
          }
-         xml += `\n${this.indentStr(indent+1)}<notes>${sys.notes ? sys.notes : ""}</notes>`;
+         let notesEsc = sys.notes ? encodeURIComponent( sys.notes) : "";
+         console.log( `notesEsc = "${notesEsc}"`);
+         xml += `\n${this.indentStr(indent+1)}<notes>${notesEsc}</notes>`;
          xml += `\n${this.indentStr(indent)}</starSystem>`;
       }
       for (let ss of this.cluster.slipstreams)
@@ -94,17 +100,17 @@ export class ClusterSerializerXML implements Serializer
                let starSysElt: Element = clusterChildNodes[i] as Element;
                let sys = new StarSystem(
                   starSysElt.getAttribute( "id"),
-                  starSysElt.getAttribute( "name"), 
+                  decodeURIComponent(starSysElt.getAttribute( "name")), 
                   Number( starSysElt.getAttribute( "technology")),
                   Number( starSysElt.getAttribute( "environment")),
                   Number( starSysElt.getAttribute( "resources")));
                let aspectElts = starSysElt.getElementsByTagName( "aspect");
                for (let j = 0; j < 3; j++)
                {
-                  sys.aspects[j] = aspectElts[j].textContent;
+                  sys.aspects[j] = decodeURIComponent( aspectElts[j].textContent);
                }
                let notesElt = starSysElt.getElementsByTagName( "notes")[0];
-               sys.notes = notesElt.textContent;
+               sys.notes = decodeURIComponent( notesElt.textContent);
                starSystems.push( sys);
             }
          }
