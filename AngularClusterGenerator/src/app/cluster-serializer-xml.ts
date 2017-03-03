@@ -33,7 +33,7 @@ export class ClusterSerializerXML implements Serializer
       let xml: string = `<?xml version="1.0"?>
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd cluster.xsd"`;
+         xsi:schemaLocation="http://how-hard-can-it-be.com/diaspora https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd"`;
       if (this.cluster.usesHighLowSlipstreams)
       {
          xml += `
@@ -47,6 +47,11 @@ export class ClusterSerializerXML implements Serializer
          // TODO: sys.name really should be xml-encoded to escape double quotes.  Or maybe just the double quotes need
          // to be escaped?
          xml += `\n${this.indentStr(indent)}<starSystem id="${sys.id}" name="${sys.name}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
+         for (let i = 0; i < 3; i++)
+         {
+            xml += `\n${this.indentStr(indent+1)}<aspect>${sys.aspects[i] ? sys.aspects[i] : ""}</aspect>`;
+         }
+         xml += `\n${this.indentStr(indent+1)}<notes>${sys.notes ? sys.notes : ""}</notes>`;
          xml += `\n${this.indentStr(indent)}</starSystem>`;
       }
       for (let ss of this.cluster.slipstreams)
@@ -87,13 +92,20 @@ export class ClusterSerializerXML implements Serializer
                 && clusterChildNodes[i].nodeName == "starSystem")
             {
                let starSysElt: Element = clusterChildNodes[i] as Element;
-               starSystems.push( new StarSystem(
+               let sys = new StarSystem(
                   starSysElt.getAttribute( "id"),
                   starSysElt.getAttribute( "name"), 
                   Number( starSysElt.getAttribute( "technology")),
                   Number( starSysElt.getAttribute( "environment")),
-                  Number( starSysElt.getAttribute( "resources"))
-               ));
+                  Number( starSysElt.getAttribute( "resources")));
+               let aspectElts = starSysElt.getElementsByTagName( "aspect");
+               for (let j = 0; j < 3; j++)
+               {
+                  sys.aspects[j] = aspectElts[j].textContent;
+               }
+               let notesElt = starSysElt.getElementsByTagName( "notes")[0];
+               sys.notes = notesElt.textContent;
+               starSystems.push( sys);
             }
          }
          if (starSystems.length > 0)

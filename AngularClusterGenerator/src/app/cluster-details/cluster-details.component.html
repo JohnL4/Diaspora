@@ -3,7 +3,10 @@
 <p>
   Cluster has {{Cluster.numSystems ? Cluster.numSystems : "no"}} systems.
 </p>
-<!--a
+
+<!-- Using table puts a border between each row and there's not really any easy way around that.  So be it.  Maybe if I
+      pull in Polymer (or something) it'll be better.
+-->
 <div class="table-responsive">
   <table class="table" *ngIf="Cluster && Cluster.numSystems">
     <tr>
@@ -12,7 +15,7 @@
       <th>Connections</th>
       <!-- <th>Aspects</th> -->
       <!-- <th>Notes</th> -->
-<!--
+
     </tr>
     <ng-container *ngFor="let sys of Cluster.systems">
       <tr>
@@ -25,20 +28,22 @@
         </td>
         <!-- <td></td> -->
         <!-- <td></td> -->
-<!--
+
       </tr>
       <tr>
         <td colspan="3">
           <table class="table">
             <tr>
               <td><strong>Aspects:</strong></td>
-              <td><input/></td>
-              <td><input/></td>
-              <td><input/></td>
+              <td>
+                <input [(ngModel)]="sys.aspects[0]"/>
+                <input [(ngModel)]="sys.aspects[1]"/>
+                <input [(ngModel)]="sys.aspects[2]"/>
+              </td>
             </tr>
             <tr>
               <td><strong>Notes:</strong></td>
-              <td colspan="3"><textarea rows="5" style="width: 100%"></textarea></td>
+              <td><textarea [(ngModel)]="sys.notes" rows="5" style="width: 100%"></textarea></td>
             </tr>
           </table>
         </td>
@@ -46,7 +51,8 @@
     </ng-container>
   </table>
 </div>
--->
+
+<!--
 <div class="row">
   <div class="col-sm-2"><label>System</label></div>
   <div class="col-sm-1"><label>Stats</label></div>
@@ -77,3 +83,4 @@
     </div>
   </div>
 </ng-container>
+-->

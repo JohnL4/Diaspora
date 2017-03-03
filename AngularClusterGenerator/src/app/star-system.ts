@@ -11,6 +11,13 @@ export class StarSystem {
     */
    public slipstreams: Array<Slipstream> = new Array<Slipstream>();
    
+   /**
+    * System aspects (two on its own merits and one from the cluster slipstream configuration.
+    */
+   public aspects: Array<string> = new Array<string>(3);
+
+   public notes: string;
+
    public constructor( private _id: string,
                        public name: string,
                        public tech: number,
