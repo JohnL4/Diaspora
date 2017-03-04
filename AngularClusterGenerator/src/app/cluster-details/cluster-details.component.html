@@ -14,41 +14,30 @@
     <tr>
       <th>System</th>
       <th>Stats</th>
+      <th>Aspects</th>
       <th>Connections</th>
-      <!-- <th>Aspects</th> -->
-      <!-- <th>Notes</th> -->
-
     </tr>
     <ng-container *ngFor="let sys of Cluster.systems">
       <tr>
         <td><input [(ngModel)]="sys.name"/></td>
         <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
         <td>
+          <input [(ngModel)]="sys.aspects[0]"/>
+          <input [(ngModel)]="sys.aspects[1]"/>
+          <input [(ngModel)]="sys.aspects[2]"/>
+        </td>
+        <td>
           <span *ngFor="let ss of sys.slipstreams">
             {{ss.otherEndPoint( sys).name}},
           </span>
         </td>
-        <!-- <td></td> -->
-        <!-- <td></td> -->
-
       </tr>
       <tr>
-        <td colspan="3">
-          <table class="table">
-            <tr>
-              <td><strong>Aspects:</strong></td>
-              <td>
-                <input [(ngModel)]="sys.aspects[0]"/>
-                <input [(ngModel)]="sys.aspects[1]"/>
-                <input [(ngModel)]="sys.aspects[2]"/>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Notes:</strong></td>
-              <td><textarea [(ngModel)]="sys.notes" rows="5" style="width: 100%"></textarea></td>
-            </tr>
-          </table>
+        <td>
+          <label>Notes:</label>
         </td>
+        <td colspan="3">
+          <textarea [(ngModel)]="sys.notes" rows="5" style="width: 100%"></textarea>
       </tr>
     </ng-container>
   </table>
