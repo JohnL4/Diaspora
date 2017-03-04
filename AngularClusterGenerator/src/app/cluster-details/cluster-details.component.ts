@@ -43,7 +43,7 @@ export class ClusterDetailsComponent implements OnInit {
             {
                selector: 'node',
                style: {
-                  label: 'data(id)'
+                  label: 'data(label)'
                }
             },
             {
@@ -92,11 +92,11 @@ export class ClusterDetailsComponent implements OnInit {
 //      ];
       for (let sys of aCluster.systems)
       {
-         retval.push( {group: 'nodes', data: {id: sys.id}});
+         retval.push( {group: 'nodes', data: {id: sys.id, label: sys.name}});
       }
       for (let slipstream of aCluster.slipstreams)
       {
-         retval.push( {group: 'edges', data: {id: `${slipstream.from.id}${slipstream.to.id}`,
+         retval.push( {group: 'edges', data: {id: `${slipstream.from.id}-${slipstream.to.id}`,
                                               source: slipstream.from.id,
                                               target: slipstream.to.id }});
                                               
