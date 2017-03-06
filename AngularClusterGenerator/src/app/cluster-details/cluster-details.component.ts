@@ -43,7 +43,23 @@ export class ClusterDetailsComponent implements OnInit {
             {
                selector: 'node',
                style: {
-                  label: 'data(label)'
+                  label: 'data(label)',
+                  'background-opacity': '0.5',
+                  width: 50,
+                  height: 30,
+                  shape: 'rectangle'
+               }
+            },
+            {
+               selector: 'node.t0e0r0',
+               style: {
+                  // 'background-color': 'green',
+                  'background-opacity': 0,
+                  width: 43,
+                  height: 23,
+                  'background-image': `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="43" height="23"><path fill="none" stroke="black" stroke-width="3" d="M 1,21 v -20 h 40 v 20 z M 21,1 v 20"/></svg>`,
+                  // 'background-image': 'https://farm2.staticflickr.com/1261/1413379559_412a540d29_b.jpg'
+                  'background-fit': 'none'
                }
             },
             {
@@ -68,9 +84,9 @@ export class ClusterDetailsComponent implements OnInit {
    /**
     * Returns an array of Cytoscape graph elements (nodes and edges).
     */
-   private elementsGraph( aCluster: Cluster): Array<any>
+   private elementsGraph( aCluster: Cluster): any
    {
-      let retval: Array<any> = new Array<any>();
+      let retval = { nodes: [], edges: []};
 //         = [
 //            { data: {id: 'Alpha'}},
 //            { data: {id: 'Bravo'}},
@@ -90,13 +106,15 @@ export class ClusterDetailsComponent implements OnInit {
 //            { data: {id: 'ce', source: 'Charlie', target: 'Echo'}},
 //            { data: {id: 'de', source: 'Delta', target: 'Echo'}},
 //      ];
+
       for (let sys of aCluster.systems)
       {
-         retval.push( {group: 'nodes', data: {id: sys.id, label: sys.name}});
+         retval.nodes.push( {data: {id: sys.id, label: sys.name}, classes: "t0e0r0"});
       }
+
       for (let slipstream of aCluster.slipstreams)
       {
-         retval.push( {group: 'edges', data: {id: `${slipstream.from.id}-${slipstream.to.id}`,
+         retval.edges.push( {data: {id: `${slipstream.from.id}-${slipstream.to.id}`,
                                               source: slipstream.from.id,
                                               target: slipstream.to.id }});
                                               
