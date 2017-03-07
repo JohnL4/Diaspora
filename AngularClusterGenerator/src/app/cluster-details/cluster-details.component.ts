@@ -36,6 +36,7 @@ export class ClusterDetailsComponent implements OnInit {
       // cose_bilkent( cytoscape);
 
       let cygen = new CytoscapeGenerator( this._cluster);
+      cygen.ensureStyles();
       let graphElements: Array<any> = cygen.getElements(); // this.elementsGraph( this._cluster);
       let styles: Array<any> = cygen.getStyles();
       let cyDiv = document.getElementById( 'cytoscapeDiv');

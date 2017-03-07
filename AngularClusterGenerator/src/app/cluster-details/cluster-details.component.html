@@ -3,44 +3,53 @@
 <p>
   Cluster has {{Cluster.numSystems ? Cluster.numSystems : "no"}} systems.
 </p>
-<div id="cytoscapeDiv" style="height: 30vh; width: 100%; border: 1px solid silver;">
-</div>
+<div class="row">
 
 <!-- Using table puts a border between each row and there's not really any easy way around that.  So be it.  Maybe if I
       pull in Polymer (or something) it'll be better.
 -->
-<div class="table-responsive">
-  <table class="table" *ngIf="Cluster && Cluster.numSystems">
-    <tr>
-      <th>System</th>
-      <th>Stats</th>
-      <th>Aspects</th>
-      <th>Connections</th>
-    </tr>
-    <ng-container *ngFor="let sys of Cluster.systems">
+<div class="col-md-8" style="/* border: 1px solid blue; */">
+
+  <div class="table-responsive">
+    <table class="table" *ngIf="Cluster && Cluster.numSystems">
       <tr>
-        <td><input [(ngModel)]="sys.name"/></td>
-        <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
-        <td>
-          <input [(ngModel)]="sys.aspects[0]"/>
-          <input [(ngModel)]="sys.aspects[1]"/>
-          <input [(ngModel)]="sys.aspects[2]"/>
-        </td>
-        <td>
-          <span *ngFor="let ss of sys.slipstreams">
-            {{ss.otherEndPoint( sys).name}},
-          </span>
-        </td>
+        <th>System</th>
+        <th>Stats</th>
+        <th>Aspects</th>
+        <th>Connections</th>
       </tr>
-      <tr>
-        <td>
-          <label>Notes:</label>
-        </td>
-        <td colspan="3">
-          <textarea [(ngModel)]="sys.notes" rows="5" style="width: 100%"></textarea>
-      </tr>
-    </ng-container>
-  </table>
+      <ng-container *ngFor="let sys of Cluster.systems">
+        <tr>
+          <td><input [(ngModel)]="sys.name"/></td>
+          <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
+          <td>
+            <input [(ngModel)]="sys.aspects[0]"/>
+            <input [(ngModel)]="sys.aspects[1]"/>
+            <input [(ngModel)]="sys.aspects[2]"/>
+          </td>
+          <td>
+            <span *ngFor="let ss of sys.slipstreams">
+              {{ss.otherEndPoint( sys).name}},
+            </span>
+          </td>
+        </tr>
+<!--
+        <tr>
+          <td>
+            <label>Notes:</label>
+          </td>
+          <td colspan="3">
+            <textarea [(ngModel)]="sys.notes" rows="5" style="width: 100%"></textarea>
+        </tr>
+-->
+      </ng-container>
+    </table>
+  </div>
+
+</div>
+
+<div class="col-md-4" id="cytoscapeDiv" style="/* width: 100%; */ height: 600px; border: 1px solid silver;" ></div>
+
 </div>
 
 <!--
