@@ -93,12 +93,14 @@ export class CytoscapeGenerator {
       let envContents = this.environmentBoxContents( aSys);
       let resContents = this.resourceBoxContents( aSys);
       let doubleBox = this.doubleBox( aSys);
-      let imageSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="43" height="23">`
+      let techStripes = this.techStripes( aSys);
+      let imageSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="43" height="31">`
          + envContents
          + resContents
          + doubleBox
+         + techStripes
          + `</svg>`;
-      let style = { width: 43, height: 23, 'background-image': `data:image/svg+xml,${imageSvg}` };
+      let style = { width: 43, height: 31, 'background-image': `data:image/svg+xml,${imageSvg}` };
       this._styleMap.set( sig, style);
    }
 
@@ -235,9 +237,12 @@ export class CytoscapeGenerator {
     * Returns SVG showing the stripes indicating a system tech level.  Low stripes for low tech and high stripes for
     * high tech.
     */
-   private techStrips( aSys: StarSystem): string
+   private techStripes( aSys: StarSystem): string
    {
-      return "";
+      let retval: string;
+      let path = "M 0,30 h 42";
+      retval = `<path fill="none" stroke="black" stroke-width="3" stroke-dasharray="6 6" d="${path}"/>`;
+      return retval;
    }
 
 }
