@@ -51,8 +51,6 @@ export class CytoscapeGenerator {
     */
    public getStyles(): any
    {
-      let doubleBox = this.doubleBox( null); // TODO: not null, but a system signature. (TER-tuple, probably).
-
       // Basic node, edge styles:
       
       let retval: Array<any> = this.basicStyles();
@@ -70,6 +68,7 @@ export class CytoscapeGenerator {
 
       // Cytoscape assigns styles in strict first-to-last order, so styles that need to take precedence (like the
       // :selected style) need to occur later in the styles array.
+
       retval.push({
          selector: 'node:selected',
          style: {
@@ -94,13 +93,16 @@ export class CytoscapeGenerator {
       let resContents = this.resourceBoxContents( aSys);
       let doubleBox = this.doubleBox( aSys);
       let techStripes = this.techStripes( aSys);
-      let imageSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="43" height="31">`
+      let iconSz = this.iconSize( aSys);
+      let imageSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSz.width}" height="${iconSz.height}">`
          + envContents
          + resContents
          + doubleBox
          + techStripes
          + `</svg>`;
-      let style = { width: 43, height: 31, 'background-image': `data:image/svg+xml,${imageSvg}` };
+      let style = { width: iconSz.width,
+                    height: iconSz.height,
+                    'background-image': `data:image/svg+xml,${imageSvg}` };
       this._styleMap.set( sig, style);
    }
 
@@ -150,8 +152,10 @@ export class CytoscapeGenerator {
     */
    private doubleBox( aSys: StarSystem): string
    {
+      let vertOffset = this.techStripeOffset( aSys);
       // 20x40, starting at (1,1), stroke-width 3 (so the strokes don't get clipped)
-      let retval = `<path fill="none" stroke="black" stroke-width="3" d="M 1,21 v -20 h 40 v 20 z M 21,1 v 20"/>`;
+      let retval = `<path fill="none" stroke="black" stroke-width="3" `
+         + `d="M 1,${21+vertOffset} v -20 h 40 v 20 z M 21,${1+vertOffset} v 20"/>`;
       return retval;
    }
 
@@ -162,6 +166,7 @@ export class CytoscapeGenerator {
     */
    private environmentBoxContents( aSys: StarSystem): string
    {
+      let vertOffset = this.techStripeOffset( aSys);
       if (aSys.environment == 0)
          return ""; // No contents.
 
@@ -176,16 +181,16 @@ export class CytoscapeGenerator {
       switch (absEnv)
       {
       case 1:
-         path = `M 1,1 h 20 l -10,10 z`;
+         path = `M 1,${1+vertOffset} h 20 l -10,10 z`;
          break;
       case 2:
-         path = `M 1,1 h 20 v 10 h -20 z`;
+         path = `M 1,${1+vertOffset} h 20 v 10 h -20 z`;
          break;
       case 3:
-         path = `M 1,1 h 20 v 20 l -10,-10 l -10,10 z`;
+         path = `M 1,${1+vertOffset} h 20 v 20 l -10,-10 l -10,10 z`;
          break;
       case 4:
-         path = `M 1,1 h 20 v 20 h -20 z`;
+         path = `M 1,${1+vertOffset} h 20 v 20 h -20 z`;
          break;
       default:
          throw `Unexpected environment value (${aSys.environment})`;
@@ -200,6 +205,7 @@ export class CytoscapeGenerator {
     */
    private resourceBoxContents( aSys: StarSystem): string
    {
+      let vertOffset = this.techStripeOffset( aSys);
       if (aSys.resources == 0)
          return ""; // No contents.
 
@@ -214,16 +220,16 @@ export class CytoscapeGenerator {
       switch (absRes)
       {
       case 1:
-         path = `M 21,21 h 20 l -10,-10 z`;
+         path = `M 21,${21+vertOffset} h 20 l -10,-10 z`;
          break;
       case 2:
-         path = `M 21,21 h 20 v -10 h -20 z`;
+         path = `M 21,${21+vertOffset} h 20 v -10 h -20 z`;
          break;
       case 3:
-         path = `M 21,21 h 20 v -20 l -10,10 l -10,-10 z`;
+         path = `M 21,${21+vertOffset} h 20 v -20 l -10,10 l -10,-10 z`;
          break;
       case 4:
-         path = `M 21,21 h 20 v -20 h -20 z`;
+         path = `M 21,${21+vertOffset} h 20 v -20 h -20 z`;
          break;
       default:
          throw `Unexpected resources value (${aSys.resources})`;
@@ -239,11 +245,137 @@ export class CytoscapeGenerator {
     */
    private techStripes( aSys: StarSystem): string
    {
+      let color: string;
+      if (aSys.tech > 0)
+         color = "hsl(270, 100%, 50%)";
+      else
+         color = "black";
+      
+      let path: string;
+      switch (aSys.tech)
+      {
+      case 0:
+         path = "";             
+         break;
+      case 1:
+         path = "M 0,1 h 42";
+         break;
+      case -1:
+         path = "M 0,30 h 42";
+         break;
+      case 2:                   // Path is same for 2 & 4; dashes will be different.
+      case 4:
+         path = "M 0,1 h 42 M 0,10 h 42";
+         break;
+      case -2:
+      case -4:
+         path = "M 0,30 h 42 M 0,39 h 42";
+         break;
+      case 3:
+      case -3:
+         // Oddball case can't be done with one path string because we need different stroke-dasharrays.
+         break;
+      default:
+         throw `path: Unexpected tech level in system ${aSys.id}: ${aSys.tech}`;
+      }
+
+      let dasharray: string;
+      switch (aSys.tech)
+      {
+      case 0:
+      case 4:
+      case -4:
+         // solid (or no) line
+         dasharray = "";
+         break;
+      case 1:
+      case -1:
+      case 2:
+      case -2:
+      case 3:
+      case -3:
+         // At least one line (of 1 or 2) drawn w/dashes
+         dasharray = `stroke-dasharray="6 6"`;
+         break;
+      default:
+         throw `dasharray: Unexpected tech level in system ${aSys.id}: ${aSys.tech}`;
+      }
+
       let retval: string;
-      let path = "M 0,30 h 42";
-      retval = `<path fill="none" stroke="black" stroke-width="3" stroke-dasharray="6 6" d="${path}"/>`;
+      switch (aSys.tech)
+      {
+      case 0:
+         // Middle-of-the-road; No stripes.
+         retval = "";
+         break;
+      case 1:
+      case -1:
+      case 2:
+      case -2:
+      case 4:
+      case -4:
+         // All lines with same dasharray, can be drawn w/one PATH element.
+         retval = `<path fill="none" stroke="${color}" stroke-width="3" ${dasharray} d="${path}"/>`;
+         break;
+      case 3:
+      case -3:
+         // Oddball case: one dashed, one solid line.
+         let solid: string;
+         let dashed: string;
+         if (aSys.tech == 3)
+         {
+            dashed = "M 0,1 h 42";
+            solid = "M 0, 10 h 42";
+         }
+         else
+         {
+            solid = "M 0,30 h 42";
+            dashed = "M 0,39 h 42";
+         }
+         retval = `<path fill="none" stroke="${color}" stroke-width="3" ${dasharray} d="${dashed}"/>`
+            + `<path fill="none" stroke="${color}" stroke-width="3" d="${solid}"/>`;
+         break;
+      default:
+         throw `retval: Unexpected tech level in system ${aSys.id}: ${aSys.tech}`;
+      }
+
       return retval;
    }
 
+   /**
+    * Returns vertical offset (if any) to account for any tech stripes above the double box and its contents.  The
+    * current scheme calls for some tech stripes ABOVE the double box, which will push it down.
+    */
+   private techStripeOffset( aSys: StarSystem): number
+   {
+      let retval: number;
+      if (aSys.tech > 1)
+         retval = 18;           // Two stripes, each of height 9.
+      else if (aSys.tech == 1)
+         retval = 9;            // One stripe.
+      else
+         retval = 0;            // No stripes, or negative tech (so, stripes BELOW box, not above).
+      return retval;
+   }
+
+   /**
+    * Returns total size of icon for system.
+    */
+   private iconSize( aSys): {width: number, height: number}
+   {
+      let techHeight = 23;      // Height including tech stripes; this is the "no tech stripes" default.
+      switch (Math.abs( aSys.tech))
+      {
+      case 0:
+         break;
+      case 1:
+         techHeight += 9
+         break;
+      default:
+         techHeight += 18;
+         break;
+      }
+      return {width: 43, height: techHeight};
+   }
 }
 

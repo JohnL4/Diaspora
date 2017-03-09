@@ -29,7 +29,7 @@
           </td>
           <td>
             <span *ngFor="let ss of sys.slipstreams">
-              {{ss.otherEndPoint( sys).name}},
+              {{ss.otherEndPoint( sys).name[0]}}
             </span>
           </td>
         </tr>
