@@ -123,8 +123,9 @@ export class CytoscapeGenerator {
             style: {
                label: 'data(label)',
                'background-opacity': 0,
-               width: 43,
-               height: 80,   // TODO: make this max possible height of an actual icon.
+               width: 44,
+               height: 42,   // TODO: make this max possible height of an actual icon.
+               padding: 3,
                shape: 'rectangle',
                'background-fit': 'none'
             }
@@ -137,8 +138,8 @@ export class CytoscapeGenerator {
                'control-point-step-size': 20,
                'source-label': '+',
                'target-label': '-',
-               'source-text-offset': 10,
-               'target-text-offset': 10,
+               'source-text-offset': 22,
+               'target-text-offset': 22,
             }
          }
       ];
@@ -155,7 +156,7 @@ export class CytoscapeGenerator {
       let vertOffset = this.techStripeOffset( aSys);
       // 20x40, starting at (1,1), stroke-width 3 (so the strokes don't get clipped)
       let retval = `<path fill="none" stroke="black" stroke-width="3" `
-         + `d="M 1,${21+vertOffset} v -20 h 40 v 20 z M 21,${1+vertOffset} v 20"/>`;
+         + `d="M 2,${22+vertOffset} v -20 h 40 v 20 z M 22,${2+vertOffset} v 20"/>`;
       return retval;
    }
 
@@ -181,16 +182,16 @@ export class CytoscapeGenerator {
       switch (absEnv)
       {
       case 1:
-         path = `M 1,${1+vertOffset} h 20 l -10,10 z`;
+         path = `M 2,${2+vertOffset} h 20 l -10,10 z`;
          break;
       case 2:
-         path = `M 1,${1+vertOffset} h 20 v 10 h -20 z`;
+         path = `M 2,${2+vertOffset} h 20 v 10 h -20 z`;
          break;
       case 3:
-         path = `M 1,${1+vertOffset} h 20 v 20 l -10,-10 l -10,10 z`;
+         path = `M 2,${2+vertOffset} h 20 v 20 l -10,-10 l -10,10 z`;
          break;
       case 4:
-         path = `M 1,${1+vertOffset} h 20 v 20 h -20 z`;
+         path = `M 2,${2+vertOffset} h 20 v 20 h -20 z`;
          break;
       default:
          throw `Unexpected environment value (${aSys.environment})`;
@@ -211,7 +212,7 @@ export class CytoscapeGenerator {
 
       let color: string;
       if (aSys.resources < 0)
-         color = "hsl(0, 0%, 40%)"; // gray
+         color = "hsl(0, 0%, 50%)"; // gray
       else
          color = "hsl(45, 100%, 50%)"; // gold
       
@@ -220,16 +221,16 @@ export class CytoscapeGenerator {
       switch (absRes)
       {
       case 1:
-         path = `M 21,${21+vertOffset} h 20 l -10,-10 z`;
+         path = `M 22,${22+vertOffset} h 20 l -10,-10 z`;
          break;
       case 2:
-         path = `M 21,${21+vertOffset} h 20 v -10 h -20 z`;
+         path = `M 22,${22+vertOffset} h 20 v -10 h -20 z`;
          break;
       case 3:
-         path = `M 21,${21+vertOffset} h 20 v -20 l -10,10 l -10,-10 z`;
+         path = `M 22,${22+vertOffset} h 20 v -20 l -10,10 l -10,-10 z`;
          break;
       case 4:
-         path = `M 21,${21+vertOffset} h 20 v -20 h -20 z`;
+         path = `M 22,${22+vertOffset} h 20 v -20 h -20 z`;
          break;
       default:
          throw `Unexpected resources value (${aSys.resources})`;
@@ -247,7 +248,7 @@ export class CytoscapeGenerator {
    {
       let color: string;
       if (aSys.tech > 0)
-         color = "hsl(270, 100%, 50%)";
+         color = "hsl(260, 100%, 50%)";
       else
          color = "black";
       
@@ -258,18 +259,18 @@ export class CytoscapeGenerator {
          path = "";             
          break;
       case 1:
-         path = "M 0,1 h 42";
+         path = "M 1,2 h 42";
          break;
       case -1:
-         path = "M 0,30 h 42";
+         path = "M 1,31 h 42";
          break;
       case 2:                   // Path is same for 2 & 4; dashes will be different.
       case 4:
-         path = "M 0,1 h 42 M 0,10 h 42";
+         path = "M 1,2 h 42 M 1,11 h 42";
          break;
       case -2:
       case -4:
-         path = "M 0,30 h 42 M 0,39 h 42";
+         path = "M 1,31 h 42 M 1,40 h 42";
          break;
       case 3:
       case -3:
@@ -324,13 +325,13 @@ export class CytoscapeGenerator {
          let dashed: string;
          if (aSys.tech == 3)
          {
-            dashed = "M 0,1 h 42";
-            solid = "M 0, 10 h 42";
+            dashed = "M 1,2 h 42";
+            solid = "M 1,11 h 42";
          }
          else
          {
-            solid = "M 0,30 h 42";
-            dashed = "M 0,39 h 42";
+            solid = "M 1,31 h 42";
+            dashed = "M 1,40 h 42";
          }
          retval = `<path fill="none" stroke="${color}" stroke-width="3" ${dasharray} d="${dashed}"/>`
             + `<path fill="none" stroke="${color}" stroke-width="3" d="${solid}"/>`;
@@ -363,7 +364,7 @@ export class CytoscapeGenerator {
     */
    private iconSize( aSys): {width: number, height: number}
    {
-      let techHeight = 23;      // Height including tech stripes; this is the "no tech stripes" default.
+      let techHeight = 24;      // Height including tech stripes; this is the "no tech stripes" default.
       switch (Math.abs( aSys.tech))
       {
       case 0:
@@ -375,7 +376,7 @@ export class CytoscapeGenerator {
          techHeight += 18;
          break;
       }
-      return {width: 43, height: techHeight};
+      return {width: 44, height: techHeight};
    }
 }
 
