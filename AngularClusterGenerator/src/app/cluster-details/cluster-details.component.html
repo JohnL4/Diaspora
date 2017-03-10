@@ -18,39 +18,39 @@
         <th>Aspects</th>
         <!-- <th>Connections</th> -->
         <th style="text-align: right;">
-            <button type="button" class="btn btn-default" aria-label="Edit">
-              <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-            </button>
+          <button type="button" class="btn btn-default" aria-label="Edit">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+          </button>
         </th>
       </tr>
       <ng-container *ngFor="let sys of Cluster.systems">
         <ng-container *ngIf="sys.isBeingEdited"> <!-- =========================== edit mode ==================== -->
-        <tr>
-          <td><input [(ngModel)]="sys.name"/></td>
-          <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
-          <td>
-            <input [(ngModel)]="sys.aspects[0]"/>
-            <input [(ngModel)]="sys.aspects[1]"/>
-            <input [(ngModel)]="sys.aspects[2]"/>
-          </td>
-<!--
-          <td>
-            <span *ngFor="let ss of sys.slipstreams">
-              {{ss.otherEndPoint( sys).name[0]}}
-            </span>
-          </td>
--->
-          <td>
-            <button type="button" class="btn btn-default" aria-label="Save" (click)="sys.toggleEdit()">
-              <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td style="text-align: right; vertical-align: top"><label>Notes:</label></td>
-          <td colspan="2">
-            <textarea [(ngModel)]="sys.notes" rows="5" style="width: 100%"></textarea>
-        </tr>
+          <tr>
+            <td><input [(ngModel)]="sys.name"/></td>
+            <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
+            <td>
+              <input [(ngModel)]="sys.aspects[0]"/>
+              <input [(ngModel)]="sys.aspects[1]"/>
+              <input [(ngModel)]="sys.aspects[2]"/>
+            </td>
+            <!--
+                <td>
+                  <span *ngFor="let ss of sys.slipstreams">
+                    {{ss.otherEndPoint( sys).name[0]}}
+                  </span>
+                </td>
+                -->
+            <td>
+              <button type="button" class="btn btn-default" aria-label="Save" (click)="sys.toggleEdit()">
+                <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: right; vertical-align: top"><label>Notes:</label></td>
+            <td colspan="2">
+              <textarea [(ngModel)]="sys.notes" rows="5" style="width: 100%"></textarea>
+          </tr>
         </ng-container>
         <ng-container *ngIf="! sys.isBeingEdited"> <!-- ======================== read-only mode ======================= -->
           <tr>
