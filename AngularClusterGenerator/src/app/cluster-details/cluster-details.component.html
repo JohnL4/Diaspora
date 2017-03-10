@@ -8,17 +8,23 @@
 <!-- Using table puts a border between each row and there's not really any easy way around that.  So be it.  Maybe if I
       pull in Polymer (or something) it'll be better.
 -->
-<div class="col-md-8" style="/* border: 1px solid blue; */">
+<div class="col-md-6" style="/* border: 1px solid blue; */">
 
   <div class="table-responsive">
-    <table class="table" *ngIf="Cluster && Cluster.numSystems">
+    <table class="table cluster-details" *ngIf="Cluster && Cluster.numSystems">
       <tr>
         <th>System</th>
         <th>Stats</th>
         <th>Aspects</th>
-        <th>Connections</th>
+        <!-- <th>Connections</th> -->
+        <th style="text-align: right;">
+            <button type="button" class="btn btn-default" aria-label="Edit">
+              <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+            </button>
+        </th>
       </tr>
       <ng-container *ngFor="let sys of Cluster.systems">
+        <ng-container *ngIf="sys.isBeingEdited"> <!-- =========================== edit mode ==================== -->
         <tr>
           <td><input [(ngModel)]="sys.name"/></td>
           <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
@@ -27,28 +33,51 @@
             <input [(ngModel)]="sys.aspects[1]"/>
             <input [(ngModel)]="sys.aspects[2]"/>
           </td>
+<!--
           <td>
             <span *ngFor="let ss of sys.slipstreams">
               {{ss.otherEndPoint( sys).name[0]}}
             </span>
           </td>
-        </tr>
-<!--
-        <tr>
+-->
           <td>
-            <label>Notes:</label>
+            <button type="button" class="btn btn-default" aria-label="Save" (click)="sys.toggleEdit()">
+              <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+            </button>
           </td>
-          <td colspan="3">
+        </tr>
+        <tr>
+          <td style="text-align: right; vertical-align: top"><label>Notes:</label></td>
+          <td colspan="2">
             <textarea [(ngModel)]="sys.notes" rows="5" style="width: 100%"></textarea>
         </tr>
--->
+        </ng-container>
+        <ng-container *ngIf="! sys.isBeingEdited"> <!-- ======================== read-only mode ======================= -->
+          <tr>
+            <td>{{sys.name}}</td>
+            <td>T{{sys.tech}} E{{sys.environment}} R{{sys.resources}}</td>
+            <!-- TODO: Need some fancy conditionals below to keep spurious semicolons from showing up. -->
+            <td>{{sys.aspects[0]}}; {{sys.aspects[1]}}; {{sys.aspects[2]}}</td>
+            <td style="text-align: right;">
+              <button type="button" class="btn btn-default" aria-label="Edit" (click)="sys.toggleEdit()">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="sys.notes">
+            <td style="text-align: right; vertical-align: top;"><label>Notes:</label></td>
+            <td colspan="3" style="vertical-align: top;">
+              {{sys.notes}}
+            </td>
+          </tr>
+        </ng-container>
       </ng-container>
     </table>
   </div>
 
 </div>
 
-<div class="col-md-4" id="cytoscapeDiv" style="/* width: 100%; */ height: 600px; border: 1px solid silver;" ></div>
+<div class="col-md-6" id="cytoscapeDiv" style="/* width: 100%; */ height: 75vh; border: 1px solid silver;" ></div>
 
 </div>
 

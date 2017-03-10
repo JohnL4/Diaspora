@@ -1,5 +1,6 @@
 import { Cluster } from './cluster';
 import { StarSystem } from './star-system';
+import { SlipknotPosition } from './slipknot-position';
 
 /**
  * Generates objects to drive Cytoscape.js (http://js.cytoscape.org/#core/initialisation).
@@ -37,10 +38,27 @@ export class CytoscapeGenerator {
 
       for (let slipstream of this.cluster.slipstreams)
       {
-         retval.edges.push( {data: {id: `${slipstream.from.id}-${slipstream.to.id}`,
-                                              source: slipstream.from.id,
-                                              target: slipstream.to.id }});
-                                              
+         // More-or-less arbitrary object we jam into the data for the edge.  The first three fields are required by
+         // Cytoscape.
+         let edgeData : { id: string,
+                          source: string,
+                          target: string,
+                          // Can't use dashes in property names here (even if we enclose them in quotes, because
+                          // Cytoscape, but underscores are ok.
+                          source_label?: string,
+                          target_label?: string
+                        };
+         edgeData = {id: `${slipstream.from.id}-${slipstream.to.id}`,
+                     source: slipstream.from.id,
+                     target: slipstream.to.id
+                    };
+         if (this.cluster.usesHighLowSlipstreams)
+         {
+            edgeData.source_label = slipstream.leave == SlipknotPosition.LOW ? '-' : '+';
+            edgeData.target_label = slipstream.arrive == SlipknotPosition.LOW ? '-' : '+';
+         }
+         retval.edges.push( {data: edgeData});
+         
       }
       return retval;
    }
@@ -117,6 +135,19 @@ export class CytoscapeGenerator {
 
    private basicStyles(): Array<any>
    {
+      let edgeStyle = {
+         'line-color': 'hsl(240, 0%, 75%)',
+         'curve-style': 'bezier', // Just in case we have two slipstreams between the same two systems.
+         'control-point-step-size': 20,
+         'source-text-offset': 24,
+         'target-text-offset': 24,
+      };
+      if (this.cluster.usesHighLowSlipstreams)
+      {
+         edgeStyle['source-label'] = 'data( source_label)';
+         edgeStyle['target-label'] = 'data( target_label)';
+      }
+      
       let retval = [
          {
             selector: 'node',
@@ -132,15 +163,7 @@ export class CytoscapeGenerator {
          },
          {
             selector: 'edge',
-            style: {
-               'line-color': 'hsl(240, 0%, 75%)',
-               'curve-style': 'bezier', // Just in case we have two slipstreams between the same two systems.
-               'control-point-step-size': 20,
-               'source-label': '+',
-               'target-label': '-',
-               'source-text-offset': 24,
-               'target-text-offset': 24,
-            }
+            style: edgeStyle
          }
       ];
 

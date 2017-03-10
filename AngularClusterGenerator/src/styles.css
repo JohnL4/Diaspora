@@ -8,3 +8,8 @@ label.required { font-size: larger; }
 @-moz-document url-prefix() {
   fieldset { display: table-cell; }
 }
+
+table.table.cluster-details th, table.table.cluster-details td {
+    vertical-align: middle;
+    /* border: 1px solid red; */
+}

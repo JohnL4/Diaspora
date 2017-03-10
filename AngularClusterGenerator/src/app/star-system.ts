@@ -18,6 +18,8 @@ export class StarSystem {
 
    public notes: string;
 
+   public isBeingEdited: boolean;
+   
    public constructor( private _id: string,
                        public name: string,
                        public tech: number,
@@ -26,6 +28,11 @@ export class StarSystem {
    {};
 
    public get id() { return this._id; }
+
+   public toggleEdit():void
+   {
+      this.isBeingEdited = ! this.isBeingEdited;
+   }
    
 //   /**
 //    * Adds a new slipstream between this system and aTo system.
