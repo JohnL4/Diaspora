@@ -138,8 +138,8 @@ export class CytoscapeGenerator {
                'control-point-step-size': 20,
                'source-label': '+',
                'target-label': '-',
-               'source-text-offset': 22,
-               'target-text-offset': 22,
+               'source-text-offset': 24,
+               'target-text-offset': 24,
             }
          }
       ];
@@ -212,7 +212,7 @@ export class CytoscapeGenerator {
 
       let color: string;
       if (aSys.resources < 0)
-         color = "hsl(0, 0%, 50%)"; // gray
+         color = "hsl(0, 0%, 45%)"; // gray
       else
          color = "hsl(45, 100%, 50%)"; // gold
       
