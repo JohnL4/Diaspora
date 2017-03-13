@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { Cluster } from '../cluster';
 import { CytoscapeGenerator } from '../cytoscape-generator';
+import { ClusterPersistenceService } from '../cluster-persistence.service';
 
 @Component({
   selector: 'app-cluster-details',
@@ -17,13 +18,14 @@ export class ClusterDetailsComponent implements OnInit {
       return this._cluster;
    }
    
-   constructor( aCluster: Cluster)
+   constructor( aCluster: Cluster, private _persistenceSvc: ClusterPersistenceService)
    {
       this._cluster = aCluster;
    }
 
    ngOnInit()
    {
+      this._persistenceSvc.getClusterNames();
       let cytoscape = require( 'cytoscape');
 
       // Can't figure out how to get cytoscape-cola in here.

@@ -29,7 +29,7 @@ export class ClusterSerializerXML implements Serializer
    serialize() : string
    {
       this._callCount++;
-      console.log( `Serializer called ${this._callCount} times`); 
+      // console.log( `Serializer called ${this._callCount} times`); 
       let xml: string = `<?xml version="1.0"?>
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -47,16 +47,16 @@ export class ClusterSerializerXML implements Serializer
          // TODO: sys.name really should be xml-encoded to escape double quotes.  Or maybe just the double quotes need
          // to be escaped?
          let nameEsc = encodeURIComponent(sys.name);
-         console.log( `nameEsc = "${nameEsc}"`);
+         // console.log( `nameEsc = "${nameEsc}"`);
          xml += `\n${this.indentStr(indent)}<starSystem id="${sys.id}" name="${nameEsc}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
          for (let i = 0; i < 3; i++)
          {
             let aspectEsc = sys.aspects[i] ? encodeURIComponent( sys.aspects[i]) : "";
-            console.log( `aspectEsc[${i}] = "${aspectEsc}"`);
+            // console.log( `aspectEsc[${i}] = "${aspectEsc}"`);
             xml += `\n${this.indentStr(indent+1)}<aspect>${aspectEsc}</aspect>`;
          }
          let notesEsc = sys.notes ? encodeURIComponent( sys.notes) : "";
-         console.log( `notesEsc = "${notesEsc}"`);
+         // console.log( `notesEsc = "${notesEsc}"`);
          xml += `\n${this.indentStr(indent+1)}<notes>${notesEsc}</notes>`;
          xml += `\n${this.indentStr(indent)}</starSystem>`;
       }

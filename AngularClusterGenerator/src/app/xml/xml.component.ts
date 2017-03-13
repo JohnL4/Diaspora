@@ -54,7 +54,7 @@ export class XmlComponent implements OnInit {
 
    public set xml( newXml: string)
    {
-      console.log( "set xml called");
+      // console.log( "set xml called");
       this._xml = newXml;
 
       // For the following, probably want to do some sort of reactive input-event throttling, but for now, just

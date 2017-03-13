@@ -3,6 +3,7 @@ import { FormsModule, NgForm, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { Cluster } from '../cluster';
+import { ClusterPersistenceService } from '../cluster-persistence.service';
 
 @Component({
   selector: 'app-generator-params',
@@ -37,7 +38,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    private _router: Router;
    private _highLowHelpShowing: boolean = false;
    
-   constructor(aCluster: Cluster, aRouter: Router, private _renderer: Renderer)
+   constructor(aCluster: Cluster, aRouter: Router, private _renderer: Renderer, private _persistenceSvc: ClusterPersistenceService)
    {
       this._cluster = aCluster;
       this._router = aRouter;
@@ -55,7 +56,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    ngAfterViewInit()
    {
-      console.log( "ngAfterViewInit()");
+      // console.log( "ngAfterViewInit()");
       // This is the safe way to invoke DOM element methods.
       // See http://angularjs.blogspot.com/2016/04/5-rookie-mistakes-to-avoid-with-angular.html
       this._renderer.invokeElementMethod( this.numSystemsInput.nativeElement, 'focus');
@@ -70,7 +71,9 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    public generateCluster()
    {
-      console.log( "generateCluster()");
+      this._persistenceSvc.init();
+      this._persistenceSvc.getClusterNames();
+      // console.log( "generateCluster()");
       if (this.parmsForm.form.valid)
          // Note that we don't simly new up a new Cluster, because the injector is managing the one we were passed.
          // Instead, we modify the existing one in place.
@@ -81,7 +84,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    public revertParams()
    {
-      console.log( "revertParams()");
+      // console.log( "revertParams()");
       this.numSystems = this._cluster
          && this._cluster.numSystems
          && this._cluster.numSystems.toString()
@@ -91,7 +94,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    onSubmit()
    {
-      console.log( "onSubmit()");
+      // console.log( "onSubmit()");
       // Note: If we were submitting form contents to a server for generation on the server side, I think I'd not do a
       // local navigation, but would instead wait for the server's response.  Maybe.  Need to make sure server updates
       // browser nav history properly so deep-linking works.  Don't know how to do that yet.
@@ -105,7 +108,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    showHighLowHelp()
    {
-      console.log( "showHighLowHelp()");
+      // console.log( "showHighLowHelp()");
       this._highLowHelpShowing = ! this._highLowHelpShowing;
       return false;
    }

@@ -3,7 +3,7 @@ import { AbstractControl, NG_VALIDATORS, Validator, ValidatorFn, Validators } fr
 
 let anv_me = "allowed-numeric-values.directive.ts";
 
-console.log( anv_me + ": loading");
+// console.log( anv_me + ": loading");
 
 const SELECTOR: string = 'allowedNumericValues'; // TODO: figure out if this is in some namespace or if it's going to
                                                  // collide with some other module's SELECTOR.
@@ -48,7 +48,7 @@ class Range
  */
 export function allowedNumericValuesValidator( anAllowedValuesSpec: string): ValidatorFn
 {
-   console.log( anv_me + ": running allowedNumericValuesValidator()");
+   // console.log( anv_me + ": running allowedNumericValuesValidator()");
    let errors: string[] = [];   // Errors from parsing allowed-values specification
    let ranges : Range[] = [];   // Allowed ranges, used in validation.
    let rangeSpecs = anAllowedValuesSpec.split( /\s*;\s*/);
@@ -97,7 +97,7 @@ export function allowedNumericValuesValidator( anAllowedValuesSpec: string): Val
       throw new Error( errors.join( "; "));
 
    return (control: AbstractControl): {[key: string]: any} => {
-      console.log( anv_me + ": running anon. validator fn");
+      // console.log( anv_me + ": running anon. validator fn");
       const numberToBeValidated = control.value;
       const num = Number( numberToBeValidated);
       if (isNaN( num))
@@ -156,7 +156,7 @@ export class AllowedNumericValuesDirective implements Validator, OnChanges
 
    ngOnChanges( changes: SimpleChanges): void
    {
-      console.log( anv_me + ": ngOnChanges()");
+      // console.log( anv_me + ": ngOnChanges()");
       const change = changes[ SELECTOR];
       if (change)
       {
@@ -169,7 +169,7 @@ export class AllowedNumericValuesDirective implements Validator, OnChanges
 
    validate( control: AbstractControl): {[key: string]: any}
    {
-      console.log( anv_me + ": validate");
+      // console.log( anv_me + ": validate");
       return this.valFn( control);
    }
 }
