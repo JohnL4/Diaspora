@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Cluster } from '../cluster';
 import { CytoscapeGenerator } from '../cytoscape-generator';
 import { ClusterPersistenceService } from '../cluster-persistence.service';
+import { ClusterSerializerXML } from '../cluster-serializer-xml';
 
 @Component({
   selector: 'app-cluster-details',
@@ -13,6 +14,8 @@ export class ClusterDetailsComponent implements OnInit {
 
    private _cluster: Cluster;
 
+   private _me = "ClusterDetailsComponent";
+   
    public get Cluster(): Cluster
    {
       return this._cluster;
@@ -25,7 +28,17 @@ export class ClusterDetailsComponent implements OnInit {
 
    ngOnInit()
    {
+      let me = `ngOnInit()`;
+      console.log( me);
+      this._persistenceSvc.init();
       this._persistenceSvc.getClusterNames();
+      if (this._cluster.numSystems == 0)
+      {
+         let serializer = new ClusterSerializerXML();
+         serializer.deserialize( localStorage.getItem( 'cluster'));
+         this._cluster.copyFrom( serializer.cluster);
+         console.log( `Deserialized ${this._cluster.numSystems} systems from localStorage`);
+      }
       let cytoscape = require( 'cytoscape');
 
       // Can't figure out how to get cytoscape-cola in here.
@@ -49,5 +62,7 @@ export class ClusterDetailsComponent implements OnInit {
          // layout: {name: 'cose'}
       });
       cy.layout({name: 'cose'});
+      console.log( me + `: done`);
+      // alert( me + `: done`);
   }
 }

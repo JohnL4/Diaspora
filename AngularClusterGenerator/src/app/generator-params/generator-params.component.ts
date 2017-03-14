@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 import { Cluster } from '../cluster';
 import { ClusterPersistenceService } from '../cluster-persistence.service';
+import { ClusterSerializerXML } from '../cluster-serializer-xml';
 
 @Component({
   selector: 'app-generator-params',
@@ -29,6 +30,8 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    
    private _useHighLowSlipstreams: boolean;
 
+   private _serializer: ClusterSerializerXML;
+
    // TODO: Should the following be private or something?
    parmsForm: NgForm;
    @ViewChild( 'parmsForm') currentForm: NgForm;
@@ -52,6 +55,13 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    ngOnInit()
    {
+      let me = this.constructor.name + ".ngOnInit(): ";
+      console.log( me);
+      this._persistenceSvc.init();
+      // this._persistenceSvc.logout();
+      // this._persistenceSvc.login();
+      this._persistenceSvc.connectToDatabase();
+      this._persistenceSvc.getClusterNames();
    }
 
    ngAfterViewInit()
@@ -71,15 +81,29 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    public generateCluster()
    {
-      this._persistenceSvc.init();
-      this._persistenceSvc.getClusterNames();
       // console.log( "generateCluster()");
       if (this.parmsForm.form.valid)
+      {
          // Note that we don't simly new up a new Cluster, because the injector is managing the one we were passed.
          // Instead, we modify the existing one in place.
          this._cluster.generate( Number( this.numSystems), this._useHighLowSlipstreams);
+
+         if (localStorage)
+         {
+            if (! this._serializer)
+               this._serializer = new ClusterSerializerXML();
+            this._serializer.cluster = this._cluster;
+            let clusterXml = this._serializer.serialize();
+            console.log( `generateCluster(): before setting, localStorage has ${localStorage.length} items`);
+            localStorage.setItem( 'cluster', clusterXml);
+            console.log( `generateCluster(): after setting, localStorage has ${localStorage.length} items`);
+            for (let key in localStorage)
+               console.log( `\tkey: ${key}`);
+         }
+      }
       else
          console.log( "form invalid; not generating cluster");
+      // alert( "generateCluster() done");
    }
 
    public revertParams()

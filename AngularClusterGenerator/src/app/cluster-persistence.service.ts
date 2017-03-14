@@ -29,10 +29,13 @@ export class ClusterPersistenceService
 
    public init(): void
    {
+      let me = this.constructor.name + '.init(): ';
+      console.log( me);
       if (this._initialized)    // Probably not threadsafe, but I'll think about that tomorrow.  After all, tomorrow is another day.
+      {
+         console.log( me + "already initialized");
          return;
-      let me = `${this._me}: init()`;
-      console.log( `${this._me}: init(): this = ${this}`);
+      }
       this._firebase = require( "firebase");
       let config = {
          apiKey: "AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E",
@@ -42,7 +45,24 @@ export class ClusterPersistenceService
          messagingSenderId: "222484722746"
       };
       this._firebase.initializeApp( config);
-      // this.doLogin();
+      let user = this._firebase.auth().currentUser;
+      console.log( me + `current user: ${user}`);
+      this._firebase.auth().getRedirectResult().then( (function( result) {
+         if (result.credential) {
+            this._googleAccessToken = result.credential.accessToken;
+            console.log( me + `accessToken = "${this._googleAccessToken}`);
+         }
+         this._user = result.user;
+         console.log( me + `logged in user "${this._user}"`);
+         // alert( "login done");
+      }).bind( this)).catch( (function( error: Error) {
+         console.log( `${me} ${error.message}`)}).bind( this));
+      this._initialized = true;
+      console.log( me + "initialized");
+   }
+
+   public connectToDatabase()
+   {
       this._db = this._firebase.database();
       console.log( `${this._me}: initialized firebase, db = "${this._db}"`);
       // Re: .bind(this): See http://stackoverflow.com/a/20279485/370611
@@ -50,30 +70,61 @@ export class ClusterPersistenceService
                                         this.clusterNamesValueChanged.bind( this),
                                         this.firebaseError.bind( this)
                                       );
-      this._initialized = true;
    }
-
-   private doLogin(): void
+   
+   public login(): void
    {
-      let me = `${this._me}: doLogin()`;
+      let me = `${this._me}: login(): `;
       console.log( me);
-      if (! this._authProvider)
-         this._authProvider = new this._firebase.auth.GoogleAuthProvider();
-      this._firebase.auth().signInWithRedirect( this._authProvider);
-      this._firebase.auth().getRedirectResult().then( (function( result) {
-         if (result.credential) {
-            this._googleAccessToken = result.credential.accessToken;
-            console.log( me + `: accessToken = "${this._googleAccessToken}`);
+      if (localStorage['loggingIn'])
+         console.log( me + `login in progress`);
+      else
+      {
+         localStorage['loggingIn'] = 'true';
+         this._user = this._firebase.auth().currentUser;
+         console.log( me + `before login attempt, current user = "${this._user}"`);
+         if (! this._user)
+         {
+            if (! this._authProvider)
+               this._authProvider = new this._firebase.auth.GoogleAuthProvider();
+            alert( "signing in w/redirect");
+            this._firebase.auth().signInWithRedirect( this._authProvider);
+            // alert( "about to process redirect result");
+            this._firebase.auth().getRedirectResult().then( (function( result) {
+               if (result.credential) {
+                  this._googleAccessToken = result.credential.accessToken;
+                  console.log( me + `accessToken = "${this._googleAccessToken}`);
+               }
+               this._user = result.user;
+               console.log( me + `logged in user "${this._user}"`);
+               // alert( "login done");
+            }).bind( this)).catch( (function( error: Error) {
+               console.log( `${me} ${error.message}`)}).bind( this));
          }
-         this._user = result.user;
-         console.log( me + `: logged in user "${this._user}"`);
-      }).bind( this)).catch( (function( error: Error) {
-         console.log( `${me}: ${error.message}`)}).bind( this))
+         // alert( "doLogin() done");
+      }
+      localStorage.removeItem('loggingIn');
+      if (localStorage['loggingIn'])
+         console.log( me + `login STILL in progress`);
+      else
+         console.log( me + `login no longer in progress`);
    }
 
+   public logout()
+   {
+      alert( "logging out");
+      this._firebase.auth().signOut().then( function() {
+         console.log( "signout successful");
+      }).catch( function( anError: Error) {
+         console.log( `signout error: ${anError.message}`);
+      });
+   }
+   
    private firebaseError( anError: Error): void
    {
       console.log( `${this._me}: firebaseError(): ` + anError.message);
+      if (anError.message.match( /^permission_denied/))
+         this.login();
    }
    
    private clusterNamesValueChanged( aSnapshot: any)
