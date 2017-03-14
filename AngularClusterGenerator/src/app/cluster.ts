@@ -95,6 +95,7 @@ export class Cluster {
     */
    generate( aNumSystems: number, aUseHighLowSlipstreams: boolean)
    {
+      let me = this.constructor.name + ".generate(): ";
       this.usesHighLowSlipstreams = aUseHighLowSlipstreams;
       let sysv = new Array<StarSystem>(); // Temporary, rather than constantly rebuilding, sorted (by id), because IE 11 is stoopid.
       let slipstreamGuaranteeMet : boolean = false;
@@ -118,27 +119,36 @@ export class Cluster {
 
       if (! slipstreamGuaranteeMet)
       {
-         console.log( "Fulfilling slipstream guarantee.");
+         console.log( me + "Fulfilling slipstream guarantee.");
          let minAttrSum = (3 * 4) + 1;
          let maxAttrSum = (3 * -4) - 1;
-         let minIx: number; // Indices of systems with lowest and highest attribute sums.
-         let maxIx: number;
+         let minIx: number[]; // Indices of systems with lowest and highest attribute sums.
+         let maxIx: number[];
          for (let i = 0; i < aNumSystems; i++)
          {
             let sum = sysv[i].tech + sysv[i].environment + sysv[i].resources;
             if (sum < minAttrSum)
             {
                minAttrSum = sum;
-               minIx = i;
+               minIx = new Array<number>();
+               minIx.push( i);
             }
+            else if (sum == minAttrSum)
+               minIx.push( i);
             if (sum > maxAttrSum)
             {
                maxAttrSum = sum;
-               maxIx = i;
+               maxIx = new Array<number>();
+               maxIx.push( i);
             }
+            else if (sum == maxAttrSum)
+               maxIx.push( i);
          }
-         this.systemMap.get(sysv[minIx].id).tech = 2;
-         this.systemMap.get(sysv[maxIx].id).tech = 2;
+         let worstIx = minIx[ Math.floor(Math.random() * minIx.length)];
+         let bestIx = maxIx[ Math.floor(Math.random() * maxIx.length)];
+         console.log( me + `Worst systems: ${minIx} (picked ${worstIx}: ${sysv[worstIx].id}); Best systems: ${maxIx} (picked ${bestIx}: ${sysv[bestIx].id})`);
+         this.systemMap.get(sysv[worstIx].id).tech = 2;
+         this.systemMap.get(sysv[bestIx].id).tech = 2;
       }
       
       // Slipstreams
