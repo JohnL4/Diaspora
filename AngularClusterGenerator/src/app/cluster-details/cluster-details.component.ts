@@ -12,8 +12,6 @@ import { ClusterSerializerXML } from '../cluster-serializer-xml';
 })
 export class ClusterDetailsComponent implements OnInit {
 
-   private _cluster: Cluster;
-
    private _me = "ClusterDetailsComponent";
    
    public get Cluster(): Cluster
@@ -21,17 +19,14 @@ export class ClusterDetailsComponent implements OnInit {
       return this._cluster;
    }
    
-   constructor( aCluster: Cluster, private _persistenceSvc: ClusterPersistenceService)
-   {
-      this._cluster = aCluster;
-   }
+   constructor( private _cluster: Cluster, private _persistenceSvc: ClusterPersistenceService) {}
 
    ngOnInit()
    {
-      let me = `ngOnInit()`;
+      let me = this.constructor.name + `.ngOnInit(): `;
       console.log( me);
-      this._persistenceSvc.init();
-      this._persistenceSvc.getClusterNames();
+      // this._persistenceSvc.init();
+      // this._persistenceSvc.getClusterNames();
       if (this._cluster.numSystems == 0)
       {
          let serializer = new ClusterSerializerXML();
@@ -62,7 +57,7 @@ export class ClusterDetailsComponent implements OnInit {
          // layout: {name: 'cose'}
       });
       cy.layout({name: 'cose'});
-      console.log( me + `: done`);
-      // alert( me + `: done`);
+      console.log( me + `done`);
+      // alert( me + `done`);
   }
 }

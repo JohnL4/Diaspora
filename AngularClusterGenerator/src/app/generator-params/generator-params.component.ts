@@ -55,13 +55,6 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    ngOnInit()
    {
-      let me = this.constructor.name + ".ngOnInit(): ";
-      console.log( me);
-      this._persistenceSvc.init();
-      // this._persistenceSvc.logout();
-      // this._persistenceSvc.login();
-      this._persistenceSvc.connectToDatabase();
-      this._persistenceSvc.getClusterNames();
    }
 
    ngAfterViewInit()

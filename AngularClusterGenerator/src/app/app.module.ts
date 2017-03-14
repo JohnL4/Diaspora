@@ -11,6 +11,7 @@ import { DotComponent } from './dot/dot.component';
 import { GeneratorParamsComponent } from './generator-params/generator-params.component';
 import { TabsComponent } from './tabs/tabs.component';
 import { XmlComponent } from './xml/xml.component';
+import { SessionOpsComponent } from './session-ops/session-ops.component';
 
 @NgModule({
    declarations: [
@@ -19,7 +20,8 @@ import { XmlComponent } from './xml/xml.component';
       DotComponent,
       GeneratorParamsComponent,
       TabsComponent,
-      XmlComponent
+      XmlComponent,
+      SessionOpsComponent
    ],
    imports: [
       BrowserModule,
@@ -47,6 +49,10 @@ import { XmlComponent } from './xml/xml.component';
          {
             path: 'dot',
             component: DotComponent
+         },
+         {
+            path: 'session-ops',
+            component: SessionOpsComponent
          }
       ])
    ],

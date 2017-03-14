@@ -23,15 +23,22 @@ import { Cluster } from './cluster';
 })
 export class AppComponent implements OnInit
 {
-  title = 'Diaspora Cluster Maintenance';
+   title = 'Diaspora Cluster Maintenance';
 
    private _cluster: Cluster; // Not at all sure this is used.  HOW DO WE DEBUG??
 
-   constructor( private _clusterPersistenceService: ClusterPersistenceService) {}
+   constructor( private _persistenceSvc: ClusterPersistenceService) {}
 
    ngOnInit()
    {
-      
+      let me = this.constructor.name + ".ngOnInit(): ";
+      console.log( me);
+      this._persistenceSvc.init();
+      // this._persistenceSvc.logout();
+      // this._persistenceSvc.login();
+      this._persistenceSvc.connectToDatabase();
+      this._persistenceSvc.getClusterNames();
+      console.log( me + 'done');
    }
    
 }
