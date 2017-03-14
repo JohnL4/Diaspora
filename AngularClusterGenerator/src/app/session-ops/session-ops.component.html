@@ -7,6 +7,9 @@
   <div class="col-sm-1">
     <p><button class="btn btn-default" type="button" (click)="login()">Login</button></p>
   </div>
+  <div class="col-sm-5" *ngIf="_persistenceSvc.user">
+    <p>Currently logged in as <span>{{_persistenceSvc.user}}</span>.</p>
+  </div>
 </div>
 <div class="row">
   <div class="col-sm-1 col-sm-offset-6">

@@ -27,6 +27,8 @@ export class ClusterPersistenceService
       console.log( `${this._me}: ctor`);
    }
 
+   public get user(): string { return this._user? this._user.toString() : null; }
+   
    public init(): void
    {
       let me = this.constructor.name + '.init(): ';
@@ -45,22 +47,37 @@ export class ClusterPersistenceService
          messagingSenderId: "222484722746"
       };
       this._firebase.initializeApp( config);
-      let user = this._firebase.auth().currentUser;
+
+      let user = this._firebase.auth().currentUser; // This doesn't work -- always comes back null even when user is
+                                                    // already logged in
       console.log( me + `current user: ${user}`);
-//       this._firebase.auth().getRedirectResult().then( (function( result) {
-//          if (result.credential) {
-//             this._googleAccessToken = result.credential.accessToken;
-//             console.log( me + `accessToken = "${this._googleAccessToken}`);
-//          }
-//          this._user = result.user;
-//          console.log( me + `logged in user "${this._user}"`);
-//          alert( me + "login done");
-//       }).bind( this)).catch( (function( error: Error) {
-//          console.log( `${me} ${error.message}`);
-//          alert( me + "error");
-//       }).bind( this));
+
+      this._firebase.auth().onAuthStateChanged( this.authStateChanged.bind( this), this.authError.bind( this));
+
       this._initialized = true;
       console.log( me + "initialized");
+   }
+
+   private authStateChanged( aFirebaseUser): void
+   {
+      let me = this.constructor.name + '.authStateChanged(): ';
+      if (aFirebaseUser)
+      {
+         this._user = aFirebaseUser.displayName || aFirebaseUser.email || aFirebaseUser.uid;
+         console.log( me + `User logged in: ${this._user} with provider ${aFirebaseUser.providerId}`);
+      }
+      else
+      {
+         console.log( me + 'auth state changed, but passed user is null or empty, assuming logged out');
+         this._user = null;
+      }
+   }
+
+   private authError( aFirebaseAuthError): void
+   {
+      let me = this.constructor.name + '.authError(): ';
+      this._user = null;
+      console.log( me + `auth error: ${aFirebaseAuthError.message}`);
    }
 
    public connectToDatabase()
