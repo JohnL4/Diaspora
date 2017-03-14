@@ -49,15 +49,21 @@ export class ClusterSerializerXML implements Serializer
          let nameEsc = encodeURIComponent(sys.name);
          // console.log( `nameEsc = "${nameEsc}"`);
          xml += `\n${this.indentStr(indent)}<starSystem id="${sys.id}" name="${nameEsc}" technology="${sys.tech}" environment="${sys.environment}" resources="${sys.resources}">`;
-         for (let i = 0; i < 3; i++)
+         for (let aspect of sys.aspects)
          {
-            let aspectEsc = sys.aspects[i] ? encodeURIComponent( sys.aspects[i]) : "";
-            // console.log( `aspectEsc[${i}] = "${aspectEsc}"`);
-            xml += `\n${this.indentStr(indent+1)}<aspect>${aspectEsc}</aspect>`;
+            if (aspect)
+            {
+               let aspectEsc = aspect ? encodeURIComponent( aspect) : "";
+               // console.log( `aspectEsc[${i}] = "${aspectEsc}"`);
+               xml += `\n${this.indentStr(indent+1)}<aspect>${aspectEsc}</aspect>`;
+            }
          }
-         let notesEsc = sys.notes ? encodeURIComponent( sys.notes) : "";
-         // console.log( `notesEsc = "${notesEsc}"`);
-         xml += `\n${this.indentStr(indent+1)}<notes>${notesEsc}</notes>`;
+         if (sys.notes)
+         {
+            let notesEsc = sys.notes ? encodeURIComponent( sys.notes) : "";
+            // console.log( `notesEsc = "${notesEsc}"`);
+            xml += `\n${this.indentStr(indent+1)}<notes>${notesEsc}</notes>`;
+         }
          xml += `\n${this.indentStr(indent)}</starSystem>`;
       }
       for (let ss of this.cluster.slipstreams)
@@ -104,13 +110,21 @@ export class ClusterSerializerXML implements Serializer
                   Number( starSysElt.getAttribute( "technology")),
                   Number( starSysElt.getAttribute( "environment")),
                   Number( starSysElt.getAttribute( "resources")));
+               sys.aspects = new Array<string>();
                let aspectElts = starSysElt.getElementsByTagName( "aspect");
-               for (let j = 0; j < 3; j++)
+               for (let j = 0; j < aspectElts.length; j++)
                {
-                  sys.aspects[j] = decodeURIComponent( aspectElts[j].textContent);
+                  sys.aspects.push( decodeURIComponent( aspectElts[j].textContent));
                }
-               let notesElt = starSysElt.getElementsByTagName( "notes")[0];
-               sys.notes = decodeURIComponent( notesElt.textContent);
+               // Since we bind hardcoded-ly to three aspects, make sure they're there.
+               while (sys.aspects.length < 3)
+                  sys.aspects.push( "");
+               let notesElts = starSysElt.getElementsByTagName( "notes");
+               if (notesElts.length > 0)
+               {
+                  let notesElt = starSysElt.getElementsByTagName( "notes")[0];
+                  sys.notes = decodeURIComponent( notesElt.textContent);
+               }
                starSystems.push( sys);
             }
          }
