@@ -13,6 +13,11 @@ import { dice, fateThrow, alphaBravo } from './utils';
 export class Cluster {
    
    /**
+    * The name of the cluster (mostly for saving and loading).
+    */
+   public name: string;
+   
+   /**
     * Map from system id to StarSystem.
     */
    public systemMap: Map<string,StarSystem>;

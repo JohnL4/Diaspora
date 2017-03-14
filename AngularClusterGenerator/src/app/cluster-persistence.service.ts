@@ -47,16 +47,18 @@ export class ClusterPersistenceService
       this._firebase.initializeApp( config);
       let user = this._firebase.auth().currentUser;
       console.log( me + `current user: ${user}`);
-      this._firebase.auth().getRedirectResult().then( (function( result) {
-         if (result.credential) {
-            this._googleAccessToken = result.credential.accessToken;
-            console.log( me + `accessToken = "${this._googleAccessToken}`);
-         }
-         this._user = result.user;
-         console.log( me + `logged in user "${this._user}"`);
-         // alert( "login done");
-      }).bind( this)).catch( (function( error: Error) {
-         console.log( `${me} ${error.message}`)}).bind( this));
+//       this._firebase.auth().getRedirectResult().then( (function( result) {
+//          if (result.credential) {
+//             this._googleAccessToken = result.credential.accessToken;
+//             console.log( me + `accessToken = "${this._googleAccessToken}`);
+//          }
+//          this._user = result.user;
+//          console.log( me + `logged in user "${this._user}"`);
+//          alert( me + "login done");
+//       }).bind( this)).catch( (function( error: Error) {
+//          console.log( `${me} ${error.message}`);
+//          alert( me + "error");
+//       }).bind( this));
       this._initialized = true;
       console.log( me + "initialized");
    }
@@ -74,7 +76,7 @@ export class ClusterPersistenceService
    
    public login(): void
    {
-      let me = `${this._me}: login(): `;
+      let me =  this.constructor.name + ".login(): ";
       console.log( me);
       if (localStorage['loggingIn'])
          console.log( me + `login in progress`);
@@ -87,7 +89,8 @@ export class ClusterPersistenceService
          {
             if (! this._authProvider)
                this._authProvider = new this._firebase.auth.GoogleAuthProvider();
-            alert( "signing in w/redirect");
+            console.log( me + "signing in with redirect");
+            // alert( "signing in w/redirect");
             this._firebase.auth().signInWithRedirect( this._authProvider);
             // alert( "about to process redirect result");
             this._firebase.auth().getRedirectResult().then( (function( result) {
@@ -112,7 +115,9 @@ export class ClusterPersistenceService
 
    public logout()
    {
-      alert( "logging out");
+      let me = this.constructor.name + ".logout(): ";
+      // alert( "logging out");
+      console.log( me);
       this._firebase.auth().signOut().then( function() {
          console.log( "signout successful");
       }).catch( function( anError: Error) {
@@ -123,8 +128,8 @@ export class ClusterPersistenceService
    private firebaseError( anError: Error): void
    {
       console.log( `${this._me}: firebaseError(): ` + anError.message);
-      if (anError.message.match( /^permission_denied/))
-         this.login();
+      // if (anError.message.match( /^permission_denied/))
+      //    this.login();
    }
    
    private clusterNamesValueChanged( aSnapshot: any)

@@ -37,8 +37,9 @@ export class AppComponent implements OnInit
       // this._persistenceSvc.logout();
       // this._persistenceSvc.login();
       this._persistenceSvc.connectToDatabase();
-      this._persistenceSvc.getClusterNames();
+      // this._persistenceSvc.getClusterNames();
       console.log( me + 'done');
+      // alert( me + 'done');
    }
    
 }

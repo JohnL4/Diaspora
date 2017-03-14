@@ -1,26 +1,26 @@
 <p>
 </p>
 <div class="row">
-  <div class="col-sm-8">
+  <div class="col-sm-6">
     <p>You cannot access the database (for saving or saved clusters) unless you are logged in.</p>
   </div>
   <div class="col-sm-1">
-    <p><button class="btn btn-default" type="button">Login</button></p>
+    <p><button class="btn btn-default" type="button" (click)="login()">Login</button></p>
   </div>
 </div>
 <div class="row">
-  <div class="col-sm-1 col-sm-offset-8">
-    <p><button class="btn btn-default" type="button">Logout</button></p>
+  <div class="col-sm-1 col-sm-offset-6">
+    <p><button class="btn btn-default" type="button" (click)="logout()">Logout</button></p>
   </div>
 </div>
 <div class="row">
-  <div class="col-sm-5">
+  <div class="col-sm-3">
     <p>Give the cluster a name and save it.</p>
   </div>
   <div class="col-sm-3">
-    <p><input type="text" name="clusterName"/></p>
+    <p><input type="text" name="clusterName" [(ngModel)]="clusterName"/></p>
   </div>
   <div class="col-sm-1">
-    <p><button class="btn btn-default" type="button">Save</button></p>
+    <p><button class="btn btn-default" type="button" (click)="saveCluster()">Save</button></p>
   </div>
 </div>
