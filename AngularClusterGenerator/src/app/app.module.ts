@@ -7,7 +7,6 @@ import { RouterModule }   from '@angular/router';
 import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 import { ClusterDetailsComponent } from './cluster-details/cluster-details.component';
-import { DotComponent } from './dot/dot.component';
 import { GeneratorParamsComponent } from './generator-params/generator-params.component';
 import { TabsComponent } from './tabs/tabs.component';
 import { XmlComponent } from './xml/xml.component';
@@ -17,7 +16,6 @@ import { SessionOpsComponent } from './session-ops/session-ops.component';
    declarations: [
       AppComponent,
       ClusterDetailsComponent,
-      DotComponent,
       GeneratorParamsComponent,
       TabsComponent,
       XmlComponent,
@@ -45,10 +43,6 @@ import { SessionOpsComponent } from './session-ops/session-ops.component';
          {
             path: 'xml',
             component: XmlComponent
-         },
-         {
-            path: 'dot',
-            component: DotComponent
          },
          {
             path: 'session-ops',
