@@ -13,7 +13,7 @@ import { Component, OnInit } from '@angular/core';
 import { ClusterPersistenceService } from './cluster-persistence.service';
 
 import { Cluster } from './cluster';
-
+import { ClusterSerializerXML } from './cluster-serializer-xml';
 
 @Component({
   selector: 'app-root',
@@ -25,19 +25,34 @@ export class AppComponent implements OnInit
 {
    title = 'Diaspora Cluster Maintenance';
 
-   private _cluster: Cluster; // Not at all sure this is used.  HOW DO WE DEBUG??
-
-   constructor( private _persistenceSvc: ClusterPersistenceService) {}
+   constructor( private _cluster: Cluster, private _persistenceSvc: ClusterPersistenceService) {}
 
    ngOnInit()
    {
       let me = this.constructor.name + ".ngOnInit(): ";
       console.log( me);
+ 
+      if (this._cluster.numSystems == 0 && localStorage)
+      {
+         let storedClusterXml = localStorage.getItem( 'cluster');
+         if (storedClusterXml)
+         {
+            let serializer = new ClusterSerializerXML( );
+            serializer.deserialize( storedClusterXml);
+            this._cluster.copyFrom( serializer.cluster);
+            console.log( `Deserialized ${this._cluster.numSystems} systems from localStorage`);
+         }
+      }
+      
+
       this._persistenceSvc.init();
       // this._persistenceSvc.logout();
       // this._persistenceSvc.login();
       this._persistenceSvc.connectToDatabase();
       // this._persistenceSvc.getClusterNames();
+
+      
+
       console.log( me + 'done');
       // alert( me + 'done');
    }

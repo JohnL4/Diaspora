@@ -8,7 +8,8 @@
     <p><button class="btn btn-default" type="button" (click)="login()">Login</button></p>
   </div>
   <div class="col-sm-5" *ngIf="_persistenceSvc.user">
-    <p>Currently logged in as <span>{{_persistenceSvc.user}}</span>.</p>
+    <!-- TODO: Need to figure out how to refresh this when data changes asynchronously. -->
+    <p>Currently logged in as {{_persistenceSvc.user}}.</p> 
   </div>
 </div>
 <div class="row">

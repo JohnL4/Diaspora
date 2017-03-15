@@ -95,11 +95,11 @@ export class ClusterPersistenceService
    {
       let me =  this.constructor.name + ".login(): ";
       console.log( me);
-      if (localStorage['loggingIn'])
-         console.log( me + `login in progress`);
-      else
-      {
-         localStorage['loggingIn'] = 'true';
+//      if (localStorage['loggingIn'])
+//         console.log( me + `login in progress`);
+//      else
+//      {
+//         localStorage['loggingIn'] = 'true';
          this._user = this._firebase.auth().currentUser;
          console.log( me + `before login attempt, current user = "${this._user}"`);
          if (! this._user)
@@ -122,12 +122,13 @@ export class ClusterPersistenceService
                console.log( `${me} ${error.message}`)}).bind( this));
          }
          // alert( "doLogin() done");
-      }
-      localStorage.removeItem('loggingIn');
-      if (localStorage['loggingIn'])
-         console.log( me + `login STILL in progress`);
-      else
-         console.log( me + `login no longer in progress`);
+//      }
+//      localStorage.removeItem('loggingIn');
+//      if (localStorage['loggingIn'])
+//         console.log( me + `login STILL in progress`);
+//      else
+//         console.log( me + `login no longer in progress`);
+      console.log( me + 'done');
    }
 
    public logout()

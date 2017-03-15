@@ -25,15 +25,7 @@ export class ClusterDetailsComponent implements OnInit {
    {
       let me = this.constructor.name + `.ngOnInit(): `;
       console.log( me);
-      // this._persistenceSvc.init();
-      // this._persistenceSvc.getClusterNames();
-      if (this._cluster.numSystems == 0)
-      {
-         let serializer = new ClusterSerializerXML();
-         serializer.deserialize( localStorage.getItem( 'cluster'));
-         this._cluster.copyFrom( serializer.cluster);
-         console.log( `Deserialized ${this._cluster.numSystems} systems from localStorage`);
-      }
+
       let cytoscape = require( 'cytoscape');
 
       // Can't figure out how to get cytoscape-cola in here.
