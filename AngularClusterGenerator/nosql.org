@@ -1,0 +1,33 @@
+* Using FireBase (NoSQL database).
+
+** Authentication
+   
+  Default rules require authentication.  I'm not comfortable leaving the database world-writable, so I figured out how
+  to authenticate.
+
+  It's kind of wacky (like all this stuff on the web).  The recommended method is redirect (on mobile, anyway, and I
+  didn't want to make two logic paths).  On a redirect, you can wind up throwing away all your state (since you browse
+  to a different site and browse back, essentially), so I jammed the cluster xml into localStorage.  (a) You can only
+  store strings in localStorage, and (b) localStorage as a web standard seems to have been around long enough for all
+  the major browsers to implement it.
+
+  To find out which user is currently logged (if any), you have to set up an event listener for the "auth changed" event
+  in Firebase, even when you're first loading the page.  That's how Firebase delivers the initial snapshot of current
+  state.
+
+  (The same is true for database reads, by the way.  I wonder how common a paradigm that is.)
+
+** Database
+
+*** Structure
+
+    Don't want to inhale the entire database when first loading the app.  We just need a list of clusters, and then
+    details for each cluster.
+
+    #+BEGIN_EXAMPLE 
+      root:
+          clusterNames: string[]
+          cluster/$name/xml: xml string
+    #+END_EXAMPLE 
+
+    
