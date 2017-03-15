@@ -7,9 +7,9 @@
   <div class="col-sm-1">
     <p><button class="btn btn-default" type="button" (click)="login()">Login</button></p>
   </div>
-  <div class="col-sm-5" *ngIf="_persistenceSvc.user">
+  <div class="col-sm-5" *ngIf="user">
     <!-- TODO: Need to figure out how to refresh this when data changes asynchronously. -->
-    <p>Currently logged in as {{_persistenceSvc.user}}.</p> 
+    <p>Currently logged in as {{user}}.</p> 
   </div>
 </div>
 <div class="row">

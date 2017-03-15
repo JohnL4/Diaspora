@@ -15,7 +15,20 @@ export class ClusterPersistenceService
    private _db: any;            // Firebase d/b
    private _authProvider: any;  // Firebase Google auth provider
    private _googleAccessToken: any;
-   private _user: any;
+
+   private _user: string;
+   private _userPromise: Promise<string>;
+
+   // On "deferred" promises: this is for the situation in which, when we create the promise ("new Promise(...)"), we do
+   // not start the asynchronous/blocking work that will result in promise fulfillment.  Instead, that work has either
+   // already been started or will be started elsewhere/elsewhen.  So, we simply save off an object holding pointers to
+   // the resolve/reject functions so we can call them later (which we do).  See the handling of
+   // this._userPromiseDeferred in this service.
+   // 
+   // See
+   // http://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it/31069505#31069505
+   //
+   private _userPromiseDeferred: {resolve: any, reject: any};
    
    private _me = "cluster-persistence.service.ts";
    private _initialized: boolean = false;
@@ -27,7 +40,10 @@ export class ClusterPersistenceService
       console.log( `${this._me}: ctor`);
    }
 
-   public get user(): string { return this._user? this._user.toString() : null; }
+   public get user(): Promise<string>
+   {
+      return this._userPromise;
+   }
    
    public init(): void
    {
@@ -52,6 +68,9 @@ export class ClusterPersistenceService
                                                     // already logged in
       console.log( me + `current user: ${user}`);
 
+      this._userPromise = new Promise(
+         ( resolve, reject) => this._userPromiseDeferred = {resolve: resolve, reject: reject});
+      
       this._firebase.auth().onAuthStateChanged( this.authStateChanged.bind( this), this.authError.bind( this));
 
       this._initialized = true;
@@ -71,6 +90,8 @@ export class ClusterPersistenceService
          console.log( me + 'auth state changed, but passed user is null or empty, assuming logged out');
          this._user = null;
       }
+      this._userPromiseDeferred.resolve( this._user); // We know _userPromiseDeferred won't be null because we create it
+                                                      // before hooking up this event handler.
    }
 
    private authError( aFirebaseAuthError): void
@@ -78,6 +99,7 @@ export class ClusterPersistenceService
       let me = this.constructor.name + '.authError(): ';
       this._user = null;
       console.log( me + `auth error: ${aFirebaseAuthError.message}`);
+      this._userPromiseDeferred.reject( aFirebaseAuthError);
    }
 
    public connectToDatabase()
