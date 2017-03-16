@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Cluster } from './cluster';
+import { User } from './user';
 
 // I'm thinking this thing stores serialized XML somewhere and retrieves it from somewhere.
 //
@@ -16,8 +17,7 @@ export class ClusterPersistenceService
    private _authProvider: any;  // Firebase Google auth provider
    private _googleAccessToken: any;
 
-   private _user: string;
-   private _userPromise: Promise<string>;
+   private _userPromise: Promise<User>;
 
    // On "deferred" promises: this is for the situation in which, when we create the promise ("new Promise(...)"), we do
    // not start the asynchronous/blocking work that will result in promise fulfillment.  Instead, that work has either
@@ -33,14 +33,12 @@ export class ClusterPersistenceService
    private _me = "cluster-persistence.service.ts";
    private _initialized: boolean = false;
    
-   private _clusterNames: string[];
-   
    constructor()
    {
       console.log( `${this._me}: ctor`);
    }
 
-   public get user(): Promise<string>
+   public get user(): Promise<User>
    {
       return this._userPromise;
    }
@@ -80,24 +78,25 @@ export class ClusterPersistenceService
    private authStateChanged( aFirebaseUser): void
    {
       let me = this.constructor.name + '.authStateChanged(): ';
+      let user: User;
       if (aFirebaseUser)
       {
-         this._user = aFirebaseUser.displayName || aFirebaseUser.email || aFirebaseUser.uid;
-         console.log( me + `User logged in: ${this._user} with provider ${aFirebaseUser.providerId}`);
+         user = new User( aFirebaseUser.displayName || aFirebaseUser.email || aFirebaseUser.uid,
+                          aFirebaseUser.uid);
+         console.log( me + `User logged in: ${user} with provider ${aFirebaseUser.providerId}`);
       }
       else
       {
          console.log( me + 'auth state changed, but passed user is null or empty, assuming logged out');
-         this._user = null;
+         user = null;
       }
-      this._userPromiseDeferred.resolve( this._user); // We know _userPromiseDeferred won't be null because we create it
+      this._userPromiseDeferred.resolve( user); // We know _userPromiseDeferred won't be null because we create it
                                                       // before hooking up this event handler.
    }
 
    private authError( aFirebaseAuthError): void
    {
       let me = this.constructor.name + '.authError(): ';
-      this._user = null;
       console.log( me + `auth error: ${aFirebaseAuthError.message}`);
       this._userPromiseDeferred.reject( aFirebaseAuthError);
    }
@@ -117,39 +116,22 @@ export class ClusterPersistenceService
    {
       let me =  this.constructor.name + ".login(): ";
       console.log( me);
-//      if (localStorage['loggingIn'])
-//         console.log( me + `login in progress`);
-//      else
-//      {
-//         localStorage['loggingIn'] = 'true';
-         this._user = this._firebase.auth().currentUser;
-         console.log( me + `before login attempt, current user = "${this._user}"`);
-         if (! this._user)
-         {
-            if (! this._authProvider)
-               this._authProvider = new this._firebase.auth.GoogleAuthProvider();
-            console.log( me + "signing in with redirect");
-            // alert( "signing in w/redirect");
-            this._firebase.auth().signInWithRedirect( this._authProvider);
-            // alert( "about to process redirect result");
-            this._firebase.auth().getRedirectResult().then( (function( result) {
-               if (result.credential) {
-                  this._googleAccessToken = result.credential.accessToken;
-                  console.log( me + `accessToken = "${this._googleAccessToken}`);
-               }
-               this._user = result.user;
-               console.log( me + `logged in user "${this._user}"`);
-               // alert( "login done");
-            }).bind( this)).catch( (function( error: Error) {
-               console.log( `${me} ${error.message}`)}).bind( this));
+      if (! this._authProvider)
+         this._authProvider = new this._firebase.auth.GoogleAuthProvider();
+      console.log( me + "signing in with redirect");
+      // alert( "signing in w/redirect");
+      this._firebase.auth().signInWithRedirect( this._authProvider);
+      // alert( "about to process redirect result");
+      this._firebase.auth().getRedirectResult().then( (function( result) {
+         if (result.credential) {
+            this._googleAccessToken = result.credential.accessToken;
+            console.log( me + `accessToken = "${this._googleAccessToken}`);
          }
-         // alert( "doLogin() done");
-//      }
-//      localStorage.removeItem('loggingIn');
-//      if (localStorage['loggingIn'])
-//         console.log( me + `login STILL in progress`);
-//      else
-//         console.log( me + `login no longer in progress`);
+         this._user = result.user;
+         console.log( me + `logged in user "${this._user}"`);
+         // alert( "login done");
+      }).bind( this)).catch( (function( error: Error) {
+         console.log( `${me} ${error.message}`)}).bind( this));
       console.log( me + 'done');
    }
 
@@ -175,8 +157,8 @@ export class ClusterPersistenceService
    private clusterNamesValueChanged( aSnapshot: any)
    {
       console.log( `clusterNamesValueChanged(${aSnapshot})`);
-      this._clusterNames = aSnapshot.val();
-      console.log( `clusterNamesValueChanged(${aSnapshot}): clusterNames = ${this._clusterNames}`);
+      let clusterNames = aSnapshot.val();
+      console.log( `clusterNamesValueChanged(${aSnapshot}): clusterNames = ${clusterNames}`);
    }
    
    getClusterNames(): string[]

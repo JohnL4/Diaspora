@@ -8,8 +8,8 @@
     <p><button class="btn btn-default" type="button" (click)="login()">Login</button></p>
   </div>
   <div class="col-sm-5" *ngIf="user">
-    <!-- TODO: Need to figure out how to refresh this when data changes asynchronously. -->
-    <p>Currently logged in as {{user}}.</p> 
+    <!-- Refreshed as a result of the fact that ClusterPersistenceService.user is a promise. -->
+    <p>Currently logged in as {{user.name}} (uid {{user.uid}}).</p> 
   </div>
 </div>
 <div class="row">

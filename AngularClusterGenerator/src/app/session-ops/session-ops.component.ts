@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { Cluster } from '../cluster';
 import { ClusterPersistenceService } from '../cluster-persistence.service';
+import { User } from '../user';
 
 @Component({
   selector: 'app-session-ops',
@@ -10,7 +11,7 @@ import { ClusterPersistenceService } from '../cluster-persistence.service';
 })
 export class SessionOpsComponent implements OnInit
 {
-   public user: string;
+   public user: User;
    
    public get clusterName(): string { return this._cluster.name};
    public set clusterName( aName: string) { this._cluster.name = aName};

@@ -24,10 +24,28 @@
     Don't want to inhale the entire database when first loading the app.  We just need a list of clusters, and then
     details for each cluster.
 
+    Looks like we can't represent arrays directly in NoSQL, so we do it by having multiple children
+    at a node.
+
     #+BEGIN_EXAMPLE 
       root:
-          clusterNames: string[]
-          cluster/$name/xml: xml string
+         users
+            <user>
+               name: string
+               email: string
+               clusters               -- Names of clusters visible to user
+                  <clusterName>
+                  (repeated)
+         clusters
+            <clusterName>             -- Make unique by appending uid of creating user?
+               owners                 -- Users who are allowed to change sharing.  Initially, the uid of the creating user.
+                  <owner>             -- uid
+                  (repeated)
+               users                  -- Users allowed to edit this cluster.  Owners always allowed to edit, so don't need to 
+                                      -- include them in this list.
+                  <user>              -- uid
+                  (repeated)
+               xml: xml string        -- XML of the cluster
     #+END_EXAMPLE 
 
     
