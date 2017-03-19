@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Rx';
+
+import * as firebase from "firebase";
 
 import { Cluster } from './cluster';
 import { User } from './user';
@@ -11,11 +14,13 @@ import { User } from './user';
 @Injectable()
 export class ClusterPersistenceService
 {
+   // public observableItems: Observable<number[]>;
+   
    private _firebase: any;
-   private _ui: any;            // Firebase ui
-   private _db: any;            // Firebase d/b
-   private _authProvider: any;  // Firebase Google auth provider
-   private _googleAccessToken: any;
+   // private _ui: any;            // Firebase ui
+   private _db: firebase.database.Database;
+   private _authProvider: firebase.auth.GoogleAuthProvider;
+   private _googleAccessToken: firebase.auth.AuthCredential;
 
    private _userPromise: Promise<User>;
 
@@ -47,6 +52,7 @@ export class ClusterPersistenceService
    {
       let me = this.constructor.name + '.init(): ';
       console.log( me);
+//      this.playWithObservables()
       if (this._initialized)    // Probably not threadsafe, but I'll think about that tomorrow.  After all, tomorrow is another day.
       {
          console.log( me + "already initialized");
@@ -74,6 +80,13 @@ export class ClusterPersistenceService
       this._initialized = true;
       console.log( me + "initialized");
    }
+
+//   private playWithObservables()
+//   {
+//      let me = this.constructor.name + '.playWithObservables(): ';
+//      console.log( me);
+//      this.observableItems = Observable.of( [1,2,3]);
+//   }
 
    private authStateChanged( aFirebaseUser): void
    {
@@ -106,10 +119,12 @@ export class ClusterPersistenceService
       this._db = this._firebase.database();
       console.log( `${this._me}: initialized firebase, db = "${this._db}"`);
       // Re: .bind(this): See http://stackoverflow.com/a/20279485/370611
-      this._db.ref( 'clusterNames').on( 'value',
-                                        this.clusterNamesValueChanged.bind( this),
-                                        this.firebaseError.bind( this)
-                                      );
+      let dbRef = this._db.ref( 'clusterNames');
+      // dbRef.foo(); // Should be compile-time error.
+      dbRef.on( 'value',
+                this.clusterNamesValueChanged.bind( this),
+                this.firebaseError.bind( this)
+              );
    }
    
    public login(): void
@@ -122,9 +137,9 @@ export class ClusterPersistenceService
       // alert( "signing in w/redirect");
       this._firebase.auth().signInWithRedirect( this._authProvider);
       // alert( "about to process redirect result");
-      this._firebase.auth().getRedirectResult().then( (function( result) {
+      this._firebase.auth().getRedirectResult().then( (function( result: firebase.auth.UserCredential) {
          if (result.credential) {
-            this._googleAccessToken = result.credential.accessToken;
+            this._googleAccessToken = result.credential;
             console.log( me + `accessToken = "${this._googleAccessToken}`);
          }
          this._user = result.user;
@@ -154,7 +169,7 @@ export class ClusterPersistenceService
       //    this.login();
    }
    
-   private clusterNamesValueChanged( aSnapshot: any)
+   private clusterNamesValueChanged( aSnapshot: firebase.database.DataSnapshot)
    {
       console.log( `clusterNamesValueChanged(${aSnapshot})`);
       let clusterNames = aSnapshot.val();
