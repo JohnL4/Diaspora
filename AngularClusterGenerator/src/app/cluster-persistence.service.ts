@@ -35,12 +35,15 @@ export class ClusterPersistenceService
    //
    private _userPromiseDeferred: {resolve: any, reject: any};
    
-   private _me = "cluster-persistence.service.ts";
+   private _clusterNamesObservable: Observable<any>;
+   public get clusterNamesObservable(): Observable<any> { return this._clusterNamesObservable }
+   
    private _initialized: boolean = false;
    
    constructor()
    {
-      console.log( `${this._me}: ctor`);
+      let me = this.constructor.name + '.ctor(): '
+      console.log( me);
    }
 
    public get user(): Promise<User>
@@ -116,17 +119,54 @@ export class ClusterPersistenceService
 
    public connectToDatabase()
    {
+      let me = this.constructor.name + '.connectToDatabase(): ';
       this._db = this._firebase.database();
-      console.log( `${this._me}: initialized firebase, db = "${this._db}"`);
-      // Re: .bind(this): See http://stackoverflow.com/a/20279485/370611
-      let dbRef = this._db.ref( 'clusterNames');
+      console.log( me + `initialized firebase, db = "${this._db}"`);
+      // let dbRef = this._db.ref( 'clusterNames');
       // dbRef.foo(); // Should be compile-time error.
-      dbRef.on( 'value',
-                this.clusterNamesValueChanged.bind( this),
-                this.firebaseError.bind( this)
-              );
+
+      // TODO: put this handful of Observation-making code into a reusable subroutine, since there's nothing specific to
+      // the snapshots generated here.
+      let clusterNamesObservable = this.makeDatabaseSnapshotObservable( 'clusterNames');
+      let obs = clusterNamesObservable; // .scan(x => x); // scan( x => x) doesn't do what we want.
+      this._clusterNamesObservable = obs;
+      
+//      Observable.fromEventPattern(
+//         (function addHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
+//            // Need to explicitly bind to firebaseError here because there's no easy way (that I can tell) to
+//            // generate/catch errors using the Observable subscription.
+//            // Re: .bind(this): See http://stackoverflow.com/a/20279485/370611
+//            dbRef.on( 'value', h, this.firebaseError); }).bind(this), 
+//         function delHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
+//            dbRef.off( 'value', h);
+//         });
+
+      let subscription = clusterNamesObservable.subscribe(
+         (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
+         ,(err) => this.firebaseError( err) // Doesn't work.
+      );
+
+//      dbRef.on( 'value',
+//                this.clusterNamesValueChanged.bind( this),
+//                this.firebaseError.bind( this)
+//              );
    }
-   
+
+   private makeDatabaseSnapshotObservable( aNoSqlTreeNodeName: string)
+   {
+      if (! this._db) this._db = this._firebase.database();
+      let dbRef = this._db.ref( aNoSqlTreeNodeName);
+      let retval = Observable.fromEventPattern(
+         (function addHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
+            // Need to explicitly bind to firebaseError here because there's no easy way (that I can tell) to
+            // generate/catch errors using the Observable subscription.
+            dbRef.on( 'value', h, this.firebaseError); }).bind(this), 
+         function delHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
+            dbRef.off( 'value', h);
+         });
+      return retval;
+   }
+
    public login(): void
    {
       let me =  this.constructor.name + ".login(): ";
@@ -164,7 +204,8 @@ export class ClusterPersistenceService
    
    private firebaseError( anError: Error): void
    {
-      console.log( `${this._me}: firebaseError(): ` + anError.message);
+      let me = "ClusterPersistenceService.firebaseError(): "; // this.constructor.name + ".firebaseError(): ";
+      console.log( me + `firebaseError(): ` + anError.message);
       // if (anError.message.match( /^permission_denied/))
       //    this.login();
    }
@@ -178,7 +219,8 @@ export class ClusterPersistenceService
    
    getClusterNames(): string[]
    {
-      console.log( `${this._me}: getClusterNames()`);
+      let me = this.constructor.name + ".getClusterNames(): ";
+      console.log( me + `getClusterNames()`);
       return new Array<string>();
    }
    
