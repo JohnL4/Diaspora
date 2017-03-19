@@ -35,7 +35,7 @@ export class ClusterPersistenceService
    //
    private _userPromiseDeferred: {resolve: any, reject: any};
    
-   private _clusterNamesObservable: Observable<any>;
+   private _clusterNamesObservable: Observable<firebase.database.DataSnapshot>;
    public get clusterNamesObservable(): Observable<any> { return this._clusterNamesObservable }
    
    private _initialized: boolean = false;
@@ -153,7 +153,7 @@ export class ClusterPersistenceService
 //              );
    }
 
-   private makeDatabaseSnapshotObservable( aNoSqlTreeNodeName: string)
+   private makeDatabaseSnapshotObservable( aNoSqlTreeNodeName: string): Observable<firebase.database.DataSnapshot>
    {
       if (! this._db) this._db = this._firebase.database();
       let dbRef = this._db.ref( aNoSqlTreeNodeName);
@@ -165,7 +165,9 @@ export class ClusterPersistenceService
          function delHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
             dbRef.off( 'value', h);
          });
-      return retval;
+      return retval
+         .map((s,i) => <firebase.database.DataSnapshot>s)
+      ;
    }
 
    public login(): void
