@@ -14,7 +14,7 @@ import { User } from './user';
 @Injectable()
 export class ClusterPersistenceService
 {
-   // public observableItems: Observable<number[]>;
+   public observableItem: Observable<number>;
    
    private _firebase: any;
    // private _ui: any;            // Firebase ui
@@ -55,7 +55,7 @@ export class ClusterPersistenceService
    {
       let me = this.constructor.name + '.init(): ';
       console.log( me);
-//      this.playWithObservables()
+      this.playWithObservables()
       if (this._initialized)    // Probably not threadsafe, but I'll think about that tomorrow.  After all, tomorrow is another day.
       {
          console.log( me + "already initialized");
@@ -84,12 +84,13 @@ export class ClusterPersistenceService
       console.log( me + "initialized");
    }
 
-//   private playWithObservables()
-//   {
-//      let me = this.constructor.name + '.playWithObservables(): ';
-//      console.log( me);
-//      this.observableItems = Observable.of( [1,2,3]);
-//   }
+   private playWithObservables()
+   {
+      let me = this.constructor.name + '.playWithObservables(): ';
+      console.log( me);
+      // this.observableItem = Observable.of( 1,2,3);
+      this.observableItem = Observable.timer( 3000, 1000);
+   }
 
    private authStateChanged( aFirebaseUser): void
    {
