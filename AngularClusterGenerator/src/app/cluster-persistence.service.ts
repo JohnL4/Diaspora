@@ -89,7 +89,7 @@ export class ClusterPersistenceService
       let me = this.constructor.name + '.playWithObservables(): ';
       console.log( me);
       // this.observableItem = Observable.of( 1,2,3);
-      this.observableItem = Observable.timer( 3000, 1000);
+      this.observableItem = Observable.timer( 300, 1000);
    }
 
    private authStateChanged( aFirebaseUser): void
@@ -164,9 +164,11 @@ export class ClusterPersistenceService
             dbRef.on( 'value', h, this.firebaseError); }).bind(this), 
          function delHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
             dbRef.off( 'value', h);
-         });
+         },
+         (aSnapshot: firebase.database.DataSnapshot) => aSnapshot
+      );
       return retval
-         .map((s,i) => <firebase.database.DataSnapshot>s)
+         .map((s,i) => s)
       ;
    }
 

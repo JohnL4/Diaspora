@@ -1,7 +1,7 @@
 <p></p>
 
 <!-- Observable play -->
-
+<!--
 <div class="row">
   <div class="col-sm-1">Observables:</div>
   <div class="col-sm-11">
@@ -11,18 +11,19 @@
       <li *ngFor="let item of _persistenceSvc.observableItems | async">{{item}}</li>
     </ul>
 -->
+<!--
   </div>
 </div>
 
 <p></p>
-
+-->
 
 <!-- More Observable play -->
 
 <div class="row">
   <div class="col-sm-1">Clusters:</div>
   <div class="col-sm-11">
-    <p>{{(_persistenceSvc.clusterNamesObservable | async)?.val()}}</p>
+    <!-- <p>{{(_persistenceSvc.clusterNamesObservable | async)?.val()}}</p> -->
     <ul>
       <!-- When clusterNamesObservable is FromEventPatternObservable<{},{}>, the following fails with "cannot find
         differ supporting object" or some such. -->
