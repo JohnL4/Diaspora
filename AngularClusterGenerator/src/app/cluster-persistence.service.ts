@@ -40,7 +40,7 @@ export class ClusterPersistenceService
    
    private _initialized: boolean = false;
    
-   constructor()
+   constructor( )
    {
       let me = this.constructor.name + '.ctor(): '
       console.log( me);
@@ -164,11 +164,11 @@ export class ClusterPersistenceService
             dbRef.on( 'value', h, this.firebaseError); }).bind(this), 
          function delHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
             dbRef.off( 'value', h);
-         },
-         (aSnapshot: firebase.database.DataSnapshot) => aSnapshot
+         }
+         // ,(aSnapshot: firebase.database.DataSnapshot) => aSnapshot
       );
       return retval
-         .map((s,i) => s)
+         .map((s,i) => <firebase.database.DataSnapshot>s)
       ;
    }
 
