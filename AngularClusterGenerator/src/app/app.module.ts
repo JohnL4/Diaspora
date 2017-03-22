@@ -6,6 +6,7 @@ import { RouterModule }   from '@angular/router';
 
 import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
+
 import { ClusterDetailsComponent } from './cluster-details/cluster-details.component';
 import { GeneratorParamsComponent } from './generator-params/generator-params.component';
 import { TabsComponent } from './tabs/tabs.component';
@@ -19,7 +20,7 @@ import { SessionOpsComponent } from './session-ops/session-ops.component';
       GeneratorParamsComponent,
       TabsComponent,
       XmlComponent,
-      SessionOpsComponent
+       SessionOpsComponent,
    ],
    imports: [
       BrowserModule,

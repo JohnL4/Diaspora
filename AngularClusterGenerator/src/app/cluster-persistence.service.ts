@@ -16,7 +16,6 @@ export class ClusterPersistenceService
 {
    public observableItem: Observable<number>;
    
-   private _firebase: any;
    // private _ui: any;            // Firebase ui
    private _db: firebase.database.Database;
    private _authProvider: firebase.auth.GoogleAuthProvider;
@@ -61,7 +60,7 @@ export class ClusterPersistenceService
          console.log( me + "already initialized");
          return;
       }
-      this._firebase = require( "firebase");
+
       let config = {
          apiKey: "AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E",
          authDomain: "diaspora-21544.firebaseapp.com",
@@ -69,16 +68,16 @@ export class ClusterPersistenceService
          storageBucket: "diaspora-21544.appspot.com",
          messagingSenderId: "222484722746"
       };
-      this._firebase.initializeApp( config);
+      firebase.initializeApp( config);
 
-      let user = this._firebase.auth().currentUser; // This doesn't work -- always comes back null even when user is
+      let user = firebase.auth().currentUser; // This doesn't work -- always comes back null even when user is
                                                     // already logged in
       console.log( me + `current user: ${user}`);
 
       this._userPromise = new Promise(
          ( resolve, reject) => this._userPromiseDeferred = {resolve: resolve, reject: reject});
       
-      this._firebase.auth().onAuthStateChanged( this.authStateChanged.bind( this), this.authError.bind( this));
+      firebase.auth().onAuthStateChanged( this.authStateChanged.bind( this), this.authError.bind( this));
 
       this._initialized = true;
       console.log( me + "initialized");
@@ -121,7 +120,7 @@ export class ClusterPersistenceService
    public connectToDatabase()
    {
       let me = this.constructor.name + '.connectToDatabase(): ';
-      this._db = this._firebase.database();
+      this._db = firebase.database();
       console.log( me + `initialized firebase, db = "${this._db}"`);
       // let dbRef = this._db.ref( 'clusterNames');
       // dbRef.foo(); // Should be compile-time error.
@@ -155,7 +154,7 @@ export class ClusterPersistenceService
 
    private makeDatabaseSnapshotObservable( aNoSqlTreeNodeName: string): Observable<firebase.database.DataSnapshot>
    {
-      if (! this._db) this._db = this._firebase.database();
+      if (! this._db) this._db = firebase.database();
       let dbRef = this._db.ref( aNoSqlTreeNodeName);
       let retval = Observable.fromEventPattern(
          (function addHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
@@ -177,12 +176,12 @@ export class ClusterPersistenceService
       let me =  this.constructor.name + ".login(): ";
       console.log( me);
       if (! this._authProvider)
-         this._authProvider = new this._firebase.auth.GoogleAuthProvider();
+         this._authProvider = new firebase.auth.GoogleAuthProvider();
       console.log( me + "signing in with redirect");
       // alert( "signing in w/redirect");
-      this._firebase.auth().signInWithRedirect( this._authProvider);
+      firebase.auth().signInWithRedirect( this._authProvider);
       // alert( "about to process redirect result");
-      this._firebase.auth().getRedirectResult().then( (function( result: firebase.auth.UserCredential) {
+      firebase.auth().getRedirectResult().then( (function( result: firebase.auth.UserCredential) {
          if (result.credential) {
             this._googleAccessToken = result.credential;
             console.log( me + `accessToken = "${this._googleAccessToken}`);
@@ -200,7 +199,7 @@ export class ClusterPersistenceService
       let me = this.constructor.name + ".logout(): ";
       // alert( "logging out");
       console.log( me);
-      this._firebase.auth().signOut().then( function() {
+      firebase.auth().signOut().then( function() {
          console.log( "signout successful");
       }).catch( function( anError: Error) {
          console.log( `signout error: ${anError.message}`);

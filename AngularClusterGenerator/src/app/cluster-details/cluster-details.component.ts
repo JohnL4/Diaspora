@@ -5,6 +5,8 @@ import { CytoscapeGenerator } from '../cytoscape-generator';
 import { ClusterPersistenceService } from '../cluster-persistence.service';
 import { ClusterSerializerXML } from '../cluster-serializer-xml';
 
+declare var cytoscape: any;
+
 @Component({
   selector: 'app-cluster-details',
   templateUrl: './cluster-details.component.html',
@@ -25,8 +27,6 @@ export class ClusterDetailsComponent implements OnInit {
    {
       let me = this.constructor.name + `.ngOnInit(): `;
       console.log( me);
-
-      let cytoscape = require( 'cytoscape');
 
       // Can't figure out how to get cytoscape-cola in here.
       // let cycola = require( 'cytoscape-cola');

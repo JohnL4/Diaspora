@@ -1,6 +1,6 @@
 import { AngularClusterGeneratorPage } from './app.po';
 
-describe('angular-cluster-generator App', function() {
+describe('angular-cluster-generator App', () => {
   let page: AngularClusterGeneratorPage;
 
   beforeEach(() => {
