@@ -30,7 +30,7 @@
     #+BEGIN_EXAMPLE 
       root:
          users
-            <user>
+            <user>                    -- uid
                name: string
                email: string
                clusters               -- Names of clusters visible to user
