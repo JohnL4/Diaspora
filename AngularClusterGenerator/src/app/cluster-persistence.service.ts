@@ -126,7 +126,6 @@ export class ClusterPersistenceService
       this._clusterNamesObservable = this.makeDatabaseSnapshotObservable( 'clusterNames');
 
       // TODO: make Behavior Subject containing cluster arrays?
-      
 
       // let subscription = this._clusterNamesObservable.subscribe(
       //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
