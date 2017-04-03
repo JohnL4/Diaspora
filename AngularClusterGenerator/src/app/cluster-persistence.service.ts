@@ -13,12 +13,12 @@ import { User } from './user';
 
 /**
  * Makes several Observables available, which point to various parts of the persistent data store in Firebase.
+ * See nosql.org to d/b structure.
  */
 @Injectable()
 export class ClusterPersistenceService 
 {
    public get clustersObservable(): Observable<Cluster[]> { return this._clustersObservable; }
-   public get clusterNamesObservable(): Observable<firebase.database.DataSnapshot> { return this._clusterNamesObservable }
 
    private _firebaseConfig = {
             apiKey: "AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E",
@@ -46,9 +46,10 @@ export class ClusterPersistenceService
    //
    private _userPromiseDeferred: {resolve: any, reject: any};
    
-   private _clusterNamesObservable: Observable<firebase.database.DataSnapshot>;
    private _clustersObservable: Observable<Cluster[]>;
 
+   private _curUser: User;
+   
    private _initialized: boolean = false;
    
    constructor( )
@@ -92,9 +93,24 @@ export class ClusterPersistenceService
       let user: User;
       if (aFirebaseUser)
       {
-         user = new User( aFirebaseUser.displayName || aFirebaseUser.email || aFirebaseUser.uid,
-                          aFirebaseUser.uid);
+         user = new User( aFirebaseUser.uid,
+                          aFirebaseUser.displayName || aFirebaseUser.email || aFirebaseUser.uid,
+                          aFirebaseUser.email,
+                          new Date( Date.now()));
          console.log( me + `User logged in: ${user} with provider ${aFirebaseUser.providerId}`);
+         if (user.uid)
+         {
+            let uidRef = this._db.ref( `/users/${user.uid}`);
+            console.log( me + `uidRef = ${uidRef}`);
+            let userProps = { name: user.name,
+                              email: user.email,
+                              lastLogin: user.lastLogin.toISOString(),
+                              timeZoneOffset: user.lastLogin.getTimezoneOffset()
+                            };
+            uidRef.update( userProps); // Performs insert if key doesn't exist, so that's good.
+         }
+         else
+            console.log( me + `WARNING: no uid for user ${user.name}`);
       }
       else
       {
@@ -123,7 +139,7 @@ export class ClusterPersistenceService
 
       // TODO: put this handful of Observation-making code into a reusable subroutine, since there's nothing specific to
       // the snapshots generated here.
-      this._clusterNamesObservable = this.makeDatabaseSnapshotObservable( 'clusterNames');
+      this._clustersObservable = this.makeDatabaseSnapshotObservable( '/clusters').map(s=><Cluster[]>s.val());
 
       // TODO: make Behavior Subject containing cluster arrays?
 
@@ -148,7 +164,7 @@ export class ClusterPersistenceService
          // ,(aSnapshot: firebase.database.DataSnapshot) => aSnapshot
       );
       return retval
-         .map((s,i) => <firebase.database.DataSnapshot>s)
+         // .map((s,i) => <firebase.database.DataSnapshot>s)
       ;
    }
 
@@ -205,11 +221,14 @@ export class ClusterPersistenceService
 //       console.log( `clusterNamesValueChanged(${aSnapshot}): clusterNames = ${clusterNames}`);
 //    }
    
-   getClusterNames(): string[]
+   /**
+    * Returns a list of "shallow" clusters -- each cluster only contains metadata, not the full cluster data.
+    */
+   getClusters(): Cluster[]
    {
       let me = this.constructor.name + ".getClusterNames(): ";
       console.log( me + `getClusterNames()`);
-      return new Array<string>();
+      return new Array<Cluster>();
    }
    
    loadCluster( aCluster: Cluster): void
@@ -220,9 +239,10 @@ export class ClusterPersistenceService
    {
    }
 
-   /** Get cluster xml from some place wondrous and mysterious (like a server).
+   /**
+    * Get cluster xml from some place wondrous and mysterious (like a server).
     */
-   private getClusterXml(): string
+   getClusterXml(): string
    {
       return "";
    }
