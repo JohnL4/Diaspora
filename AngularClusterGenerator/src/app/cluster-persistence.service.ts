@@ -11,11 +11,23 @@ import { User } from './user';
 // Maybe into a global variable (how do we set that up) and via a text field somewhere (how do we set that up)?  In
 // future, a FireBase d/b, maybe?  Need to get credentials from user for FireBase.
 
+/**
+ * Makes several Observables available, which point to various parts of the persistent data store in Firebase.
+ * See nosql.org to d/b structure.
+ */
 @Injectable()
-export class ClusterPersistenceService
+export class ClusterPersistenceService 
 {
-   public observableItem: Observable<number>;
-   
+   public get clustersObservable(): Observable<Cluster[]> { return this._clustersObservable; }
+
+   private _firebaseConfig = {
+            apiKey: "AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E",
+            authDomain: "diaspora-21544.firebaseapp.com",
+            databaseURL: "https://diaspora-21544.firebaseio.com",
+            storageBucket: "diaspora-21544.appspot.com",
+            messagingSenderId: "222484722746"
+      };
+
    // private _ui: any;            // Firebase ui
    private _db: firebase.database.Database;
    private _authProvider: firebase.auth.GoogleAuthProvider;
@@ -34,15 +46,16 @@ export class ClusterPersistenceService
    //
    private _userPromiseDeferred: {resolve: any, reject: any};
    
-   private _clusterNamesObservable: Observable<firebase.database.DataSnapshot>;
-   public get clusterNamesObservable(): Observable<any> { return this._clusterNamesObservable }
+   private _clustersObservable: Observable<Cluster[]>;
+
+   private _curUser: User;
    
    private _initialized: boolean = false;
    
    constructor( )
    {
       let me = this.constructor.name + '.ctor(): '
-      console.log( me);
+      console.log( me + `=============================================================================================`);
    }
 
    public get user(): Promise<User>
@@ -50,29 +63,20 @@ export class ClusterPersistenceService
       return this._userPromise;
    }
    
+   /**
+    * Initialize firebase and hook up AuthStateChanged event.
+    */
    public init(): void
    {
       let me = this.constructor.name + '.init(): ';
       console.log( me);
-      this.playWithObservables()
       if (this._initialized)    // Probably not threadsafe, but I'll think about that tomorrow.  After all, tomorrow is another day.
       {
          console.log( me + "already initialized");
          return;
       }
 
-      let config = {
-         apiKey: "AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E",
-         authDomain: "diaspora-21544.firebaseapp.com",
-         databaseURL: "https://diaspora-21544.firebaseio.com",
-         storageBucket: "diaspora-21544.appspot.com",
-         messagingSenderId: "222484722746"
-      };
-      firebase.initializeApp( config);
-
-      let user = firebase.auth().currentUser; // This doesn't work -- always comes back null even when user is
-                                                    // already logged in
-      console.log( me + `current user: ${user}`);
+      firebase.initializeApp( this._firebaseConfig);
 
       this._userPromise = new Promise(
          ( resolve, reject) => this._userPromiseDeferred = {resolve: resolve, reject: reject});
@@ -83,23 +87,30 @@ export class ClusterPersistenceService
       console.log( me + "initialized");
    }
 
-   private playWithObservables()
-   {
-      let me = this.constructor.name + '.playWithObservables(): ';
-      console.log( me);
-      // this.observableItem = Observable.of( 1,2,3);
-      this.observableItem = Observable.timer( 300, 1000);
-   }
-
    private authStateChanged( aFirebaseUser): void
    {
       let me = this.constructor.name + '.authStateChanged(): ';
       let user: User;
       if (aFirebaseUser)
       {
-         user = new User( aFirebaseUser.displayName || aFirebaseUser.email || aFirebaseUser.uid,
-                          aFirebaseUser.uid);
+         user = new User( aFirebaseUser.uid,
+                          aFirebaseUser.displayName || aFirebaseUser.email || aFirebaseUser.uid,
+                          aFirebaseUser.email,
+                          new Date( Date.now()));
          console.log( me + `User logged in: ${user} with provider ${aFirebaseUser.providerId}`);
+         if (user.uid)
+         {
+            let uidRef = this._db.ref( `/users/${user.uid}`);
+            console.log( me + `uidRef = ${uidRef}`);
+            let userProps = { name: user.name,
+                              email: user.email,
+                              lastLogin: user.lastLogin.toISOString(),
+                              timeZoneOffset: user.lastLogin.getTimezoneOffset()
+                            };
+            uidRef.update( userProps); // Performs insert if key doesn't exist, so that's good.
+         }
+         else
+            console.log( me + `WARNING: no uid for user ${user.name}`);
       }
       else
       {
@@ -117,39 +128,25 @@ export class ClusterPersistenceService
       this._userPromiseDeferred.reject( aFirebaseAuthError);
    }
 
+   /**
+    * Make Observables for various items in the Firebase database, from Firebase events.
+    */
    public connectToDatabase()
    {
       let me = this.constructor.name + '.connectToDatabase(): ';
       this._db = firebase.database();
       console.log( me + `initialized firebase, db = "${this._db}"`);
-      // let dbRef = this._db.ref( 'clusterNames');
-      // dbRef.foo(); // Should be compile-time error.
 
       // TODO: put this handful of Observation-making code into a reusable subroutine, since there's nothing specific to
       // the snapshots generated here.
-      let clusterNamesObservable = this.makeDatabaseSnapshotObservable( 'clusterNames');
-      let obs = clusterNamesObservable; // .scan(x => x); // scan( x => x) doesn't do what we want.
-      this._clusterNamesObservable = obs;
-      
-//      Observable.fromEventPattern(
-//         (function addHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
-//            // Need to explicitly bind to firebaseError here because there's no easy way (that I can tell) to
-//            // generate/catch errors using the Observable subscription.
-//            // Re: .bind(this): See http://stackoverflow.com/a/20279485/370611
-//            dbRef.on( 'value', h, this.firebaseError); }).bind(this), 
-//         function delHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
-//            dbRef.off( 'value', h);
-//         });
+      this._clustersObservable = this.makeDatabaseSnapshotObservable( '/clusters').map(s=><Cluster[]>s.val());
 
-      let subscription = clusterNamesObservable.subscribe(
-         (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
-         ,(err) => this.firebaseError( err) // Doesn't work.
-      );
+      // TODO: make Behavior Subject containing cluster arrays?
 
-//      dbRef.on( 'value',
-//                this.clusterNamesValueChanged.bind( this),
-//                this.firebaseError.bind( this)
-//              );
+      // let subscription = this._clusterNamesObservable.subscribe(
+      //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
+      //    ,(err) => this.firebaseError( err) // Doesn't work.
+      // );
    }
 
    private makeDatabaseSnapshotObservable( aNoSqlTreeNodeName: string): Observable<firebase.database.DataSnapshot>
@@ -167,10 +164,13 @@ export class ClusterPersistenceService
          // ,(aSnapshot: firebase.database.DataSnapshot) => aSnapshot
       );
       return retval
-         .map((s,i) => <firebase.database.DataSnapshot>s)
+         // .map((s,i) => <firebase.database.DataSnapshot>s)
       ;
    }
 
+   /**
+    * Initiate login to Firebase.
+    */
    public login(): void
    {
       let me =  this.constructor.name + ".login(): ";
@@ -214,18 +214,21 @@ export class ClusterPersistenceService
       //    this.login();
    }
    
-   private clusterNamesValueChanged( aSnapshot: firebase.database.DataSnapshot)
-   {
-      console.log( `clusterNamesValueChanged(${aSnapshot})`);
-      let clusterNames = aSnapshot.val();
-      console.log( `clusterNamesValueChanged(${aSnapshot}): clusterNames = ${clusterNames}`);
-   }
+//    private clusterNamesValueChanged( aSnapshot: firebase.database.DataSnapshot)
+//    {
+//       console.log( `clusterNamesValueChanged(${aSnapshot})`);
+//       let clusterNames = aSnapshot.val();
+//       console.log( `clusterNamesValueChanged(${aSnapshot}): clusterNames = ${clusterNames}`);
+//    }
    
-   getClusterNames(): string[]
+   /**
+    * Returns a list of "shallow" clusters -- each cluster only contains metadata, not the full cluster data.
+    */
+   getClusters(): Cluster[]
    {
       let me = this.constructor.name + ".getClusterNames(): ";
       console.log( me + `getClusterNames()`);
-      return new Array<string>();
+      return new Array<Cluster>();
    }
    
    loadCluster( aCluster: Cluster): void
@@ -236,9 +239,10 @@ export class ClusterPersistenceService
    {
    }
 
-   /** Get cluster xml from some place wondrous and mysterious (like a server).
+   /**
+    * Get cluster xml from some place wondrous and mysterious (like a server).
     */
-   private getClusterXml(): string
+   getClusterXml(): string
    {
       return "";
    }

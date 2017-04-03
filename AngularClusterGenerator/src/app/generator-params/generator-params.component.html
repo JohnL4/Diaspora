@@ -1,9 +1,17 @@
 <p></p>
 
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">Enter parameters and generate a new cluster</h2>
+    </div>
+    <div class="panel-body">
+
 <form #parmsForm="ngForm"
       (ngSubmit)="onSubmit()"
       class="form-horizontal">  <!-- "form-horizontal" is Bootstrap class -->
-  <div class="form-group">                           <!-- "form-group" is Bootstrap class -->
+
+
+  <div class="form-group">                           <!-- "form-group" is Bootstrap class,  makes div behave like a .row in a .form-horizontal, so don't need .row -->
     <div class=" control-label col-sm-3"> <!-- "control-label" is the class for labels in HORIZONTAL forms. -->
     <label for="numSystems"> 
       Number of systems in cluster
@@ -100,3 +108,89 @@
     </div>
   </div>
 </form>
+    </div>
+  </div>
+
+<p></p>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">Or select an existing cluster</h2>
+    </div>
+    <div class="panel-body">
+      
+      <table class="table">
+        <tr>
+          <th></th>
+          <th>Cluster Name</th>
+          <th>User Name</th>
+          <th>Changed</th>
+          <th>Cluster Notes</th>
+        </tr>
+        <tr>
+          <td>
+          <button type="button" class="btn btn-warning" aria-label="Load cluster">
+            <span class="glyphicon glyphicon-edit"></span>
+          </button>
+          </td>
+          <td>alpha</td>
+          <td>user name</td>
+          <td>Mar. 30, 2017 5:41 PM</td>
+          <td>All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  </td>
+        </tr>
+        <tr>
+          <td>
+          <button type="button" class="btn btn-warning" aria-label="Load cluster">
+            <span class="glyphicon glyphicon-edit"></span>
+          </button>
+          </td>
+          <td>alpha</td>
+          <td>user name</td>
+          <td>Mar. 30, 2017 5:41 PM</td>
+          <td>All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  </td>
+        </tr>
+        <tr>
+          <td>
+          <button type="button" class="btn btn-warning" aria-label="Load cluster">
+            <span class="glyphicon glyphicon-edit"></span>
+          </button>
+          </td>
+          <td>alpha</td>
+          <td>user name</td>
+          <td>Mar. 30, 2017 5:41 PM</td>
+          <td>All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  </td>
+        </tr>
+      </table>
+
+      
+      <!--
+      <div class="list-group">
+        <button type="button" class="list-group-item">
+          <div class="col-sm-2">cluster name</div>
+          <div class="col-sm-2">user name</div>
+          <div class="col-sm-8">notes notes notes</div>
+        </button>
+        <button type="button" class="list-group-item">
+          cluster name
+        </button>
+        <button type="button" class="list-group-item">
+          cluster name
+        </button>
+      </div>
+      -->
+
+      <!--
+        <div class="row">
+          <div class="col-sm-2">alpha</div>
+          <div class="col-sm-2">user name</div>
+          <div class="col-sm-8">notes notes notes</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-2">alpha</div>
+          <div class="col-sm-2">user name</div>
+          <div class="col-sm-8">notes notes notes</div>
+        </div>
+      -->
+    </div> <!-- panel-body -->
+  </div> <!-- panel -->
+  

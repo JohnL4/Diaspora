@@ -16,6 +16,21 @@ export class Cluster {
     * The name of the cluster (mostly for saving and loading).
     */
    public name: string;
+
+   /**
+    * User guid of the last person to make an edit to this cluster.
+    */
+   public lastAuthor: string;
+
+   /**
+    * Date cluster last modified (including creation).
+    */
+   public lastChanged: Date;
+
+   /**
+    * Author-created notes.
+    */
+   public notes: string;
    
    /**
     * Map from system id to StarSystem.
