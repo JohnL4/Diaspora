@@ -253,7 +253,12 @@ export class ClusterPersistenceService
     */
    private uniqueClusterName( aCluster: Cluster, aUserUid: string): string
    {
-      let retval = aCluster.name + '\x1F' + aUserUid; // \x1F is ASCII US -- "Unit Separator" -- what we think of as a field separator.
+      // \x1F is ASCII US -- "Unit Separator" -- what we think of as a field separator.  I could have used any character
+      // (e.g., NUL, but that might come with its own hassles), but there just happens to be an ASCII character exactly
+      // for hijinks like this.
+      // 
+      // We stringify the cluster name in case somebody is doing something shady like inject another \x1F into it.
+      let retval = JSON.stringify( aCluster.name) + '\x1F' + aUserUid; 
       return retval;
    }
 }
