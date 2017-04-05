@@ -35,12 +35,12 @@
                email: string
                lastLogin: date
          clusters                     # Data whose size is more-or-less bounded -- just simple data items.
-            <clusterName>             # Make unique by appending uid of creating user?
+            <uniqueClusterName>       # Make unique by appending uid of creating user?
                lastEditedByUser: uid
                lastEditedDate: Date
                notes: string
          clusterData                  # "Scalable" data -- unbounded lists, large-ish XML, etc.
-            <clusterName>             # Append uid to make unique.
+            <uniqueClusterName>       # Append uid to make unique.
                editors                # Users who are allowed to change sharing.  Initially, the uid of the creating user.
                   <owner>             # uid
                   (repeated)

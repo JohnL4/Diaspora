@@ -18,7 +18,7 @@ import { User } from './user';
 @Injectable()
 export class ClusterPersistenceService 
 {
-   public get clustersObservable(): Observable<Cluster[]> { return this._clustersObservable; }
+   public get clusters(): Observable<Cluster[]> { return this._clusters; }
 
    private _firebaseConfig = {
             apiKey: "AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E",
@@ -46,7 +46,7 @@ export class ClusterPersistenceService
    //
    private _userPromiseDeferred: {resolve: any, reject: any};
    
-   private _clustersObservable: Observable<Cluster[]>;
+   private _clusters: Observable<Cluster[]>;
 
    private _curUser: User;
    
@@ -58,11 +58,6 @@ export class ClusterPersistenceService
       console.log( me + `=============================================================================================`);
    }
 
-   public get user(): Promise<User>
-   {
-      return this._userPromise;
-   }
-   
    /**
     * Initialize firebase and hook up AuthStateChanged event.
     */
@@ -87,47 +82,6 @@ export class ClusterPersistenceService
       console.log( me + "initialized");
    }
 
-   private authStateChanged( aFirebaseUser): void
-   {
-      let me = this.constructor.name + '.authStateChanged(): ';
-      let user: User;
-      if (aFirebaseUser)
-      {
-         user = new User( aFirebaseUser.uid,
-                          aFirebaseUser.displayName || aFirebaseUser.email || aFirebaseUser.uid,
-                          aFirebaseUser.email,
-                          new Date( Date.now()));
-         console.log( me + `User logged in: ${user} with provider ${aFirebaseUser.providerId}`);
-         if (user.uid)
-         {
-            let uidRef = this._db.ref( `/users/${user.uid}`);
-            console.log( me + `uidRef = ${uidRef}`);
-            let userProps = { name: user.name,
-                              email: user.email,
-                              lastLogin: user.lastLogin.toISOString(),
-                              timeZoneOffset: user.lastLogin.getTimezoneOffset()
-                            };
-            uidRef.update( userProps); // Performs insert if key doesn't exist, so that's good.
-         }
-         else
-            console.log( me + `WARNING: no uid for user ${user.name}`);
-      }
-      else
-      {
-         console.log( me + 'auth state changed, but passed user is null or empty, assuming logged out');
-         user = null;
-      }
-      this._userPromiseDeferred.resolve( user); // We know _userPromiseDeferred won't be null because we create it
-                                                      // before hooking up this event handler.
-   }
-
-   private authError( aFirebaseAuthError): void
-   {
-      let me = this.constructor.name + '.authError(): ';
-      console.log( me + `auth error: ${aFirebaseAuthError.message}`);
-      this._userPromiseDeferred.reject( aFirebaseAuthError);
-   }
-
    /**
     * Make Observables for various items in the Firebase database, from Firebase events.
     */
@@ -139,7 +93,7 @@ export class ClusterPersistenceService
 
       // TODO: put this handful of Observation-making code into a reusable subroutine, since there's nothing specific to
       // the snapshots generated here.
-      this._clustersObservable = this.makeDatabaseSnapshotObservable( '/clusters').map(s=><Cluster[]>s.val());
+      this._clusters = this.makeDatabaseSnapshotObservable( '/clusters').map( s => <Cluster[]> s.val());
 
       // TODO: make Behavior Subject containing cluster arrays?
 
@@ -147,25 +101,6 @@ export class ClusterPersistenceService
       //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
       //    ,(err) => this.firebaseError( err) // Doesn't work.
       // );
-   }
-
-   private makeDatabaseSnapshotObservable( aNoSqlTreeNodeName: string): Observable<firebase.database.DataSnapshot>
-   {
-      if (! this._db) this._db = firebase.database();
-      let dbRef = this._db.ref( aNoSqlTreeNodeName);
-      let retval = Observable.fromEventPattern(
-         (function addHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
-            // Need to explicitly bind to firebaseError here because there's no easy way (that I can tell) to
-            // generate/catch errors using the Observable subscription.
-            dbRef.on( 'value', h, this.firebaseError); }).bind(this), 
-         function delHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
-            dbRef.off( 'value', h);
-         }
-         // ,(aSnapshot: firebase.database.DataSnapshot) => aSnapshot
-      );
-      return retval
-         // .map((s,i) => <firebase.database.DataSnapshot>s)
-      ;
    }
 
    /**
@@ -206,30 +141,20 @@ export class ClusterPersistenceService
       });
    }
    
-   private firebaseError( anError: Error): void
+   public get user(): Promise<User>
    {
-      let me = "ClusterPersistenceService.firebaseError(): "; // this.constructor.name + ".firebaseError(): ";
-      console.log( me + `firebaseError(): ` + anError.message);
-      // if (anError.message.match( /^permission_denied/))
-      //    this.login();
+      return this._userPromise;
    }
    
-//    private clusterNamesValueChanged( aSnapshot: firebase.database.DataSnapshot)
-//    {
-//       console.log( `clusterNamesValueChanged(${aSnapshot})`);
-//       let clusterNames = aSnapshot.val();
-//       console.log( `clusterNamesValueChanged(${aSnapshot}): clusterNames = ${clusterNames}`);
-//    }
-   
-   /**
-    * Returns a list of "shallow" clusters -- each cluster only contains metadata, not the full cluster data.
-    */
-   getClusters(): Cluster[]
-   {
-      let me = this.constructor.name + ".getClusterNames(): ";
-      console.log( me + `getClusterNames()`);
-      return new Array<Cluster>();
-   }
+//   /**
+//    * Returns a list of "shallow" clusters -- each cluster only contains metadata, not the full cluster data.
+//    */
+//   getClusters(): Cluster[]     // TODO: probably don't need this and can delete.
+//   {
+//      let me = this.constructor.name + ".getClusterNames(): ";
+//      console.log( me + `getClusterNames()`);
+//      return new Array<Cluster>();
+//   }
    
    loadCluster( aCluster: Cluster): void
    {
@@ -237,6 +162,12 @@ export class ClusterPersistenceService
 
    saveCluster( aCluster: Cluster): void
    {
+      let uniqueName = JSON.stringify( this.uniqueClusterName( aCluster, this._curUser.uid));
+      let dbRef = this._db.ref( `/clusters/${uniqueName}`);
+      let clusterProps = { lastEditedBy: this._curUser.uid,
+                           lastEditedDate: new Date( Date.now())
+                         };
+      dbRef.update( clusterProps);
    }
 
    /**
@@ -247,4 +178,82 @@ export class ClusterPersistenceService
       return "";
    }
 
+   // -----------------------------------------------  Private Methods  ------------------------------------------------
+   
+   private authStateChanged( aFirebaseUser): void
+   {
+      let me = this.constructor.name + '.authStateChanged(): ';
+      // let user: User;
+      if (aFirebaseUser)
+      {
+         this._curUser = new User( aFirebaseUser.uid,
+                          aFirebaseUser.displayName || aFirebaseUser.email || aFirebaseUser.uid,
+                          aFirebaseUser.email,
+                          new Date( Date.now()));
+         console.log( me + `User logged in: ${this._curUser} with provider ${aFirebaseUser.providerId}`);
+         if (this._curUser.uid)
+         {
+            let uidRef = this._db.ref( `/users/${this._curUser.uid}`);
+            console.log( me + `uidRef = ${uidRef}`);
+            let userProps = { name: this._curUser.name,
+                              email: this._curUser.email,
+                              lastLogin: this._curUser.lastLogin.toISOString(),
+                              timeZoneOffset: this._curUser.lastLogin.getTimezoneOffset()
+                            };
+            uidRef.update( userProps); // Performs insert if key doesn't exist, so that's good.
+         }
+         else
+            console.log( me + `WARNING: no uid for user ${this._curUser.name}`);
+      }
+      else
+      {
+         console.log( me + 'auth state changed, but passed user is null or empty, assuming logged out');
+         this._curUser = null;
+      }
+      this._userPromiseDeferred.resolve( this._curUser); // We know _userPromiseDeferred won't be null because we create it
+                                                      // before hooking up this event handler.
+   }
+
+   private authError( aFirebaseAuthError): void
+   {
+      let me = this.constructor.name + '.authError(): ';
+      console.log( me + `auth error: ${aFirebaseAuthError.message}`);
+      this._userPromiseDeferred.reject( aFirebaseAuthError);
+   }
+
+   private makeDatabaseSnapshotObservable( aNoSqlTreeNodeName: string): Observable<firebase.database.DataSnapshot>
+   {
+      if (! this._db) this._db = firebase.database();
+      let dbRef = this._db.ref( aNoSqlTreeNodeName);
+      let retval = Observable.fromEventPattern(
+         (function addHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
+            // Need to explicitly bind to firebaseError here because there's no easy way (that I can tell) to
+            // generate/catch errors using the Observable subscription.
+            dbRef.on( 'value', h, this.firebaseError); }).bind(this), 
+         function delHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
+            dbRef.off( 'value', h);
+         }
+         // ,(aSnapshot: firebase.database.DataSnapshot) => aSnapshot
+      );
+      return retval
+         // .map((s,i) => <firebase.database.DataSnapshot>s)
+      ;
+   }
+
+   private firebaseError( anError: Error): void
+   {
+      let me = "ClusterPersistenceService.firebaseError(): "; // this.constructor.name + ".firebaseError(): ";
+      console.log( me + `firebaseError(): ` + anError.message);
+      // if (anError.message.match( /^permission_denied/))
+      //    this.login();
+   }
+
+   /**
+    * Makes a universally unique cluster name by combining the cluster name with the user uid.
+    */
+   private uniqueClusterName( aCluster: Cluster, aUserUid: string): string
+   {
+      let retval = aCluster.name + '\x1F' + aUserUid; // \x1F is ASCII US -- "Unit Separator" -- what we think of as a field separator.
+      return retval;
+   }
 }

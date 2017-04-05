@@ -54,5 +54,8 @@ export class SessionOpsComponent implements OnInit
       this._persistenceSvc.logout();
    }
 
-   public saveCluster(){}
+   public saveCluster()
+   {
+      this._persistenceSvc.saveCluster( this._cluster);
+   }
 }
