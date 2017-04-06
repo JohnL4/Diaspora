@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Rx';
 import * as firebase from "firebase";
 
 import { Cluster } from './cluster';
+import { ClusterSerializerXML } from './cluster-serializer-xml';
 import { User } from './user';
 
 // I'm thinking this thing stores serialized XML somewhere and retrieves it from somewhere.
@@ -57,6 +58,8 @@ export class ClusterPersistenceService
    private _curUser: User;
    
    private _initialized: boolean = false;
+
+   private _xmlSerializer: ClusterSerializerXML;
    
    /**
     * \x1F is ASCII US -- "Unit Separator" -- what we think of as a field separator.  I could have used any character
@@ -86,6 +89,8 @@ export class ClusterPersistenceService
          return;
       }
 
+      this._xmlSerializer = new ClusterSerializerXML();
+      
       firebase.initializeApp( this._firebaseConfig);
 
       this._userPromise = new Promise(
@@ -187,9 +192,22 @@ export class ClusterPersistenceService
    saveCluster( aCluster: Cluster): void
    {
       let uniqueName = JSON.stringify( this.uniqueClusterName( aCluster, this._curUser.uid));
-      let dbRef = this._db.ref( `/clusters/${uniqueName}`);
+      let dbRef = this._db.ref();
+      let updates = Object.create( null);
+
       let clusterProps = { lastChanged: new Date( Date.now()) };
-      dbRef.update( clusterProps);
+      updates[`/clusters/${uniqueName}`] = clusterProps;
+
+      this._xmlSerializer.cluster = aCluster;
+      let xml = this._xmlSerializer.serialize();
+      let owners = Object.create( null);
+      owners[ `${this._curUser.uid}`] = 1;
+      let clusterDataProps = { xml: xml,
+                               owners: owners
+                             };
+      updates[`/clusterData/${uniqueName}`] = clusterDataProps;
+
+      dbRef.update( updates);
    }
 
    /**

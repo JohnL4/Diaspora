@@ -122,22 +122,27 @@
       <div class="table-responsive">
       <table class="table table-hover">
         <tr>
-          <th></th>
+          <th>Load</th>
           <th>Cluster Name</th>
           <th>User Name</th>
           <th>Changed</th>
           <th>Cluster Notes</th>
+          <th>Delete</th>
         </tr>
         <tr *ngFor="let cluster of clusterMetadata | async">
           <td>
             <button type="button" class="btn btn-warning" aria-label="Load cluster">
-              <span class="glyphicon glyphicon-edit"></span>
+              <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
             </button>
           </td>
           <td>{{cluster.name}}</td>
           <td>{{_persistenceSvc.getUser( cluster.lastAuthor)?.name || cluster.lastAuthor}}</td>
           <td>{{cluster.lastChanged}}</td>
           <td>(notes will go here)</td>
+          <td>
+            <button type="button" class="btn btn-danger" aria-label="Delete cluster">
+              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </button>
         </tr>
       </table>
       </div>
