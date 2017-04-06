@@ -41,6 +41,10 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    private _router: Router;
    private _highLowHelpShowing: boolean = false;
    
+   private get clusterMetadata() { return this._persistenceSvc.clusterMetadata; }
+
+   // ------------------------------------------------  Public Methods  ------------------------------------------------
+   
    constructor(aCluster: Cluster, aRouter: Router, private _renderer: Renderer, private _persistenceSvc: ClusterPersistenceService)
    {
       this._cluster = aCluster;

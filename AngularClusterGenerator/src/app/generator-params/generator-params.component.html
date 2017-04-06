@@ -127,70 +127,18 @@
           <th>Changed</th>
           <th>Cluster Notes</th>
         </tr>
-        <tr>
+        <tr *ngFor="let cluster of clusterMetadata | async">
           <td>
-          <button type="button" class="btn btn-warning" aria-label="Load cluster">
-            <span class="glyphicon glyphicon-edit"></span>
-          </button>
+            <button type="button" class="btn btn-warning" aria-label="Load cluster">
+              <span class="glyphicon glyphicon-edit"></span>
+            </button>
           </td>
-          <td>alpha</td>
-          <td>user name</td>
-          <td>Mar. 30, 2017 5:41 PM</td>
-          <td>All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  </td>
-        </tr>
-        <tr>
-          <td>
-          <button type="button" class="btn btn-warning" aria-label="Load cluster">
-            <span class="glyphicon glyphicon-edit"></span>
-          </button>
-          </td>
-          <td>alpha</td>
-          <td>user name</td>
-          <td>Mar. 30, 2017 5:41 PM</td>
-          <td>All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  </td>
-        </tr>
-        <tr>
-          <td>
-          <button type="button" class="btn btn-warning" aria-label="Load cluster">
-            <span class="glyphicon glyphicon-edit"></span>
-          </button>
-          </td>
-          <td>alpha</td>
-          <td>user name</td>
-          <td>Mar. 30, 2017 5:41 PM</td>
-          <td>All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  All work and no play makes Jack a dull boy.  </td>
+          <td>{{cluster.name}}</td>
+          <td>{{_persistenceSvc.getUser( cluster.lastAuthor)?.name || cluster.lastAuthor}}</td>
+          <td>{{cluster.lastChanged}}</td>
+          <td>(notes will go here)</td>
         </tr>
       </table>
-
-      
-      <!--
-      <div class="list-group">
-        <button type="button" class="list-group-item">
-          <div class="col-sm-2">cluster name</div>
-          <div class="col-sm-2">user name</div>
-          <div class="col-sm-8">notes notes notes</div>
-        </button>
-        <button type="button" class="list-group-item">
-          cluster name
-        </button>
-        <button type="button" class="list-group-item">
-          cluster name
-        </button>
-      </div>
-      -->
-
-      <!--
-        <div class="row">
-          <div class="col-sm-2">alpha</div>
-          <div class="col-sm-2">user name</div>
-          <div class="col-sm-8">notes notes notes</div>
-        </div>
-        <div class="row">
-          <div class="col-sm-2">alpha</div>
-          <div class="col-sm-2">user name</div>
-          <div class="col-sm-8">notes notes notes</div>
-        </div>
-      -->
     </div> <!-- panel-body -->
   </div> <!-- panel -->
   

@@ -18,8 +18,11 @@ import { User } from './user';
 @Injectable()
 export class ClusterPersistenceService 
 {
-   public get clusters(): Observable<Cluster[]> { return this._clusters; }
-
+   /**
+    * Map from cluster name to cluster meadata (e.g., last edited by/when, notes, etc.)
+    */
+   public get clusterMetadata(): Observable<Cluster[]> { return this._clusterMetadata; }
+   
    private _firebaseConfig = {
             apiKey: "AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E",
             authDomain: "diaspora-21544.firebaseapp.com",
@@ -35,6 +38,9 @@ export class ClusterPersistenceService
 
    private _userPromise: Promise<User>;
 
+   private _users: Observable<Map<string,User>>;
+   private _latestUserMap: Map<string,User>;
+   
    // On "deferred" promises: this is for the situation in which, when we create the promise ("new Promise(...)"), we do
    // not start the asynchronous/blocking work that will result in promise fulfillment.  Instead, that work has either
    // already been started or will be started elsewhere/elsewhen.  So, we simply save off an object holding pointers to
@@ -46,11 +52,20 @@ export class ClusterPersistenceService
    //
    private _userPromiseDeferred: {resolve: any, reject: any};
    
-   private _clusters: Observable<Cluster[]>;
+   private _clusterMetadata: Observable<Cluster[]>;
 
    private _curUser: User;
    
    private _initialized: boolean = false;
+   
+   /**
+    * \x1F is ASCII US -- "Unit Separator" -- what we think of as a field separator.  I could have used any character
+    * (e.g., NUL, but that might come with its own hassles), but there just happens to be an ASCII character exactly for
+    * hijinks like this.
+    */
+   private ASCII_US = "\x1F";
+
+   // ------------------------------------------------  Public Methods  ------------------------------------------------
    
    constructor( )
    {
@@ -91,9 +106,10 @@ export class ClusterPersistenceService
       this._db = firebase.database();
       console.log( me + `initialized firebase, db = "${this._db}"`);
 
-      // TODO: put this handful of Observation-making code into a reusable subroutine, since there's nothing specific to
-      // the snapshots generated here.
-      this._clusters = this.makeDatabaseSnapshotObservable( '/clusters').map( s => <Cluster[]> s.val());
+      this._clusterMetadata = this.makeDatabaseSnapshotObservable( '/clusters').map( s => this.parseMetadata( s.val()));
+      this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
+
+      this._users.subscribe( map => {this._latestUserMap = map;});
 
       // TODO: make Behavior Subject containing cluster arrays?
 
@@ -101,6 +117,14 @@ export class ClusterPersistenceService
       //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
       //    ,(err) => this.firebaseError( err) // Doesn't work.
       // );
+   }
+
+   public getUser( aUid: string): User
+   {
+      let retval: User;
+      if (this._latestUserMap)
+         retval = this._latestUserMap.get( aUid);
+      return retval;
    }
 
    /**
@@ -164,9 +188,7 @@ export class ClusterPersistenceService
    {
       let uniqueName = JSON.stringify( this.uniqueClusterName( aCluster, this._curUser.uid));
       let dbRef = this._db.ref( `/clusters/${uniqueName}`);
-      let clusterProps = { lastEditedBy: this._curUser.uid,
-                           lastEditedDate: new Date( Date.now())
-                         };
+      let clusterProps = { lastChanged: new Date( Date.now()) };
       dbRef.update( clusterProps);
    }
 
@@ -249,16 +271,48 @@ export class ClusterPersistenceService
    }
 
    /**
+    * Returns a map from cluster name to cluster metadata (e.g., last edited by/when, notes), which map is created from
+    * the given d/b snapshot.
+    */
+   private parseMetadata( aSnapshot: Object): Cluster[]
+   {
+      let me = this.constructor.name + ".parseMetadata(): ";
+      let retval = Array<Cluster>();
+      for (let key in aSnapshot)
+      {
+         let keyTuple = JSON.parse( key);
+         let [name,uid] = keyTuple.split( this.ASCII_US, 2);
+         name = JSON.parse( name);
+         let cluster = <Cluster> aSnapshot[key];
+         cluster.lastAuthor = uid;
+         cluster.name = name;
+         retval.push( cluster);
+      }
+      console.log( me + `aSnapshot contains ${retval.length} clusters`);
+      return retval;
+   }
+
+   private parseUsers( aSnapshot: Object): Map<string,User> {
+      let me = this.constructor.name + ".parseUsers(): ";
+      let retval = new Map<string,User>();
+      for (let uid in aSnapshot)
+      {
+         let user = aSnapshot[uid];
+         user.uid = uid;
+         retval.set(uid, user);
+      }
+      console.log( me + `snapshot contains ${retval.size} users`);
+      return retval;
+   }
+   
+   /**
     * Makes a universally unique cluster name by combining the cluster name with the user uid.
     */
    private uniqueClusterName( aCluster: Cluster, aUserUid: string): string
    {
-      // \x1F is ASCII US -- "Unit Separator" -- what we think of as a field separator.  I could have used any character
-      // (e.g., NUL, but that might come with its own hassles), but there just happens to be an ASCII character exactly
-      // for hijinks like this.
       // 
-      // We stringify the cluster name in case somebody is doing something shady like inject another \x1F into it.
-      let retval = JSON.stringify( aCluster.name) + '\x1F' + aUserUid; 
+      // We stringify the cluster name in case somebody is doing something shady like inject another ASCII US into it.
+      let retval = JSON.stringify( aCluster.name) + this.ASCII_US + aUserUid; 
       return retval;
    }
 }
