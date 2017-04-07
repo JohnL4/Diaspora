@@ -38,7 +38,7 @@ import { SessionOpsComponent } from './session-ops/session-ops.component';
             component: GeneratorParamsComponent
          },
          {
-            path: 'details/:uniqueClusterName',
+            path: 'details',    // path: 'details/:uniqueClusterName',
             component: ClusterDetailsComponent
          },
          {

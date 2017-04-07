@@ -130,8 +130,8 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    gotoDetails()
    {
-      let uniqueName = uniqueClusterName( this._cluster, this._persistenceSvc.curUser);
-      this._router.navigate([`/details/${uniqueName}`]);
+      // let uniqueName = uniqueClusterName( this._cluster, this._persistenceSvc.curUser);
+      this._router.navigate([`/details`]); //([`/details/${uniqueName}`]);
    }
 
    showHighLowHelp()
