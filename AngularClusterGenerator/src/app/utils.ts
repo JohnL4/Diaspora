@@ -1,3 +1,8 @@
+import { Cluster } from './cluster';
+import { User } from './user';
+
+export const ASCII_US = "\x1F";
+
 export class Utils {
 }
 
@@ -56,4 +61,37 @@ export function alphaBravo( i: number): string
       return null;
    else
       return _alphaBravo[i-1];
+}
+
+/**
+ * Makes a universally unique cluster name by combining the cluster name with date from the User.  Note that neither
+ * cluster nor user need to exist (both can be null) or have truthy data, but if they don't the cluster name will not
+ * truly be unique.
+ */
+export function uniqueClusterName( aCluster: Cluster, aUser: User): string
+{
+   let uid = aUser ? aUser.uid : "";
+   if (! uid)
+      uid = "";
+   let retval = uniqueClusterNameFromUid( aCluster, uid);
+   return retval;
+}
+
+/**
+ * Makes a universally unique cluster name by combining the cluster name with the user uid.  Note that neither cluster
+ * nor user need to exist (both can be null) or have truthy data, but if they don't the cluster name will not truly be
+ * unique.
+ */
+export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): string
+{
+   // We stringify the cluster name in case somebody is doing something shady like inject another ASCII US into it.
+   let stringifiedClusterName: string;
+   if (aCluster ? aCluster.name : "")
+      stringifiedClusterName = JSON.stringify( aCluster.name);
+   else
+      stringifiedClusterName = "";
+
+   let retval = stringifiedClusterName + ASCII_US + aUserUid; 
+   return retval;
+
 }

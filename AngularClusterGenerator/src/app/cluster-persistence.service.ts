@@ -6,6 +6,7 @@ import * as firebase from "firebase";
 import { Cluster } from './cluster';
 import { ClusterSerializerXML } from './cluster-serializer-xml';
 import { User } from './user';
+import { ASCII_US, uniqueClusterName } from './utils';
 
 // I'm thinking this thing stores serialized XML somewhere and retrieves it from somewhere.
 //
@@ -23,6 +24,8 @@ export class ClusterPersistenceService
     * Map from cluster name to cluster meadata (e.g., last edited by/when, notes, etc.)
     */
    public get clusterMetadata(): Observable<Cluster[]> { return this._clusterMetadata; }
+   
+   private _latestClusterMap: Map<string, Cluster>;
    
    private _firebaseConfig = {
             apiKey: "AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E",
@@ -55,6 +58,10 @@ export class ClusterPersistenceService
    
    private _clusterMetadata: Observable<Cluster[]>;
 
+   /**
+    * Current User.
+    */
+   public get curUser(): User { return this._curUser; }
    private _curUser: User;
    
    private _initialized: boolean = false;
@@ -66,7 +73,7 @@ export class ClusterPersistenceService
     * (e.g., NUL, but that might come with its own hassles), but there just happens to be an ASCII character exactly for
     * hijinks like this.
     */
-   private ASCII_US = "\x1F";
+   // private ASCII_US = "\x1F";
 
    // ------------------------------------------------  Public Methods  ------------------------------------------------
    
@@ -112,11 +119,12 @@ export class ClusterPersistenceService
       console.log( me + `initialized firebase, db = "${this._db}"`);
 
       this._clusterMetadata = this.makeDatabaseSnapshotObservable( '/clusters').map( s => this.parseMetadata( s.val()));
-      this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
 
+      this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
       this._users.subscribe( map => {this._latestUserMap = map;});
 
-      // TODO: make Behavior Subject containing cluster arrays?
+      // TODO: make Behavior Subject containing cluster arrays?  Answer: YES, probably a good idea.  Then we wouldn't
+      // need to bother with this "latest" junk, because a BehaviorSubject will always have the latest value.
 
       // let subscription = this._clusterNamesObservable.subscribe(
       //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
@@ -129,6 +137,12 @@ export class ClusterPersistenceService
       let retval: User;
       if (this._latestUserMap)
          retval = this._latestUserMap.get( aUid);
+      return retval;
+   }
+
+   public getCluster( aUniqueName: string): Cluster
+   {
+      let retval = this._latestClusterMap.get( aUniqueName);
       return retval;
    }
 
@@ -191,7 +205,7 @@ export class ClusterPersistenceService
 
    saveCluster( aCluster: Cluster): void
    {
-      let uniqueName = JSON.stringify( this.uniqueClusterName( aCluster, this._curUser.uid));
+      let uniqueName = JSON.stringify( uniqueClusterName( aCluster, this._curUser));
       let dbRef = this._db.ref();
       let updates = Object.create( null);
 
@@ -295,16 +309,18 @@ export class ClusterPersistenceService
    private parseMetadata( aSnapshot: Object): Cluster[]
    {
       let me = this.constructor.name + ".parseMetadata(): ";
+      this._latestClusterMap = new Map<string, Cluster>();
       let retval = Array<Cluster>();
       for (let key in aSnapshot)
       {
          let keyTuple = JSON.parse( key);
-         let [name,uid] = keyTuple.split( this.ASCII_US, 2);
+         let [name,uid] = keyTuple.split( ASCII_US, 2);
          name = JSON.parse( name);
          let cluster = <Cluster> aSnapshot[key];
          cluster.lastAuthor = uid;
          cluster.name = name;
          retval.push( cluster);
+         this._latestClusterMap.set( key, cluster);
       }
       console.log( me + `aSnapshot contains ${retval.length} clusters`);
       return retval;
@@ -323,14 +339,4 @@ export class ClusterPersistenceService
       return retval;
    }
    
-   /**
-    * Makes a universally unique cluster name by combining the cluster name with the user uid.
-    */
-   private uniqueClusterName( aCluster: Cluster, aUserUid: string): string
-   {
-      // 
-      // We stringify the cluster name in case somebody is doing something shady like inject another ASCII US into it.
-      let retval = JSON.stringify( aCluster.name) + this.ASCII_US + aUserUid; 
-      return retval;
-   }
 }

@@ -4,7 +4,7 @@ import { StarSystem } from './star-system';
 import { Slipstream } from './slipstream';
 import { SlipknotPosition } from './slipknot-position';
 
-import { dice, fateThrow, alphaBravo } from './utils';
+import { dice, fateThrow, alphaBravo, uniqueClusterNameFromUid } from './utils';
 
 /**
  * A cluster of star systems.
@@ -92,6 +92,11 @@ export class Cluster {
 //   {
 //      this.systemMap.set( aSystem.id, aSystem);
 //   }
+
+   public uniqueName(): string
+   {
+      return uniqueClusterNameFromUid( this, this.lastAuthor);
+   }
 
    /**
     * Copy the data from the given cluster into this cluster, overwriting existing data.

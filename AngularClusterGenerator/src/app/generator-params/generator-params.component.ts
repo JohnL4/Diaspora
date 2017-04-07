@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Cluster } from '../cluster';
 import { ClusterPersistenceService } from '../cluster-persistence.service';
 import { ClusterSerializerXML } from '../cluster-serializer-xml';
+import { uniqueClusterName } from '../utils';
 
 @Component({
   selector: 'app-generator-params',
@@ -103,6 +104,11 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       // alert( "generateCluster() done");
    }
 
+   public loadCluster( aUniqueName: string): void
+   {
+      this._cluster.copyFrom( this._persistenceSvc.getCluster( aUniqueName));
+   }
+   
    public revertParams()
    {
       // console.log( "revertParams()");
@@ -124,7 +130,8 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    gotoDetails()
    {
-      this._router.navigate(['/details']);
+      let uniqueName = uniqueClusterName( this._cluster, this._persistenceSvc.curUser);
+      this._router.navigate([`/details/${uniqueName}`]);
    }
 
    showHighLowHelp()

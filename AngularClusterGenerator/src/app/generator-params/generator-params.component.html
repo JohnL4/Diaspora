@@ -93,13 +93,13 @@
            element will submit the form by simulating a click on the first submit button in the form.  The rules are a
            little complicated; see "Implicit Submission" in the actual HTML spec.
         -->
-      <button id="goBtn" (click)="generateCluster()" class="btn btn-default btn-warning"
+      <button type="submit" id="goBtn" (click)="generateCluster()" class="btn btn-default btn-warning"
               [disabled]="! parmsForm.form.valid"
               title="Obviously, this will hammer your existing cluster. Be sure you have it backed up or otherwise saved, or that you don't care."
               >
         Go!
       </button>
-      <button id="revertBtn" type="button"
+      <button type="button" id="revertBtn" 
               class="btn btn-default"
               (click)="revertParams()"
               >
@@ -131,7 +131,9 @@
         </tr>
         <tr *ngFor="let cluster of clusterMetadata | async">
           <td>
-            <button type="button" class="btn btn-warning" aria-label="Load cluster">
+            <button type="button" class="btn btn-warning" aria-label="Load cluster"
+                    (click)="loadCluster( cluster.uniqueName)"
+                    >
               <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
             </button>
           </td>
