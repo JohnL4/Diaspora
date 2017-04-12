@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Observable, BehaviorSubject } from 'rxjs/Rx';
 
 import * as firebase from "firebase";
 
@@ -24,6 +24,11 @@ export class ClusterPersistenceService
     * Map from cluster name to cluster meadata (e.g., last edited by/when, notes, etc.)
     */
    public get clusterMetadata(): Observable<Cluster[]> { return this._clusterMetadata; }
+
+   /**
+    * Current cluster from persistent (possibly shared) store.
+    */
+   public get currentPersistedCluster(): BehaviorSubject<Cluster> { return this._currentPersistedCluster; }
    
    private _latestClusterMap: Map<string, Cluster>;
    
@@ -56,8 +61,10 @@ export class ClusterPersistenceService
    //
    private _userPromiseDeferred: {resolve: any, reject: any};
    
-   private _clusterMetadata: Observable<Cluster[]>;
+   private _clusterMetadata: BehaviorSubject<Cluster[]>;
 
+   private _currentPersistedCluster: BehaviorSubject<Cluster>;
+   
    /**
     * Current User.
     */
@@ -115,10 +122,16 @@ export class ClusterPersistenceService
    public connectToDatabase()
    {
       let me = this.constructor.name + '.connectToDatabase(): ';
+
       this._db = firebase.database();
       console.log( me + `initialized firebase, db = "${this._db}"`);
 
-      this._clusterMetadata = this.makeDatabaseSnapshotObservable( '/clusters').map( s => this.parseMetadata( s.val()));
+      this._clusterMetadata = new BehaviorSubject<Cluster[]>(new Array<Cluster>());
+      
+      let clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
+         .map( s => this.parseMetadata( s.val()))
+         .multicast( this._clusterMetadata)
+         .connect();
 
       this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
       this._users.subscribe( map => {this._latestUserMap = map;});
