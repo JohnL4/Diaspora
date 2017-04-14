@@ -105,6 +105,12 @@ export class Cluster {
     */
    public copyFrom( aCluster: Cluster): void
    {
+      let me = this.constructor.name + ":copyFrom(): ";
+      if (! aCluster)
+      {
+         console.log( me + "WARNING: Can't copy from null cluster");
+         return;
+      }
       this.usesHighLowSlipstreams = aCluster.usesHighLowSlipstreams;
       this.systemMap = aCluster.systemMap;
       this.slipstreams = aCluster.slipstreams;
