@@ -131,7 +131,7 @@
         </tr>
         <tr *ngFor="let cluster of clusterMetadata | async">
           <td>
-            <button type="button" class="btn btn-warning" aria-label="Load cluster"
+            <button type="submit" class="btn btn-warning" aria-label="Load cluster"
                     (click)="loadCluster( cluster.uniqueName)"
                     >
               <span class="glyphicon glyphicon-open" aria-hidden="true"></span>

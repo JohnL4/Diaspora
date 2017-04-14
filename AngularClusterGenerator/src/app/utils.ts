@@ -66,7 +66,7 @@ export function alphaBravo( i: number): string
 /**
  * Makes a universally unique cluster name by combining the cluster name with date from the User.  Note that neither
  * cluster nor user need to exist (both can be null) or have truthy data, but if they don't the cluster name will not
- * truly be unique.
+ * truly be unique.  Returned value is unencoded/unescaped.
  */
 export function uniqueClusterName( aCluster: Cluster, aUser: User): string
 {
