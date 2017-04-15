@@ -104,9 +104,17 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       // alert( "generateCluster() done");
    }
 
-   public loadCluster( aUniqueName: string): void
+   public loadCluster( aCluster: Cluster): void
    {
-      this._cluster.copyFrom( this._persistenceSvc.getCluster( aUniqueName));
+      let me = this.constructor.name + ".loadCluster(): ";
+      console.log( me + `cluster = ${aCluster.toString()} (constructor = ${aCluster.constructor.name})`);
+//      for (let prop in aCluster)
+//      {
+//         console.log( me + `    ${prop}\t: ${aCluster[prop]}`);
+//      }
+      let uniqueName = aCluster.uniqueName();
+      console.log( me + `cluster unique name = "${uniqueName}"`);
+      this._cluster.copyFrom( this._persistenceSvc.getCluster( aCluster));
    }
    
    public revertParams()

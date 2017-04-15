@@ -84,6 +84,7 @@ export function uniqueClusterName( aCluster: Cluster, aUser: User): string
  */
 export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): string
 {
+   let me = "utils.uniqueClusterNameFromUid(): ";
    // We stringify the cluster name in case somebody is doing something shady like inject another ASCII US into it.
    let stringifiedClusterName: string;
    if (aCluster ? aCluster.name : "")
@@ -91,6 +92,7 @@ export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): 
    else
       stringifiedClusterName = "";
 
+   console.log( me + `stringified cluster name: "${stringifiedClusterName}"`);
    let retval = stringifiedClusterName + ASCII_US + aUserUid; 
    return retval;
 

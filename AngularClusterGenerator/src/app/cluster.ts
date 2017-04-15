@@ -95,6 +95,8 @@ export class Cluster {
 
    public uniqueName(): string
    {
+      let me = this.constructor.name + ".uniqueName(): ";
+      console.log( me);
       return uniqueClusterNameFromUid( this, this.lastAuthor);
    }
 

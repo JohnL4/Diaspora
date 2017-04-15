@@ -30,6 +30,10 @@ export class ClusterPersistenceService
     */
    public get currentPersistedCluster(): BehaviorSubject<Cluster> { return this._currentPersistedCluster; }
    
+   /**
+    * Map from cluster unique name to Cluster.  Zero or more of these clusters will have all data filled in (and not
+    * necessarily up to date); the rest will have only metadata.
+    */ 
    private _latestClusterMap: Map<string, Cluster>;
    
    private _firebaseConfig = {
@@ -153,9 +157,13 @@ export class ClusterPersistenceService
       return retval;
    }
 
-   public getCluster( aUniqueName: string): Cluster
+   /**
+    * Initiates a request to load the filled-in details of the cluster and returns whatever we have now in the cluster map.
+    */ 
+   public getCluster( aCluster: Cluster): Cluster
    {
-      let retval = this._latestClusterMap.get( aUniqueName);
+      this.loadCluster( aCluster.uniqueName());
+      let retval = this._latestClusterMap.get( aCluster.uniqueName());
       return retval;
    }
 
@@ -212,8 +220,12 @@ export class ClusterPersistenceService
 //      return new Array<Cluster>();
 //   }
    
-   loadCluster( aCluster: Cluster): void
+   loadCluster( aUniqueName: string): void
    {
+      let me = this.constructor.name + ".loadCluster(): ";
+      console.log( me + `loading ${aUniqueName}`);
+      let [name,uid] = aUniqueName.split( ASCII_US, 2);
+      name = JSON.parse( name);
    }
 
    saveCluster( aCluster: Cluster): void
@@ -329,10 +341,19 @@ export class ClusterPersistenceService
          let keyTuple = JSON.parse( key);
          let [name,uid] = keyTuple.split( ASCII_US, 2);
          name = JSON.parse( name);
-         let cluster = <Cluster> aSnapshot[key];
+         let clusterObj = <Cluster> aSnapshot[key]; // Note: just casting an Object (which is what I think aSnapshot[key]
+                                                 // is, since Firebase knows nothing about our class hierarchy) to
+                                                 // Cluster does not actually MAKE the thing a Cluster, it just
+                                                 // satisfies TypeScript's demand for type "congruence".
+         clusterObj.lastAuthor = uid;
+         clusterObj.name = name;
+
+         let cluster = new Cluster();
          cluster.lastAuthor = uid;
          cluster.name = name;
-         retval.push( cluster);
+         cluster.lastChanged = clusterObj.lastChanged;
+
+         retval.push( cluster); 
          this._latestClusterMap.set( key, cluster);
       }
       console.log( me + `aSnapshot contains ${retval.length} clusters`);
