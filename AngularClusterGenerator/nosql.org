@@ -44,9 +44,12 @@
                owners                 # Users who are allowed to change sharing.  Initially, the uid of the creating user.
                   <owner>             # uid
                   (repeated)
-               users                  # Users allowed to edit this cluster.  Owners always allowed to edit, so don't need to
+               editors                # Users allowed to edit this cluster.  Owners always allowed to edit, so don't need to
                                       # include them in this list.
                   <user>              # uid; Need a special value indicating "all users".
+                  (repeated)
+               viewers                # Users allowed to see this cluster
+                  <user>
                   (repeated)
                xml: xml string        # XML of the cluster
     #+END_SRC

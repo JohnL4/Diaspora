@@ -80,94 +80,93 @@ export class ClusterSerializerXML implements Serializer
    /**
     * Parse XML string into this.cluster, returning list of errors, if any.  Otherwise, returns null.
     */
-   deserialize(aString: string): NodeListOf<Element>
+   deserialize(aString: string): NodeListOf<Element> {
+      this.cluster = new Cluster();
+
+      let clusterDom : Document = this._parser.parseFromString( aString, "text/xml");
+      let clusterElt = clusterDom.documentElement;
+      let clusterChildNodes = clusterElt.childNodes;
+      let parserErrors = clusterElt.getElementsByTagName( "parsererror");
+      if (parserErrors.length > 0)
       {
-         this.cluster = new Cluster();
-
-         let clusterDom : Document = this._parser.parseFromString( aString, "text/xml");
-         let clusterElt = clusterDom.documentElement;
-         let clusterChildNodes = clusterElt.childNodes;
-         let parserErrors = clusterElt.getElementsByTagName( "parsererror");
-         if (parserErrors.length > 0)
-         {
-            return parserErrors;
-         }
-
-         let usesHighLowAttr: string = clusterElt.getAttribute( "usesHighLowSlipstreams");
-         if (usesHighLowAttr != null && usesHighLowAttr.length > 0)
-            this.cluster.usesHighLowSlipstreams = Boolean( usesHighLowAttr);
-         
-         let starSystems = new Array<StarSystem>();
-         for (let i = 0; i < clusterChildNodes.length; i++)
-         {
-            if (clusterChildNodes[i].nodeType == Node.ELEMENT_NODE
-                && clusterChildNodes[i].nodeName == "starSystem")
-            {
-               let starSysElt: Element = clusterChildNodes[i] as Element;
-               let sys = new StarSystem(
-                  starSysElt.getAttribute( "id"),
-                  decodeURIComponent(starSysElt.getAttribute( "name")), 
-                  Number( starSysElt.getAttribute( "technology")),
-                  Number( starSysElt.getAttribute( "environment")),
-                  Number( starSysElt.getAttribute( "resources")));
-               sys.aspects = new Array<string>();
-               let aspectElts = starSysElt.getElementsByTagName( "aspect");
-               for (let j = 0; j < aspectElts.length; j++)
-               {
-                  sys.aspects.push( decodeURIComponent( aspectElts[j].textContent));
-               }
-               // Since we bind hardcoded-ly to three aspects, make sure they're there.
-               while (sys.aspects.length < 3)
-                  sys.aspects.push( "");
-               let notesElts = starSysElt.getElementsByTagName( "notes");
-               if (notesElts.length > 0)
-               {
-                  let notesElt = starSysElt.getElementsByTagName( "notes")[0];
-                  sys.notes = decodeURIComponent( notesElt.textContent);
-               }
-               starSystems.push( sys);
-            }
-         }
-         if (starSystems.length > 0)
-         {
-            this.cluster.systems = starSystems;
-         }
-
-         this.cluster.slipstreams = new Array<Slipstream>();
-         for (let i = 0; i < clusterChildNodes.length; i++)
-         {
-            if (clusterChildNodes[i].nodeType == Node.ELEMENT_NODE
-                && clusterChildNodes[i].nodeName == "slipstream")
-            {
-               let slipstreamElt = clusterChildNodes[i] as Element;
-               let from = slipstreamElt.getAttribute( "from");
-               let to = slipstreamElt.getAttribute( "to");
-               let fromSys = this.cluster.systemMap.get( from);
-               let toSys = this.cluster.systemMap.get( to);
-
-               let leave: SlipknotPosition = null;
-               let arrive: SlipknotPosition = null;
-               if (this.cluster.usesHighLowSlipstreams)
-               {
-                  let leaveAttr: string = slipstreamElt.getAttribute( "leave");
-                  let arriveAttr: string = slipstreamElt.getAttribute( "arrive");
-                  if (leaveAttr != null && leaveAttr.length > 0 && arriveAttr != null && arriveAttr.length > 0)
-                  {
-                     leave = SlipknotPosition[ leaveAttr];
-                     arrive = SlipknotPosition[ arriveAttr];
-                  }
-                  else
-                     throw "Cluster uses high/low slipknot positions, but XML doesn't specify values for slipstreams";
-               }
-               
-               let ss = new Slipstream( fromSys, toSys, leave, arrive );
-               this.cluster.slipstreams.push( ss);
-               fromSys.slipstreams.push( ss);
-               toSys.slipstreams.push( ss);
-            }
-         }
-         return null;              // No errors.
+         return parserErrors;
       }
+
+      let usesHighLowAttr: string = clusterElt.getAttribute( "usesHighLowSlipstreams");
+      if (usesHighLowAttr != null && usesHighLowAttr.length > 0)
+         this.cluster.usesHighLowSlipstreams = Boolean( usesHighLowAttr);
+      
+      let starSystems = new Array<StarSystem>();
+      for (let i = 0; i < clusterChildNodes.length; i++)
+      {
+         if (clusterChildNodes[i].nodeType == Node.ELEMENT_NODE
+             && clusterChildNodes[i].nodeName == "starSystem")
+         {
+            let starSysElt: Element = clusterChildNodes[i] as Element;
+            let sys = new StarSystem(
+               starSysElt.getAttribute( "id"),
+               decodeURIComponent(starSysElt.getAttribute( "name")), 
+               Number( starSysElt.getAttribute( "technology")),
+               Number( starSysElt.getAttribute( "environment")),
+               Number( starSysElt.getAttribute( "resources")));
+            sys.aspects = new Array<string>();
+            let aspectElts = starSysElt.getElementsByTagName( "aspect");
+            for (let j = 0; j < aspectElts.length; j++)
+            {
+               sys.aspects.push( decodeURIComponent( aspectElts[j].textContent));
+            }
+            // Since we bind hardcoded-ly to three aspects, make sure they're there.
+            while (sys.aspects.length < 3)
+               sys.aspects.push( "");
+            let notesElts = starSysElt.getElementsByTagName( "notes");
+            if (notesElts.length > 0)
+            {
+               let notesElt = starSysElt.getElementsByTagName( "notes")[0];
+               sys.notes = decodeURIComponent( notesElt.textContent);
+            }
+            starSystems.push( sys);
+         }
+      }
+      if (starSystems.length > 0)
+      {
+         this.cluster.systems = starSystems;
+      }
+
+      this.cluster.slipstreams = new Array<Slipstream>();
+      for (let i = 0; i < clusterChildNodes.length; i++)
+      {
+         if (clusterChildNodes[i].nodeType == Node.ELEMENT_NODE
+             && clusterChildNodes[i].nodeName == "slipstream")
+         {
+            let slipstreamElt = clusterChildNodes[i] as Element;
+            let from = slipstreamElt.getAttribute( "from");
+            let to = slipstreamElt.getAttribute( "to");
+            let fromSys = this.cluster.systemMap.get( from);
+            let toSys = this.cluster.systemMap.get( to);
+
+            let leave: SlipknotPosition = null;
+            let arrive: SlipknotPosition = null;
+            if (this.cluster.usesHighLowSlipstreams)
+            {
+               let leaveAttr: string = slipstreamElt.getAttribute( "leave");
+               let arriveAttr: string = slipstreamElt.getAttribute( "arrive");
+               if (leaveAttr != null && leaveAttr.length > 0 && arriveAttr != null && arriveAttr.length > 0)
+               {
+                  leave = SlipknotPosition[ leaveAttr];
+                  arrive = SlipknotPosition[ arriveAttr];
+               }
+               else
+                  throw "Cluster uses high/low slipknot positions, but XML doesn't specify values for slipstreams";
+            }
+            
+            let ss = new Slipstream( fromSys, toSys, leave, arrive );
+            this.cluster.slipstreams.push( ss);
+            fromSys.slipstreams.push( ss);
+            toSys.slipstreams.push( ss);
+         }
+      }
+      return null;              // No errors.
+   }
 
    private indentStr( anIndent: number): string
    {

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs/Rx';
+import { Observable, BehaviorSubject, Subscription } from 'rxjs/Rx';
 
 import * as firebase from "firebase";
 
 import { Cluster } from './cluster';
+import { ClusterData } from './cluster-data';
 import { ClusterSerializerXML } from './cluster-serializer-xml';
 import { User } from './user';
 import { ASCII_US, uniqueClusterName } from './utils';
@@ -68,6 +69,8 @@ export class ClusterPersistenceService
    private _clusterMetadata: BehaviorSubject<Cluster[]>;
 
    private _currentPersistedCluster: BehaviorSubject<Cluster>;
+
+   private _currentPersistedClusterSubscription: Subscription;
    
    /**
     * Current User.
@@ -223,9 +226,19 @@ export class ClusterPersistenceService
    loadCluster( aUniqueName: string): void
    {
       let me = this.constructor.name + ".loadCluster(): ";
-      console.log( me + `loading ${aUniqueName}`);
-      let [name,uid] = aUniqueName.split( ASCII_US, 2);
-      name = JSON.parse( name);
+      let uniqueName = JSON.stringify( aUniqueName);
+      console.log( me + `loading ${uniqueName}`);
+      if (this._currentPersistedCluster || this._currentPersistedClusterSubscription)
+      {
+         if (this._currentPersistedClusterSubscription)
+            this._currentPersistedClusterSubscription.unsubscribe();
+         // TODO: unsubscribe or whatever needs to be done (the above is just a guess).
+      }
+      this._currentPersistedCluster = new BehaviorSubject<Cluster>( new Cluster());
+      this._currentPersistedClusterSubscription = this.makeDatabaseSnapshotObservable( `/clusterData/${uniqueName}`)
+         .map( s => this.parseClusterData( s.val()))
+         .multicast( this._currentPersistedCluster)
+         .connect();
    }
 
    saveCluster( aCluster: Cluster): void
@@ -345,13 +358,13 @@ export class ClusterPersistenceService
                                                  // is, since Firebase knows nothing about our class hierarchy) to
                                                  // Cluster does not actually MAKE the thing a Cluster, it just
                                                  // satisfies TypeScript's demand for type "congruence".
-         clusterObj.lastAuthor = uid;
-         clusterObj.name = name;
+         // clusterObj.lastAuthor = uid;
+         // clusterObj.name = name;
 
          let cluster = new Cluster();
+         cluster.lastChanged = clusterObj.lastChanged;
          cluster.lastAuthor = uid;
          cluster.name = name;
-         cluster.lastChanged = clusterObj.lastChanged;
 
          retval.push( cluster); 
          this._latestClusterMap.set( key, cluster);
@@ -360,6 +373,17 @@ export class ClusterPersistenceService
       return retval;
    }
 
+   private parseClusterData( aSnapshot: Object): Cluster
+   {
+      let me = this.constructor.name + ".parseClusterData(): ";
+      let snapshot = <ClusterData> aSnapshot; // TODO
+      let serializer = new ClusterSerializerXML();
+      let errors = serializer.deserialize( snapshot.xml);
+      if (errors)
+         console.log( me + `ERRORS:\n\t${errors}`);
+      return serializer.cluster;
+   }
+   
    private parseUsers( aSnapshot: Object): Map<string,User> {
       let me = this.constructor.name + ".parseUsers(): ";
       let retval = new Map<string,User>();
