@@ -100,22 +100,22 @@ export class Cluster {
       return uniqueClusterNameFromUid( this, this.lastAuthor);
    }
 
-   /**
-    * Copy the data from the given cluster into this cluster, overwriting existing data.
-    * I'm not yet sure how injection works, but I don't think I can just replace one Cluster reference with another.
-    * Hence, this method.
-    */
-   public copyFrom( aCluster: Cluster): void
-   {
-      let me = this.constructor.name + ":copyFrom(): ";
-      if (! aCluster)
-      {
-         throw new Error("Can't copy from null cluster");
-      }
-      this.usesHighLowSlipstreams = aCluster.usesHighLowSlipstreams;
-      this.systemMap = aCluster.systemMap;
-      this.slipstreams = aCluster.slipstreams;
-   }
+//   /**
+//    * Copy the data from the given cluster into this cluster, overwriting existing data.
+//    * I'm not yet sure how injection works, but I don't think I can just replace one Cluster reference with another.
+//    * Hence, this method.
+//    */
+//   public copyFrom( aCluster: Cluster): void
+//   {
+//      let me = this.constructor.name + ":copyFrom(): ";
+//      if (! aCluster)
+//      {
+//         throw new Error("Can't copy from null cluster");
+//      }
+//      this.usesHighLowSlipstreams = aCluster.usesHighLowSlipstreams;
+//      this.systemMap = aCluster.systemMap;
+//      this.slipstreams = aCluster.slipstreams;
+//   }
 
    /**
     * Generate the starsystems and slipstreams that define the cluster.

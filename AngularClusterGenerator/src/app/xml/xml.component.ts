@@ -65,7 +65,8 @@ export class XmlComponent implements OnInit {
       let parserErrors = this._serializer.deserialize( newXml);
       if (parserErrors == null || parserErrors.length == 0)
       {
-         this.cluster.copyFrom( this._serializer.cluster);
+         this._persistenceSvc.currentCluster = this._serializer.cluster;
+         // this.cluster.copyFrom( this._serializer.cluster);
       }
       else
       {

@@ -168,16 +168,16 @@ export class ClusterPersistenceService
       return retval;
    }
 
-   /**
-    * Initiates a request to load the filled-in details of the cluster and returns whatever we have now in the cluster map.
-    * See also {@link #currentCluster} property.
-    */ 
-   public getCluster( aCluster: Cluster): Cluster
-   {
-      this.loadCluster( aCluster.uniqueName());
-      let retval = this._latestClusterMap.get( aCluster.uniqueName());
-      return retval;
-   }
+//   /**
+//    * Initiates a request to load the filled-in details of the cluster and returns whatever we have now in the cluster map.
+//    * See also {@link #currentCluster} property.
+//    */ 
+//   public getCluster( aCluster: Cluster): Cluster
+//   {
+//      this.loadCluster( aCluster.uniqueName());
+//      let retval = this._latestClusterMap.get( aCluster.uniqueName());
+//      return retval;
+//   }
 
    /**
     * Initiate login to Firebase.
