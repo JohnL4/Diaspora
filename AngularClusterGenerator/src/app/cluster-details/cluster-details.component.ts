@@ -14,8 +14,6 @@ declare var cytoscape: any;
 })
 export class ClusterDetailsComponent implements OnInit {
 
-   private _me = "ClusterDetailsComponent";
-
    public get cluster(): Cluster
    {
       return this._persistenceSvc.currentCluster;

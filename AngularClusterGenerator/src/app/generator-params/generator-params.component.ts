@@ -38,7 +38,8 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    @ViewChild( 'parmsForm') currentForm: NgForm;
    @ViewChild( 'numSystemsInput') numSystemsInput: ElementRef;
    
-   private _cluster: Cluster;
+   private get cluster(): Cluster { return this._persistenceSvc.currentCluster; }
+   
    private _router: Router;
    private _highLowHelpShowing: boolean = false;
    
@@ -49,13 +50,13 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    constructor( /* aCluster: Cluster, */ aRouter: Router, private _renderer: Renderer, private _persistenceSvc: ClusterPersistenceService)
    {
       // this._cluster = aCluster;
-      this._cluster = this._persistenceSvc.currentCluster;
+      // this.cluster = this._persistenceSvc.currentCluster;
       this._router = aRouter;
-      if (this._cluster)
+      if (this.cluster)
       {
-         this._useHighLowSlipstreams = this._cluster && this._cluster.usesHighLowSlipstreams;
-         if (this._cluster.numSystems)
-            this.numSystems = this._cluster.numSystems.toString();
+         this._useHighLowSlipstreams = this.cluster && this.cluster.usesHighLowSlipstreams;
+         if (this.cluster.numSystems)
+            this.numSystems = this.cluster.numSystems.toString();
       }
    }
 
@@ -85,13 +86,13 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       {
          // Note that we don't simly new up a new Cluster, because the injector is managing the one we were passed.
          // Instead, we modify the existing one in place.
-         this._cluster.generate( Number( this.numSystems), this._useHighLowSlipstreams);
+         this.cluster.generate( Number( this.numSystems), this._useHighLowSlipstreams);
 
          if (localStorage)
          {
             if (! this._serializer)
                this._serializer = new ClusterSerializerXML();
-            this._serializer.cluster = this._cluster;
+            this._serializer.cluster = this.cluster;
             let clusterXml = this._serializer.serialize();
             console.log( `generateCluster(): before setting, localStorage has ${localStorage.length} items`);
             localStorage.setItem( 'cluster', clusterXml);
@@ -115,17 +116,17 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 //      }
       let uniqueName = aCluster.uniqueName();
       console.log( me + `cluster unique name = >${JSON.stringify(uniqueName)}<`);
-      this._cluster.copyFrom( this._persistenceSvc.getCluster( aCluster));
+      this.cluster.copyFrom( this._persistenceSvc.getCluster( aCluster));
    }
    
    public revertParams()
    {
       // console.log( "revertParams()");
-      this.numSystems = this._cluster
-         && this._cluster.numSystems
-         && this._cluster.numSystems.toString()
+      this.numSystems = this.cluster
+         && this.cluster.numSystems
+         && this.cluster.numSystems.toString()
          || "";
-      this._useHighLowSlipstreams = this._cluster && this._cluster.usesHighLowSlipstreams;
+      this._useHighLowSlipstreams = this.cluster && this.cluster.usesHighLowSlipstreams;
    }
 
    onSubmit()
@@ -141,8 +142,8 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    {
       let me = this.constructor.name + ".gotoDetails(): ";
       let uniqueName: string;
-      if (this._cluster.name)
-         uniqueName = uniqueClusterName( this._cluster, this._persistenceSvc.currentUser);
+      if (this.cluster.name)
+         uniqueName = uniqueClusterName( this.cluster, this._persistenceSvc.currentUser);
       else
       {
          console.log( me + "Cluster has no name, therefore, no unique name.");
