@@ -84,8 +84,9 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       // console.log( "generateCluster()");
       if (this.parmsForm.form.valid)
       {
-         // Note that we don't simly new up a new Cluster, because the injector is managing the one we were passed.
-         // Instead, we modify the existing one in place.
+         // Note that we don't simply new up a new Cluster, because the injector is managing the one we were passed.
+         // Instead, we modify the existing one in place.  (NOTE: now that we've gotten rid of the injected Cluster, we
+         // don't have to do it this way.)
          this.cluster.generate( Number( this.numSystems), this._useHighLowSlipstreams);
 
          if (localStorage)
