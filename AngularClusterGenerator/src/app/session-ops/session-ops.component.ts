@@ -13,8 +13,9 @@ export class SessionOpsComponent implements OnInit
 {
    public user: User;
    
-   public get clusterName(): string { return this._cluster.name};
-   public set clusterName( aName: string) { this._cluster.name = aName};
+   private get cluster(): Cluster { return this._persistenceSvc.currentCluster; }
+   public get clusterName(): string { return this.cluster.name};
+   public set clusterName( aName: string) { this.cluster.name = aName};
    
    private getUser(): void
    {
@@ -24,12 +25,12 @@ export class SessionOpsComponent implements OnInit
       this._persistenceSvc.user.then( 
          user => {
             console.log( `user = ${user}`);
-            console.log( `cluster has ${this._cluster.numSystems} systems`);
+            console.log( `cluster has ${this.cluster.numSystems} systems`);
             this.user = user;
          });
    }
 
-   constructor( private _cluster: Cluster, private _persistenceSvc: ClusterPersistenceService) { }
+   constructor( /* private _cluster: Cluster, */ private _persistenceSvc: ClusterPersistenceService) { }
 
    ngOnInit()
    {
@@ -56,6 +57,6 @@ export class SessionOpsComponent implements OnInit
 
    public saveCluster()
    {
-      this._persistenceSvc.saveCluster( this._cluster);
+      this._persistenceSvc.saveCluster( this.cluster);
    }
 }

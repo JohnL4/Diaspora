@@ -15,13 +15,13 @@ declare var cytoscape: any;
 export class ClusterDetailsComponent implements OnInit {
 
    private _me = "ClusterDetailsComponent";
-   
-   public get Cluster(): Cluster
+
+   public get cluster(): Cluster
    {
-      return this._cluster;
+      return this._persistenceSvc.currentCluster;
    }
    
-   constructor( private _cluster: Cluster, private _persistenceSvc: ClusterPersistenceService) {}
+   constructor( /* private _cluster: Cluster, */ private _persistenceSvc: ClusterPersistenceService) {   }
 
    ngOnInit()
    {
@@ -37,7 +37,7 @@ export class ClusterDetailsComponent implements OnInit {
       // let cose_bilkent = require( 'cytoscape-cose-bilkent');
       // cose_bilkent( cytoscape);
 
-      let cygen = new CytoscapeGenerator( this._cluster);
+      let cygen = new CytoscapeGenerator( this.cluster);
       cygen.ensureStyles();
       let graphElements: Array<any> = cygen.getElements(); // this.elementsGraph( this._cluster);
       let styles: Array<any> = cygen.getStyles();

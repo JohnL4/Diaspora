@@ -19,28 +19,34 @@ import { ClusterSerializerXML } from './cluster-serializer-xml';
   selector: 'app-root',
   templateUrl: './app.component.html',
    styleUrls: ['./app.component.css'],
-   providers: [Cluster, ClusterPersistenceService],
+   providers: [
+      //Cluster,
+      ClusterPersistenceService
+   ],
 })
 export class AppComponent implements OnInit
 {
    title = 'Diaspora Cluster Maintenance';
 
-   constructor( private _cluster: Cluster, private _persistenceSvc: ClusterPersistenceService) {}
+   private get cluster(): Cluster { return this._persistenceSvc.currentCluster; }
+   
+   constructor( /* private _cluster: Cluster, */ private _persistenceSvc: ClusterPersistenceService) { }
 
    ngOnInit()
    {
       let me = this.constructor.name + ".ngOnInit(): ";
       console.log( me);
  
-      if (this._cluster.numSystems == 0 && localStorage)
+      if (! (this.cluster && this.cluster.numSystems) && localStorage)
       {
          let storedClusterXml = localStorage.getItem( 'cluster');
          if (storedClusterXml)
          {
             let serializer = new ClusterSerializerXML( );
             serializer.deserialize( storedClusterXml);
-            this._cluster.copyFrom( serializer.cluster);
-            console.log( `Deserialized ${this._cluster.numSystems} systems from localStorage`);
+            // this.cluster.copyFrom( serializer.cluster);
+            this._persistenceSvc.currentCluster = serializer.cluster;
+            console.log( `Deserialized ${this.cluster.numSystems} systems from localStorage`);
          }
       }
       

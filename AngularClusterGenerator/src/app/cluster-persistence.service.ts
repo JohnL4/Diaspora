@@ -21,6 +21,8 @@ import { ASCII_US, uniqueClusterName } from './utils';
 @Injectable()
 export class ClusterPersistenceService 
 {
+   // --------------------------------------------  Public Data, Accessors  --------------------------------------------
+   
    /**
     * Map from cluster name to cluster meadata (e.g., last edited by/when, notes, etc.)
     */
@@ -30,6 +32,18 @@ export class ClusterPersistenceService
     * Current cluster from persistent (possibly shared) store.
     */
    public get currentPersistedCluster(): BehaviorSubject<Cluster> { return this._currentPersistedCluster; }
+   
+   /**
+    * Current User.
+    */
+   public get currentUser(): User { return this._curUser; }
+
+   /**
+    * The current cluster (which may not have been saved yet).
+    */
+   public currentCluster: Cluster;
+
+   // -------------------------------------------------  Private Data  -------------------------------------------------
    
    /**
     * Map from cluster unique name to Cluster.  Zero or more of these clusters will have all data filled in (and not
@@ -72,24 +86,13 @@ export class ClusterPersistenceService
 
    private _currentPersistedClusterSubscription: Subscription;
    
-   /**
-    * Current User.
-    */
-   public get curUser(): User { return this._curUser; }
    private _curUser: User;
    
    private _initialized: boolean = false;
 
    private _xmlSerializer: ClusterSerializerXML;
    
-   /**
-    * \x1F is ASCII US -- "Unit Separator" -- what we think of as a field separator.  I could have used any character
-    * (e.g., NUL, but that might come with its own hassles), but there just happens to be an ASCII character exactly for
-    * hijinks like this.
-    */
-   // private ASCII_US = "\x1F";
-
-   // ------------------------------------------------  Public Methods  ------------------------------------------------
+   // -------------------------------------------------  Constructors  -------------------------------------------------
    
    constructor( )
    {
@@ -97,6 +100,8 @@ export class ClusterPersistenceService
       console.log( me + `=============================================================================================`);
    }
 
+   // ------------------------------------------------  Public Methods  ------------------------------------------------
+   
    /**
     * Initialize firebase and hook up AuthStateChanged event.
     */
@@ -152,6 +157,9 @@ export class ClusterPersistenceService
       // );
    }
 
+   /**
+    * Returns a User object for the given uid. May return null.
+    */
    public getUser( aUid: string): User
    {
       let retval: User;
@@ -162,6 +170,7 @@ export class ClusterPersistenceService
 
    /**
     * Initiates a request to load the filled-in details of the cluster and returns whatever we have now in the cluster map.
+    * See also {@link #currentCluster} property.
     */ 
    public getCluster( aCluster: Cluster): Cluster
    {
@@ -223,7 +232,7 @@ export class ClusterPersistenceService
 //      return new Array<Cluster>();
 //   }
    
-   loadCluster( aUniqueName: string): void
+   public loadCluster( aUniqueName: string): void
    {
       let me = this.constructor.name + ".loadCluster(): ";
       let uniqueName = JSON.stringify( aUniqueName);
@@ -241,7 +250,7 @@ export class ClusterPersistenceService
          .connect();
    }
 
-   saveCluster( aCluster: Cluster): void
+   public saveCluster( aCluster: Cluster): void
    {
       let uniqueName = JSON.stringify( uniqueClusterName( aCluster, this._curUser));
       let dbRef = this._db.ref();
@@ -265,7 +274,7 @@ export class ClusterPersistenceService
    /**
     * Get cluster xml from some place wondrous and mysterious (like a server).
     */
-   getClusterXml(): string
+   public getClusterXml(): string
    {
       return "";
    }

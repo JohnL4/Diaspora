@@ -46,15 +46,16 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    // ------------------------------------------------  Public Methods  ------------------------------------------------
    
-   constructor(aCluster: Cluster, aRouter: Router, private _renderer: Renderer, private _persistenceSvc: ClusterPersistenceService)
+   constructor( /* aCluster: Cluster, */ aRouter: Router, private _renderer: Renderer, private _persistenceSvc: ClusterPersistenceService)
    {
-      this._cluster = aCluster;
+      // this._cluster = aCluster;
+      this._cluster = this._persistenceSvc.currentCluster;
       this._router = aRouter;
-      if (aCluster)
+      if (this._cluster)
       {
-         this._useHighLowSlipstreams = aCluster && aCluster.usesHighLowSlipstreams;
-         if (aCluster.numSystems)
-            this.numSystems = aCluster.numSystems.toString();
+         this._useHighLowSlipstreams = this._cluster && this._cluster.usesHighLowSlipstreams;
+         if (this._cluster.numSystems)
+            this.numSystems = this._cluster.numSystems.toString();
       }
    }
 
@@ -141,7 +142,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       let me = this.constructor.name + ".gotoDetails(): ";
       let uniqueName: string;
       if (this._cluster.name)
-         uniqueName = uniqueClusterName( this._cluster, this._persistenceSvc.curUser);
+         uniqueName = uniqueClusterName( this._cluster, this._persistenceSvc.currentUser);
       else
       {
          console.log( me + "Cluster has no name, therefore, no unique name.");

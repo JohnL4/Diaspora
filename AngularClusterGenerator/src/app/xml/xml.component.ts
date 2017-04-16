@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ClusterSerializerXML } from '../cluster-serializer-xml';
+import { ClusterPersistenceService } from '../cluster-persistence.service';
 import { Cluster } from '../cluster';
 import { StarSystem } from '../star-system';
 import { Slipstream } from '../slipstream';
@@ -11,7 +12,7 @@ import { Slipstream } from '../slipstream';
 })
 export class XmlComponent implements OnInit {
 
-   private _cluster: Cluster;
+   private get cluster(): Cluster { return this._persistenceSvc.currentCluster; }
    private _serializer: ClusterSerializerXML = new ClusterSerializerXML();
 
    private _xml: string;
@@ -19,12 +20,12 @@ export class XmlComponent implements OnInit {
    
    @ViewChild( 'parseErrorDisplay') _parseErrorDisplay: ElementRef;
 
-   constructor( aCluster: Cluster)
+   constructor( /* aCluster: Cluster, */ private _persistenceSvc: ClusterPersistenceService)
    {
       // Constructor is called every time we come back to this tab (because of the router?).
       // This means the private _xml member gets reset, so you can't use it to save data when you switch tabs.
       // Instead, probably need to inject something that the injector will instantiate only once.
-      this._cluster = aCluster;
+      // this._cluster = aCluster;
 
       if ((<any>window).DOMParser)
          this._parser = new (<any>window).DOMParser();
@@ -43,9 +44,9 @@ export class XmlComponent implements OnInit {
    
    public get xml(): string
    {
-      if (this._cluster && this._cluster.numSystems)
+      if (this.cluster && this.cluster.numSystems)
       {
-         this._serializer.cluster = this._cluster;
+         this._serializer.cluster = this.cluster;
          return this._serializer.serialize();
       }
       else
@@ -64,7 +65,7 @@ export class XmlComponent implements OnInit {
       let parserErrors = this._serializer.deserialize( newXml);
       if (parserErrors == null || parserErrors.length == 0)
       {
-         this._cluster.copyFrom( this._serializer.cluster);
+         this.cluster.copyFrom( this._serializer.cluster);
       }
       else
       {
