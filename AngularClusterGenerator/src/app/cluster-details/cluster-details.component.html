@@ -1,7 +1,7 @@
 <p>
 </p>
 <p>
-  Cluster has {{cluster.numSystems ? cluster.numSystems : "no"}} systems.
+  Cluster {{(cluster | async).name}} has {{(cluster | async).numSystems}} systems.
 </p>
 <div class="row">
 
@@ -11,7 +11,7 @@
 <div class="col-md-6" style="/* border: 1px solid blue; */">
 
   <div class="table-responsive">
-    <table class="table cluster-details" *ngIf="cluster && cluster.numSystems">
+    <table class="table cluster-details" *ngIf="(cluster | async).numSystems">
       <tr>
         <th>System</th>
         <th><a href="http://www.vsca.ca/Diaspora/diaspora-srd.html#system-attributes" target="_blank">Stats</a></th>
@@ -23,7 +23,7 @@
           </button>
         </th>
       </tr>
-      <ng-container *ngFor="let sys of cluster.systems">
+      <ng-container *ngFor="let sys of (cluster | async).systems">
         <ng-container *ngIf="sys.isBeingEdited"> <!-- =========================== edit mode ==================== -->
           <tr>
             <td><input [(ngModel)]="sys.name"/></td>

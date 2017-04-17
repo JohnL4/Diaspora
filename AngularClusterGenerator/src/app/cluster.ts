@@ -123,6 +123,7 @@ export class Cluster {
    generate( aNumSystems: number, aUseHighLowSlipstreams: boolean)
    {
       let me = this.constructor.name + ".generate(): ";
+      this.name = null;
       this.usesHighLowSlipstreams = aUseHighLowSlipstreams;
       let sysv = new Array<StarSystem>(); // Temporary, rather than constantly rebuilding, sorted (by id), because IE 11 is stoopid.
       let slipstreamGuaranteeMet : boolean = false;

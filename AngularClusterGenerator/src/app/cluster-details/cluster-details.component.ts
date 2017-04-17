@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Subject } from 'rxjs/Rx';
 
 import { Cluster } from '../cluster';
 import { CytoscapeGenerator } from '../cytoscape-generator';
@@ -14,9 +15,9 @@ declare var cytoscape: any;
 })
 export class ClusterDetailsComponent implements OnInit {
 
-   public get cluster(): Cluster
+   public get cluster(): Subject<Cluster>
    {
-      return this._persistenceSvc.currentCluster;
+      return this._persistenceSvc.currentClusterSubject;
    }
    
    constructor( /* private _cluster: Cluster, */ private _persistenceSvc: ClusterPersistenceService) {   }
@@ -35,7 +36,7 @@ export class ClusterDetailsComponent implements OnInit {
       // let cose_bilkent = require( 'cytoscape-cose-bilkent');
       // cose_bilkent( cytoscape);
 
-      let cygen = new CytoscapeGenerator( this.cluster);
+      let cygen = new CytoscapeGenerator( this._persistenceSvc.currentCluster);
       cygen.ensureStyles();
       let graphElements: Array<any> = cygen.getElements(); // this.elementsGraph( this._cluster);
       let styles: Array<any> = cygen.getStyles();

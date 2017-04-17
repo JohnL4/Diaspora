@@ -12,7 +12,7 @@ import { Slipstream } from '../slipstream';
 })
 export class XmlComponent implements OnInit {
 
-   private get cluster(): Cluster { return this._persistenceSvc.currentCluster; }
+   private get cluster(): Cluster { return this._persistenceSvc.currentClusterSubject.value; }
    private _serializer: ClusterSerializerXML = new ClusterSerializerXML();
 
    private _xml: string;
@@ -65,7 +65,7 @@ export class XmlComponent implements OnInit {
       let parserErrors = this._serializer.deserialize( newXml);
       if (parserErrors == null || parserErrors.length == 0)
       {
-         this._persistenceSvc.currentCluster = this._serializer.cluster;
+         this._persistenceSvc.currentGeneratedCluster = this._serializer.cluster;
          // this.cluster.copyFrom( this._serializer.cluster);
       }
       else

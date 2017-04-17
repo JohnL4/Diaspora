@@ -17,9 +17,12 @@ export class CytoscapeGenerator {
     */
    public ensureStyles(): void
    {
-      for (let sys of this.cluster.systems) // TODO: probably better not to call this method
+      if (this.cluster && this.cluster.numSystems)
       {
-         this.ensureStyle( sys);
+         for (let sys of this.cluster.systems) // TODO: probably better not to call this method
+         {
+            this.ensureStyle( sys);
+         }
       }
    }
 
@@ -30,35 +33,38 @@ export class CytoscapeGenerator {
    public getElements(): any
    {
       let retval = { nodes: [], edges: []};
-      for (let sys of this.cluster.systems) // TODO: probably better not to call this method
+      if (this.cluster && this.cluster.numSystems)
       {
-         let signature = this.signature( sys);
-         retval.nodes.push( {data: {id: sys.id, label: sys.name}, classes: signature});
-      }
-
-      for (let slipstream of this.cluster.slipstreams)
-      {
-         // More-or-less arbitrary object we jam into the data for the edge.  The first three fields are required by
-         // Cytoscape.
-         let edgeData : { id: string,
-                          source: string,
-                          target: string,
-                          // Can't use dashes in property names here (even if we enclose them in quotes, because
-                          // Cytoscape, but underscores are ok.
-                          source_label?: string,
-                          target_label?: string
-                        };
-         edgeData = {id: `${slipstream.from.id}-${slipstream.to.id}`,
-                     source: slipstream.from.id,
-                     target: slipstream.to.id
-                    };
-         if (this.cluster.usesHighLowSlipstreams)
+         for (let sys of this.cluster.systems) // TODO: probably better not to call this method
          {
-            edgeData.source_label = slipstream.leave == SlipknotPosition.LOW ? '-' : '+';
-            edgeData.target_label = slipstream.arrive == SlipknotPosition.LOW ? '-' : '+';
+            let signature = this.signature( sys);
+            retval.nodes.push( {data: {id: sys.id, label: sys.name}, classes: signature});
          }
-         retval.edges.push( {data: edgeData});
-         
+
+         for (let slipstream of this.cluster.slipstreams)
+         {
+            // More-or-less arbitrary object we jam into the data for the edge.  The first three fields are required by
+            // Cytoscape.
+            let edgeData : { id: string,
+                             source: string,
+                             target: string,
+                             // Can't use dashes in property names here (even if we enclose them in quotes, because
+                             // Cytoscape, but underscores are ok.
+                             source_label?: string,
+                             target_label?: string
+                           };
+            edgeData = {id: `${slipstream.from.id}-${slipstream.to.id}`,
+                        source: slipstream.from.id,
+                        target: slipstream.to.id
+                       };
+            if (this.cluster.usesHighLowSlipstreams)
+            {
+               edgeData.source_label = slipstream.leave == SlipknotPosition.LOW ? '-' : '+';
+               edgeData.target_label = slipstream.arrive == SlipknotPosition.LOW ? '-' : '+';
+            }
+            retval.edges.push( {data: edgeData});
+            
+         }
       }
       return retval;
    }

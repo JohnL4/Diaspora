@@ -33,7 +33,13 @@ export class ClusterSerializerXML implements Serializer
       let xml: string = `<?xml version="1.0"?>
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://how-hard-can-it-be.com/diaspora https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd"`;
+         xsi:schemaLocation="http://how-hard-can-it-be.com/diaspora https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd"
+`;
+      if (this.cluster.name)
+      {
+         xml += `
+         name="${encodeURIComponent( this.cluster.name)}"`;
+      }
       if (this.cluster.usesHighLowSlipstreams)
       {
          xml += `
@@ -92,6 +98,10 @@ export class ClusterSerializerXML implements Serializer
          return parserErrors;
       }
 
+      let nameAttr: string = clusterElt.getAttribute( "name");
+      if (nameAttr)
+         this.cluster.name = decodeURIComponent( nameAttr); // JSON.parse( nameAttr); // Not sure why I don't need to parse, if I stringified
+                                       // during serialization.
       let usesHighLowAttr: string = clusterElt.getAttribute( "usesHighLowSlipstreams");
       if (usesHighLowAttr != null && usesHighLowAttr.length > 0)
          this.cluster.usesHighLowSlipstreams = Boolean( usesHighLowAttr);

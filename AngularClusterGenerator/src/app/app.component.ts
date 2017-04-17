@@ -45,7 +45,7 @@ export class AppComponent implements OnInit
             let serializer = new ClusterSerializerXML( );
             serializer.deserialize( storedClusterXml);
             // this.cluster.copyFrom( serializer.cluster);
-            this._persistenceSvc.currentCluster = serializer.cluster;
+            this._persistenceSvc.currentGeneratedCluster = serializer.cluster;
             console.log( `Deserialized ${this.cluster.numSystems} systems from localStorage`);
          }
       }

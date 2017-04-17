@@ -13,7 +13,7 @@ export class SessionOpsComponent implements OnInit
 {
    public user: User;
    
-   private get cluster(): Cluster { return this._persistenceSvc.currentCluster; }
+   private get cluster(): Cluster { return this._persistenceSvc.currentClusterSubject.value; }
    public get clusterName(): string { return this.cluster.name};
    public set clusterName( aName: string) { this.cluster.name = aName};
    

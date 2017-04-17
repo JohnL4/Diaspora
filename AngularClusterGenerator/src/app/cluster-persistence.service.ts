@@ -24,6 +24,38 @@ export class ClusterPersistenceService
    // --------------------------------------------  Public Data, Accessors  --------------------------------------------
    
    /**
+    * Current User.
+    */
+   public get currentUser(): User { return this._curUser; }
+
+   /**
+    * The current cluster (which may not have been saved yet), as a Subject.
+    */
+   public get currentClusterSubject(): BehaviorSubject<Cluster> {
+      return this._currentGeneratedCluster
+         || this._currentPersistedCluster;
+   }
+
+   /**
+    * The current cluster (which may not have been saved yet, and/or, in the case of a persisted cluster, may be out of
+    * date).
+    */
+   public get currentCluster(): Cluster {
+      return (this._currentGeneratedCluster && this._currentGeneratedCluster.value)
+         || (this._currentPersistedCluster && this._currentPersistedCluster.value);
+   }
+
+   public set currentGeneratedCluster( aCluster: Cluster) {
+      if (this._currentPersistedCluster || this._currentPersistedClusterSubscription)
+      {
+         if (this._currentPersistedClusterSubscription)
+            this._currentPersistedClusterSubscription.unsubscribe();
+         // TODO: unsubscribe or whatever needs to be done (the above is just a guess).
+      }
+      this._currentGeneratedCluster = new BehaviorSubject<Cluster>( aCluster);
+   }
+
+   /**
     * Map from cluster name to cluster meadata (e.g., last edited by/when, notes, etc.)
     */
    public get clusterMetadata(): Observable<Cluster[]> { return this._clusterMetadata; }
@@ -31,18 +63,8 @@ export class ClusterPersistenceService
    /**
     * Current cluster from persistent (possibly shared) store.
     */
-   public get currentPersistedCluster(): BehaviorSubject<Cluster> { return this._currentPersistedCluster; }
+   private get currentPersistedCluster(): BehaviorSubject<Cluster> { return this._currentPersistedCluster; }
    
-   /**
-    * Current User.
-    */
-   public get currentUser(): User { return this._curUser; }
-
-   /**
-    * The current cluster (which may not have been saved yet).
-    */
-   public currentCluster: Cluster;
-
    // -------------------------------------------------  Private Data  -------------------------------------------------
    
    /**
@@ -82,6 +104,10 @@ export class ClusterPersistenceService
    
    private _clusterMetadata: BehaviorSubject<Cluster[]>;
 
+   private _currentGeneratedCluster: BehaviorSubject<Cluster>;
+
+   private _currentGeneratedClusterSubscription: Subscription;
+   
    private _currentPersistedCluster: BehaviorSubject<Cluster>;
 
    private _currentPersistedClusterSubscription: Subscription;
@@ -241,6 +267,14 @@ export class ClusterPersistenceService
       {
          if (this._currentPersistedClusterSubscription)
             this._currentPersistedClusterSubscription.unsubscribe();
+         if (this._currentGeneratedClusterSubscription)
+         {
+            this._currentGeneratedClusterSubscription.unsubscribe();
+            this._currentGeneratedClusterSubscription = null;
+         }
+         if (this._currentGeneratedCluster)
+            this._currentGeneratedCluster = null;
+         
          // TODO: unsubscribe or whatever needs to be done (the above is just a guess).
       }
       this._currentPersistedCluster = new BehaviorSubject<Cluster>( new Cluster());

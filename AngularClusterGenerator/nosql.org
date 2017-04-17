@@ -54,3 +54,17 @@
                xml: xml string        # XML of the cluster
     #+END_SRC
 
+*** Use
+
+    Need to cover two cases:
+
+    - generated, not-yet-persisted cluster (no deep link (i.e., parameterized url) possible)
+    - persisted cluster (deep link via url parameterization that causes cluster to be loaded as observable)
+
+**** Generated Cluster
+
+     Make svc.currentCluster observable, UN-hook it from firebase (if hooked).
+
+**** Persisted Cluster
+
+     Make svc.currentCluster observable, hook it up to firebase (UN-hook first).
