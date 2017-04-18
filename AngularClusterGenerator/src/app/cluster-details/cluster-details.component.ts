@@ -36,6 +36,13 @@ export class ClusterDetailsComponent implements OnInit {
       // let cose_bilkent = require( 'cytoscape-cose-bilkent');
       // cose_bilkent( cytoscape);
 
+      this._persistenceSvc.currentClusterSubject.subscribe( () => this.layoutCytoscape());
+      // this.layoutCytoscape();
+   }
+
+   private layoutCytoscape(): void
+   {
+      let me = this.constructor.name + `.layoutCytoscape(): `;
       let cygen = new CytoscapeGenerator( this._persistenceSvc.currentCluster);
       cygen.ensureStyles();
       let graphElements: Array<any> = cygen.getElements(); // this.elementsGraph( this._cluster);
@@ -50,5 +57,5 @@ export class ClusterDetailsComponent implements OnInit {
       cy.layout({name: 'cose'});
       console.log( me + `done`);
       // alert( me + `done`);
-  }
+   }
 }
