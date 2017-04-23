@@ -15,7 +15,13 @@ export class SessionOpsComponent implements OnInit
    
    private get cluster(): Cluster { return this._persistenceSvc.currentClusterSubject.value; }
    public get clusterName(): string { return this.cluster.name};
-   public set clusterName( aName: string) { this.cluster.name = aName};
+   public set clusterName( aName: string)
+   {
+      // let me = this.constructor.name + '.set clusterName(): ';
+      this.cluster.name = aName
+      // let jsonStringifiedName = JSON.stringify( aName);
+      // console.log( me + `JSON name: ${jsonStringifiedName}`);
+   };
    
    private getUser(): void
    {
