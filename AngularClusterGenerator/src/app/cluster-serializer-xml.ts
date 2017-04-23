@@ -33,8 +33,7 @@ export class ClusterSerializerXML implements Serializer
       let xml: string = `<?xml version="1.0"?>
 <cluster xmlns="http://how-hard-can-it-be.com/diaspora"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://how-hard-can-it-be.com/diaspora https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd"
-`;
+         xsi:schemaLocation="http://how-hard-can-it-be.com/diaspora https://raw.githubusercontent.com/JohnL4/Diaspora/master/AngularClusterGenerator/src/app/cluster.xsd"`;
       if (this.cluster.name)
       {
          xml += `

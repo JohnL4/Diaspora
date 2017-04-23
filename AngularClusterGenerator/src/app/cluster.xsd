@@ -17,6 +17,13 @@
         <element name="starSystem" type="cluster:starSystem" maxOccurs="unbounded"/>
         <element name="slipstream" type="cluster:slipstream" maxOccurs="unbounded"/>
       </sequence>
+      <attribute name="name" type="string">
+        <annotation>
+          <documentation>
+            The name of this cluster.
+          </documentation>
+        </annotation>
+      </attribute>
       <attribute name="usesHighLowSlipstreams" type="boolean">
         <annotation>
           <documentation>
