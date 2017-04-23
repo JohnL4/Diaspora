@@ -130,7 +130,7 @@
           </tr>
           <tr *ngFor="let cluster of clusterMetadata | async">
             <td>
-              <button type="submit" class="btn btn-warning" aria-label="Load cluster"
+              <button type="submit" aria-label="Load cluster" class="btn btn-warning"
                       (click)="loadCluster( cluster)"
                       >
                 <span class="glyphicon glyphicon-open" aria-hidden="true"></span>
@@ -141,7 +141,10 @@
             <td>{{cluster.lastChanged}}</td>
             <td>(notes will go here)</td>
             <td>
-              <button type="button" class="btn btn-danger" aria-label="Delete cluster">
+              <button type="button" aria-label="Delete cluster"
+                      class="btn btn-danger"
+                      (click)="deleteCluster( cluster)"
+                      >
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
               </button>
           </tr>

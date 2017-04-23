@@ -284,6 +284,22 @@ export class ClusterPersistenceService
          .connect();
    }
 
+   public deleteCluster( aUniqueName: string):void
+   {
+      let me = this.constructor.name + ".deleteCluster(): ";
+      let uniqueName = JSON.stringify( aUniqueName);
+      console.log( me + `deleting ${uniqueName}`);
+      if (this._currentGeneratedClusterSubscription)
+      {
+         this._currentPersistedClusterSubscription.unsubscribe();
+         this._currentPersistedClusterSubscription = null;
+      }
+
+      if (! this._db) this._db = firebase.database();
+      this._db.ref( `/clusters/${uniqueName}`).remove();
+      this._db.ref( `/clusterData/${uniqueName}`).remove();
+   }
+   
    public saveCluster( aCluster: Cluster): void
    {
       let uniqueName = JSON.stringify( uniqueClusterName( aCluster, this._curUser));

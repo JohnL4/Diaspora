@@ -116,6 +116,13 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       this._persistenceSvc.loadCluster( aCluster.uniqueName());
    }
    
+   public deleteCluster( aCluster: Cluster): void
+   {
+      let me = this.constructor.name + ".deleteCluster(): ";
+      let uniqueName = aCluster.uniqueName();
+      this._persistenceSvc.deleteCluster( uniqueName);
+   }
+   
    public revertParams()
    {
       // console.log( "revertParams()");
