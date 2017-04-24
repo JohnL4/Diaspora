@@ -106,10 +106,11 @@ export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): 
 export function minimalEncode( aString: string): string
 {
    let retval = aString.replace(
-      "[\"'<&/]",
+      new RegExp("[\"'<&/]"),
       function( aMatch: string, anOffset: number, theWholeString: string)
       {
          let innerRetval: string;
+         console.log( `aMatch: ${aMatch}`);
          switch (aMatch)
          {
          case "\"":
@@ -141,7 +142,7 @@ export function minimalEncode( aString: string): string
 export function minimalDecode( aString: string): string
 {
    let retval = aString.replace(
-      "&(quot|apos|lt|amp|sol);",
+      new RegExp( "&(quot|apos|lt|amp|sol);"),
       function( aMatch: string, aP1: string, anOffset: number, theWholeString: string)
       {
          let innerRetval: string;
