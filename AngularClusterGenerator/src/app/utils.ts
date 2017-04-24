@@ -106,7 +106,7 @@ export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): 
 export function minimalEncode( aString: string): string
 {
    let retval = aString.replace(
-      new RegExp("[\"'<&/]"),
+      new RegExp("[\"'<&/]", "gi"),
       function( aMatch: string, anOffset: number, theWholeString: string)
       {
          let innerRetval: string;
@@ -114,22 +114,22 @@ export function minimalEncode( aString: string): string
          switch (aMatch)
          {
          case "\"":
-            retval = "&quot;";
+            innerRetval = "&quot;";
             break;
          case "'":
-            retval = "&apos;";
+            innerRetval = "&apos;";
             break;
          case "<":
-            retval = "&lt;";
+            innerRetval = "&lt;";
             break;
          case "&":
-            retval = "&amp;";
+            innerRetval = "&amp;";
             break;
          case "/":
-            retval = "&sol;";
+            innerRetval = "&sol;";
             break;
          default:
-            retval = aMatch;
+            innerRetval = aMatch;
          }
          return innerRetval;
       });
@@ -142,26 +142,26 @@ export function minimalEncode( aString: string): string
 export function minimalDecode( aString: string): string
 {
    let retval = aString.replace(
-      new RegExp( "&(quot|apos|lt|amp|sol);"),
+      new RegExp( "&(quot|apos|lt|amp|sol);", "gi"),
       function( aMatch: string, aP1: string, anOffset: number, theWholeString: string)
       {
          let innerRetval: string;
          switch (aP1)
          {
          case "quot":
-            retval = "\"";
+            innerRetval = "\"";
             break;
          case "apos":
-            retval = "'";
+            innerRetval = "'";
             break;
          case "lt":
-            retval = "<";
+            innerRetval = "<";
             break;
          case "amp":
-            retval = "&";
+            innerRetval = "&";
             break;
          case "sol":
-            retval = "/";
+            innerRetval = "/";
             break;
          default:
             innerRetval = aMatch;

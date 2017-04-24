@@ -42,7 +42,7 @@ import { SessionOpsComponent } from './session-ops/session-ops.component';
             component: ClusterDetailsComponent
          },
          {
-            path: 'details/:uniqueClusterName',
+            path: 'details/:uniqueClusterName', // cluster name uri encoded
             component: ClusterDetailsComponent
          },
          {

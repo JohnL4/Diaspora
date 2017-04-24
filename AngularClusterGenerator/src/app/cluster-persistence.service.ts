@@ -261,7 +261,8 @@ export class ClusterPersistenceService
    public loadCluster( aUniqueName: string): void
    {
       let me = this.constructor.name + ".loadCluster(): ";
-      let uniqueName = JSON.stringify( minimalEncode( aUniqueName));
+      // let uniqueName = JSON.stringify( minimalEncode( aUniqueName));
+      let uniqueName = encodeURIComponent( aUniqueName);
       console.log( me + `loading ${uniqueName}`);
       if (this._currentPersistedCluster || this._currentPersistedClusterSubscription)
       {
@@ -302,7 +303,8 @@ export class ClusterPersistenceService
    
    public saveCluster( aCluster: Cluster): void
    {
-      let uniqueName = JSON.stringify( minimalEncode( uniqueClusterName( aCluster, this._curUser)));
+      // let uniqueName = JSON.stringify( minimalEncode( uniqueClusterName( aCluster, this._curUser)));
+      let uniqueName = encodeURIComponent( uniqueClusterName( aCluster, this._curUser));
       let dbRef = this._db.ref();
       let updates = Object.create( null);
 
@@ -410,7 +412,8 @@ export class ClusterPersistenceService
       let retval = Array<Cluster>();
       for (let key in aSnapshot)
       {
-         let keyTuple = minimalDecode( JSON.parse( key));
+         // let keyTuple = minimalDecode( JSON.parse( key));
+         let keyTuple = decodeURIComponent( key);
          let [name,uid] = keyTuple.split( ASCII_US, 2);
          name = JSON.parse( name);
          let clusterObj = <Cluster> aSnapshot[key]; // Note: just casting an Object (which is what I think aSnapshot[key]

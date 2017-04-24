@@ -154,7 +154,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
          uniqueName = null;
       }
       if (uniqueName)
-         this._router.navigate([`/details/${uniqueName}`]);
+         this._router.navigate([`/details/${encodeURIComponent( uniqueName)}`]);
       else
          this._router.navigate(['/details']);
    }
