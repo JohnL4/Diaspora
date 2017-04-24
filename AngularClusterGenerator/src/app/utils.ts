@@ -97,3 +97,75 @@ export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): 
    return retval;
 
 }
+
+/**
+ * Encode a string "minimally", escaping only double & single quotes, left angle bracket and ampersand, into &quot;
+ * &apos; &lt; &ampt; respectively.  Also, turn / into &sol; ("solidus").  This is because "/" is significant to
+ * FireBase.
+ */
+export function minimalEncode( aString: string): string
+{
+   let retval = aString.replace(
+      "[\"'<&/]",
+      function( aMatch: string, anOffset: number, theWholeString: string)
+      {
+         let innerRetval: string;
+         switch (aMatch)
+         {
+         case "\"":
+            retval = "&quot;";
+            break;
+         case "'":
+            retval = "&apos;";
+            break;
+         case "<":
+            retval = "&lt;";
+            break;
+         case "&":
+            retval = "&amp;";
+            break;
+         case "/":
+            retval = "&sol;";
+            break;
+         default:
+            retval = aMatch;
+         }
+         return innerRetval;
+      });
+   return retval;
+}
+
+/**
+ * Decode a string encoded by {@see #minimalEncode}.
+ */
+export function minimalDecode( aString: string): string
+{
+   let retval = aString.replace(
+      "&(quot|apos|lt|amp|sol);",
+      function( aMatch: string, aP1: string, anOffset: number, theWholeString: string)
+      {
+         let innerRetval: string;
+         switch (aP1)
+         {
+         case "quot":
+            retval = "\"";
+            break;
+         case "apos":
+            retval = "'";
+            break;
+         case "lt":
+            retval = "<";
+            break;
+         case "amp":
+            retval = "&";
+            break;
+         case "sol":
+            retval = "/";
+            break;
+         default:
+            innerRetval = aMatch;
+         }
+         return innerRetval;
+      });
+   return retval;
+}
