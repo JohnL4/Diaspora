@@ -80,7 +80,8 @@ export function uniqueClusterName( aCluster: Cluster, aUser: User): string
 /**
  * Makes a universally unique cluster name by combining the cluster name with the user uid.  Note that neither cluster
  * nor user need to exist (both can be null) or have truthy data, but if they don't the cluster name will not truly be
- * unique.  Returned value is unencoded/unescaped.
+ * unique.  Returned value is unencoded/unescaped, although the cluster-name part will be encoded somehow (to avoid
+ * injection scenarios).
  */
 export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): string
 {
@@ -88,7 +89,7 @@ export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): 
    // We stringify the cluster name in case somebody is doing something shady like inject another ASCII US into it.
    let stringifiedClusterName: string;
    if (aCluster ? aCluster.name : "")
-      stringifiedClusterName = JSON.stringify( aCluster.name);
+      stringifiedClusterName = encodeURIComponent( aCluster.name);
    else
       stringifiedClusterName = "";
 

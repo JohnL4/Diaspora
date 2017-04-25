@@ -288,7 +288,7 @@ export class ClusterPersistenceService
    public deleteCluster( aUniqueName: string):void
    {
       let me = this.constructor.name + ".deleteCluster(): ";
-      let uniqueName = JSON.stringify( aUniqueName);
+      let uniqueName = encodeURIComponent( aUniqueName);
       console.log( me + `deleting ${uniqueName}`);
       if (this._currentGeneratedClusterSubscription)
       {
@@ -415,7 +415,7 @@ export class ClusterPersistenceService
          // let keyTuple = minimalDecode( JSON.parse( key));
          let keyTuple = decodeURIComponent( key);
          let [name,uid] = keyTuple.split( ASCII_US, 2);
-         name = JSON.parse( name);
+         name = decodeURIComponent( name);
          let clusterObj = <Cluster> aSnapshot[key]; // Note: just casting an Object (which is what I think aSnapshot[key]
                                                  // is, since Firebase knows nothing about our class hierarchy) to
                                                  // Cluster does not actually MAKE the thing a Cluster, it just

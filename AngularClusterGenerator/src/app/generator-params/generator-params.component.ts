@@ -45,6 +45,12 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    
    private get clusterMetadata() { return this._persistenceSvc.clusterMetadata; }
 
+   /**
+    * The name of the cluster that has been requested by some user gesture (either generate a new cluster, in which case
+    * there will be no requested name, or load a named cluster, in which case....)
+    */
+   private _requestedClusterName: string;
+
    // ------------------------------------------------  Public Methods  ------------------------------------------------
    
    constructor( /* aCluster: Cluster, */ aRouter: Router, private _renderer: Renderer, private _persistenceSvc: ClusterPersistenceService)
@@ -84,6 +90,8 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       // console.log( "generateCluster()");
       if (this.parmsForm.form.valid)
       {
+         this._requestedClusterName = null;
+         
          // Note that we don't simply new up a new Cluster, because the injector is managing the one we were passed.
          // Instead, we modify the existing one in place.  (NOTE: now that we've gotten rid of the injected Cluster, we
          // don't have to do it this way.)
@@ -112,8 +120,10 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       let me = this.constructor.name + ".loadCluster(): ";
       console.log( me + `cluster = ${aCluster.toString()} (constructor = ${aCluster.constructor.name})`);
       let uniqueName = aCluster.uniqueName();
-      console.log( me + `cluster unique name = >${JSON.stringify(uniqueName)}<`);
-      this._persistenceSvc.loadCluster( aCluster.uniqueName());
+      console.log( me + `cluster unique name (encoded) = >${encodeURIComponent( uniqueName)}<`);
+      this._persistenceSvc.loadCluster( aCluster.uniqueName()); // TODO: probably better to just do this in the details
+                                                                // screen, which will help w/the deep linking.
+      this._requestedClusterName = uniqueName;
    }
    
    public deleteCluster( aCluster: Cluster): void
@@ -146,15 +156,18 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    {
       let me = this.constructor.name + ".gotoDetails(): ";
       let uniqueName: string;
-      if (this.cluster.name)
-         uniqueName = uniqueClusterName( this.cluster, this._persistenceSvc.currentUser);
+      // Note: loading is happening asynchronously, so it doesn't do any good to ask the cluster its name; it probably
+      // hasn't been loaded yet.
+      // if (this.cluster.name)
+      if (this._requestedClusterName)
+         uniqueName = this._requestedClusterName;
       else
       {
          console.log( me + "Cluster has no name, therefore, no unique name.");
          uniqueName = null;
       }
       if (uniqueName)
-         this._router.navigate([`/details/${encodeURIComponent( uniqueName)}`]);
+         this._router.navigate([`/details/${uniqueName}`]);
       else
          this._router.navigate(['/details']);
    }
