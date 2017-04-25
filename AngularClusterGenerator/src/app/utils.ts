@@ -89,7 +89,7 @@ export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): 
    // We stringify the cluster name in case somebody is doing something shady like inject another ASCII US into it.
    let stringifiedClusterName: string;
    if (aCluster ? aCluster.name : "")
-      stringifiedClusterName = encodeURIComponent( aCluster.name);
+      stringifiedClusterName = minimalEncode( aCluster.name);
    else
       stringifiedClusterName = "";
 
@@ -107,7 +107,7 @@ export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): 
 export function minimalEncode( aString: string): string
 {
    let retval = aString.replace(
-      new RegExp("[\"'<&/]", "gi"),
+      new RegExp("[\"'<&/\x1F]", "gi"),
       function( aMatch: string, anOffset: number, theWholeString: string)
       {
          let innerRetval: string;
@@ -129,6 +129,9 @@ export function minimalEncode( aString: string): string
          case "/":
             innerRetval = "&sol;";
             break;
+         case "\x1F":
+            innerRetval = "%1F";
+            break;
          default:
             innerRetval = aMatch;
          }
@@ -143,26 +146,29 @@ export function minimalEncode( aString: string): string
 export function minimalDecode( aString: string): string
 {
    let retval = aString.replace(
-      new RegExp( "&(quot|apos|lt|amp|sol);", "gi"),
+      new RegExp( "&(quot|apos|lt|amp|sol);|%1F", "gi"),
       function( aMatch: string, aP1: string, anOffset: number, theWholeString: string)
       {
          let innerRetval: string;
-         switch (aP1)
+         switch (aMatch)
          {
-         case "quot":
+         case "&quot;":
             innerRetval = "\"";
             break;
-         case "apos":
+         case "&apos;":
             innerRetval = "'";
             break;
-         case "lt":
+         case "&lt;":
             innerRetval = "<";
             break;
-         case "amp":
+         case "&amp;":
             innerRetval = "&";
             break;
-         case "sol":
+         case "&sol;":
             innerRetval = "/";
+            break;
+         case "%1F":
+            innerRetval = "\x1F";
             break;
          default:
             innerRetval = aMatch;

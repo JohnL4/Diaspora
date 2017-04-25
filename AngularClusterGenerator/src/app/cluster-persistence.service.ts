@@ -257,7 +257,12 @@ export class ClusterPersistenceService
 //      console.log( me + `getClusterNames()`);
 //      return new Array<Cluster>();
 //   }
-   
+
+   /**
+    * Initiate a request to the back end to load the cluster.
+    *
+    * @param aUniqueName Minimally-encoded cluster name + ASCII US + user uid
+    */
    public loadCluster( aUniqueName: string): void
    {
       let me = this.constructor.name + ".loadCluster(): ";
@@ -285,6 +290,11 @@ export class ClusterPersistenceService
          .connect();
    }
 
+   /**
+    * Initiate a request to the back end to delete the given cluster.
+    *
+    * @param aUniqueName Same as that for {@see #loadCluster}.
+    */
    public deleteCluster( aUniqueName: string):void
    {
       let me = this.constructor.name + ".deleteCluster(): ";
@@ -415,7 +425,7 @@ export class ClusterPersistenceService
          // let keyTuple = minimalDecode( JSON.parse( key));
          let keyTuple = decodeURIComponent( key);
          let [name,uid] = keyTuple.split( ASCII_US, 2);
-         name = decodeURIComponent( name);
+         name = minimalDecode( name);
          let clusterObj = <Cluster> aSnapshot[key]; // Note: just casting an Object (which is what I think aSnapshot[key]
                                                  // is, since Firebase knows nothing about our class hierarchy) to
                                                  // Cluster does not actually MAKE the thing a Cluster, it just
@@ -438,12 +448,22 @@ export class ClusterPersistenceService
    private parseClusterData( aSnapshot: Object): Cluster
    {
       let me = this.constructor.name + ".parseClusterData(): ";
-      let snapshot = <ClusterData> aSnapshot; // TODO
-      let serializer = new ClusterSerializerXML();
-      let errors = serializer.deserialize( snapshot.xml);
-      if (errors)
-         console.log( me + `ERRORS:\n\t${errors}`);
-      return serializer.cluster;
+      let retval: Cluster;
+      if (aSnapshot)
+      {
+         let snapshot = <ClusterData> aSnapshot; // TODO
+         let serializer = new ClusterSerializerXML();
+         let errors = serializer.deserialize( snapshot.xml);
+         if (errors)
+            console.log( me + `ERRORS:\n\t${errors}`);
+         retval = serializer.cluster;
+      }
+      else
+      {
+         console.log( me + "NOTE: data snapshot is null, so no cluster");
+         retval = null;
+      }
+      return retval;
    }
    
    private parseUsers( aSnapshot: Object): Map<string,User> {

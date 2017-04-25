@@ -43,19 +43,24 @@ export class ClusterDetailsComponent implements OnInit {
    private layoutCytoscape(): void
    {
       let me = this.constructor.name + `.layoutCytoscape(): `;
-      let cygen = new CytoscapeGenerator( this._persistenceSvc.currentCluster);
-      cygen.ensureStyles();
-      let graphElements: Array<any> = cygen.getElements(); // this.elementsGraph( this._cluster);
-      let styles: Array<any> = cygen.getStyles();
-      let cyDiv = document.getElementById( 'cytoscapeDiv');
-      let cy = cytoscape({
-         container: cyDiv,
-         elements: graphElements,
-         style: styles
-         // layout: {name: 'cose'}
-      });
-      cy.layout({name: 'cose'});
-      console.log( me + `done`);
-      // alert( me + `done`);
+      if (this._persistenceSvc.currentCluster)
+      {
+         let cygen = new CytoscapeGenerator( this._persistenceSvc.currentCluster);
+         cygen.ensureStyles();
+         let graphElements: Array<any> = cygen.getElements(); // this.elementsGraph( this._cluster);
+         let styles: Array<any> = cygen.getStyles();
+         let cyDiv = document.getElementById( 'cytoscapeDiv');
+         let cy = cytoscape({
+            container: cyDiv,
+            elements: graphElements,
+            style: styles
+            // layout: {name: 'cose'}
+         });
+         cy.layout({name: 'cose'});
+         console.log( me + `done`);
+         // alert( me + `done`);
+      }
+      else
+         console.log( me + "NOTE: no cluster, so no CytoScape layout");
    }
 }
