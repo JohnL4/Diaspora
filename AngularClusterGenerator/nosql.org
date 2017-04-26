@@ -41,6 +41,7 @@
                notes: string
          clusterData                  # "Scalable" data -- unbounded lists, large-ish XML, etc.
             <uniqueClusterName>       # Append uid to make unique.
+               xml: xml string        # XML of the cluster
                owners                 # Users who are allowed to change sharing.  Initially, the uid of the creating user.
                   <owner>             # uid
                   (repeated)
@@ -51,8 +52,32 @@
                viewers                # Users allowed to see this cluster
                   <user>
                   (repeated)
-               xml: xml string        # XML of the cluster
     #+END_SRC
+
+**** Security
+
+     - Viewers :: Read permissions
+     - Editors :: Write permissions, but only to data, not lists of users
+     - Owners :: Write permissions, /including/ to lists of users
+
+***** TODO Screen for sharing that lists available users
+
+      Don't disclose UIDs unnecessarily.
+
+      Need to be able to set "world" as share target.
+      
+***** TODO clusters/clusterData
+
+      Any fool can create (not overwrite).  When they do, they become owners.  (TODO: something
+      about =newdata= vs. old data?)
+
+      Anyone can view (read) if they're listed under =clusterData/viewers= (TODO: does this affect
+      /listing/ cluster nodes?)
+
+      Anyone can write if they're listed under =clusterData/editors=.  (Writing new XML will require
+      merging on the client, so edits to unaffected starsystems are not lost.)
+
+      =clusterData/owners= can be written to /iff/ user is already present in =owners= list.
 
 *** Use
 
