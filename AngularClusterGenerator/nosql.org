@@ -79,6 +79,8 @@
 
       =clusterData/owners= can be written to /iff/ user is already present in =owners= list.
 
+      Only owners can delete.
+
 *** Use
 
     Need to cover two cases:
