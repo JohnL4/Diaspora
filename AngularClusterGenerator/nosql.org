@@ -72,7 +72,11 @@
       about =newdata= vs. old data?)
 
       Anyone can view (read) if they're listed under =clusterData/viewers= (TODO: does this affect
-      /listing/ cluster nodes?)
+      /listing/ cluster nodes? Answer: listing is allowed if the node corresponding to the list
+      (i.e., the parent node of all the children) is readable, regardless of the children's
+      individual status.  Conversely, if the parent node is not readable, listing is not allowed,
+      even though child nodes may be readable (in which case, those children can be read
+      individually. traversing through the parent node in spite of the fact that it cannot be read.)
 
       Anyone can write if they're listed under =clusterData/editors=.  (Writing new XML will require
       merging on the client, so edits to unaffected starsystems are not lost.)
