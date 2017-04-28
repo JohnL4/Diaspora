@@ -66,24 +66,72 @@
 
       Need to be able to set "world" as share target.
       
-***** TODO clusters/clusterData
+***** TODO Proposed d/b structure
 
-      Any fool can create (not overwrite).  When they do, they become owners.  (TODO: something
-      about =newdata= vs. old data?)
+****** Current
+      
+      - users
+      - clusters
+      - clusterData
 
-      Anyone can view (read) if they're listed under =clusterData/viewers= (TODO: does this affect
-      /listing/ cluster nodes? Answer: listing is allowed if the node corresponding to the list
-      (i.e., the parent node of all the children) is readable, regardless of the children's
-      individual status.  Conversely, if the parent node is not readable, listing is not allowed,
-      even though child nodes may be readable (in which case, those children can be read
-      individually. traversing through the parent node in spite of the fact that it cannot be read.)
+****** Requirements (or Operations and Governing Rules)
 
-      Anyone can write if they're listed under =clusterData/editors=.  (Writing new XML will require
-      merging on the client, so edits to unaffected starsystems are not lost.)
+******* Create
+        
+      Any fool can create (not overwrite).  When they do, they become owners.  (TODO: something about =newdata= vs. old
+      data?)
+
+      *Rule:* 
+
+******* Read
+        
+      Anyone can view (read) if they're listed under =clusterData/viewers= (TODO: does this affect /listing/ cluster
+      nodes? Answer: listing is allowed if the node corresponding to the list (i.e., the parent node of all the
+      children) is readable, regardless of the children's individual status.  Conversely, if the parent node is not
+      readable, listing is not allowed, even though child nodes may be readable (in which case, those children can be
+      read individually. traversing through the parent node in spite of the fact that it cannot be read.)
+
+      *Rule:*
+      
+******* Update
+        
+      Anyone can write if they're listed under =clusterData/editors=.  (Writing new XML will require merging on the
+      client, so edits to unaffected starsystems are not lost.)
 
       =clusterData/owners= can be written to /iff/ user is already present in =owners= list.
 
-      Only owners can delete.
+      *Rule:*
+      
+******* Delete
+        
+      Only owners can delete.  Delete really just removes "share" links.  When last "share" link is removed, cluster is
+      deleted.  So, really, that's two operations: share and delete.
+
+      *Rule:*
+
+******* Share
+        
+      Only owners can change sharing.
+
+****** New structure
+
+       - users
+         - $uid
+           - name
+           - email
+           - lastLogin
+           - (etc.)
+           - clusters
+             - $clusterName (possibly unique-ified, for consistency; if not, not unique-ified, since it lives under
+               user)
+       - clusters (metadata)
+         - $clusterName
+           - (various metadata)
+           - owners
+           - editors
+           - viewers
+           - ".read": /clusters/$clusterName/viewers.contains($uid)
+           - ".write": /clusters/$clusterName/editors.contains($uid)
 
 *** Use
 
