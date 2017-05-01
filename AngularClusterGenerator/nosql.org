@@ -81,7 +81,7 @@
       Any fool can create (not overwrite).  When they do, they become owners.  (TODO: something about =newdata= vs. old
       data?)
 
-      *Rule:* 
+      *Rule:* NewData key doesn't exist yet
 
 ******* Read
         
@@ -91,7 +91,13 @@
       readable, listing is not allowed, even though child nodes may be readable (in which case, those children can be
       read individually. traversing through the parent node in spite of the fact that it cannot be read.)
 
-      *Rule:*
+      *Rule:* current user uid is in list of viewers for cluster
+
+******** List available clusters
+
+         List of clusters available for reading/editing/sharing must be in users/$uid/clusters
+         node.  So I don't think there's a rule-based approach to this (except /users/$uid must
+         match current user uid).
       
 ******* Update
         
