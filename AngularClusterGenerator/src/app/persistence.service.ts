@@ -160,7 +160,8 @@ export class PersistenceService
    }
 
    /**
-    * Make Observables for various items in the Firebase database, from Firebase events.
+    * Establish initial d/b connections. Note that initial connections may result in Observables/Promises which will
+    * result in further connection requests.
     */
    public connectToDatabase()
    {
@@ -171,6 +172,7 @@ export class PersistenceService
          console.log( me + `initialized firebase, db = "${this._db}"`);
 
          this._visibleClusterNames = new BehaviorSubject<string[]>(new Array<string>());
+         this._visibleClusterNames.subscribe( names => this.handleVisibleClusterListChange( names));
          let visibleClusterNamesSubscription
             = this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`)
             .map( s => { let namesObj = s.val();
@@ -181,7 +183,7 @@ export class PersistenceService
                        })
             .multicast( this._visibleClusterNames)
             .connect();
-
+         
          // TODO: keep cluster metadata, but build differently.  Subscribe to each cluster separately, and provide next
          // result appropriately.  So... change in xml only, no next observable, but change in metadata ==> next result.
          // Change in _visbibleClusterNames almost certainly means at least a change in metadata ROWS (insert, delete).
@@ -206,6 +208,15 @@ export class PersistenceService
          console.log( me + 'WARNING: current user not yet initialized; cannot establish references to user-specific data');
    }
 
+   /**
+    * Called when the list of names of clusters visible to the current user has changed, with the new list of names.
+    * Will drop subscriptions for deleted clusters and start new ones for new clusters.  Subscriptions for existing
+    * clusters will continue unchanged.
+    */
+   public handleVisibleClusterListChange( aNamesv: string[]): void
+   {
+   }
+   
    /**
     * Returns a User object for the given uid. May return null.
     */
