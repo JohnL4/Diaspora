@@ -101,6 +101,11 @@ export class PersistenceService
    // http://stackoverflow.com/questions/31069453/creating-a-es6-promise-without-starting-to-resolve-it/31069505#31069505
    //
    private _userPromiseDeferred: {resolve: any, reject: any};
+
+   /**
+    * List of names of clusters that are visible to the current user.
+    */
+   private _visibleClusterNames: BehaviorSubject<string[]>;
    
    private _clusterMetadata: BehaviorSubject<Cluster[]>;
 
@@ -157,32 +162,44 @@ export class PersistenceService
    /**
     * Make Observables for various items in the Firebase database, from Firebase events.
     */
-   // TODO: Need to only call this when we have a user uid available (i.e., when handling an auth change event).
    public connectToDatabase()
    {
       let me = this.constructor.name + '.connectToDatabase(): ';
       if (this._curUser && this._curUser.uid)
       {
+         this._db = firebase.database();
+         console.log( me + `initialized firebase, db = "${this._db}"`);
 
-      this._db = firebase.database();
-      console.log( me + `initialized firebase, db = "${this._db}"`);
+         this._visibleClusterNames = new BehaviorSubject<string[]>(new Array<string>());
+         let visibleClusterNamesSubscription
+            = this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`)
+            .map( s => { let namesObj = s.val();
+                         let names = new Array<string>();
+                         for (let name in namesObj)
+                            names.push( name);
+                         return names;
+                       })
+            .multicast( this._visibleClusterNames)
+            .connect();
 
-      this._clusterMetadata = new BehaviorSubject<Cluster[]>(new Array<Cluster>());
-      
-      let clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
-         .map( s => this.parseMetadata( s.val()))
-         .multicast( this._clusterMetadata)
-         .connect();
+         // TODO: keep cluster metadata, but build differently.  Subscribe to each cluster separately, and provide next
+         // result appropriately.  So... change in xml only, no next observable, but change in metadata ==> next result.
+         // Change in _visbibleClusterNames almost certainly means at least a change in metadata ROWS (insert, delete).
+         this._clusterMetadata = new BehaviorSubject<Cluster[]>(new Array<Cluster>());
+         let clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
+            .map( s => this.parseMetadata( s.val()))
+            .multicast( this._clusterMetadata)
+            .connect();
 
-      this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
-      this._users.subscribe( map => {this._latestUserMap = map;});
+         this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
+         this._users.subscribe( map => {this._latestUserMap = map;});
 
-      // TODO: make Behavior Subject containing cluster arrays?  Answer: YES, probably a good idea.  Then we wouldn't
-      // need to bother with this "latest" junk, because a BehaviorSubject will always have the latest value.
+         // TODO: make Behavior Subject containing cluster arrays?  Answer: YES, probably a good idea.  Then we wouldn't
+         // need to bother with this "latest" junk, because a BehaviorSubject will always have the latest value.
 
-      // let subscription = this._clusterNamesObservable.subscribe(
-      //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
-      //    ,(err) => this.firebaseError( err) // Doesn't work.
+         // let subscription = this._clusterNamesObservable.subscribe(
+         //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
+         //    ,(err) => this.firebaseError( err) // Doesn't work.
          // );
       }
       else
