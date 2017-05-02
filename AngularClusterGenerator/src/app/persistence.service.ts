@@ -161,6 +161,8 @@ export class PersistenceService
    public connectToDatabase()
    {
       let me = this.constructor.name + '.connectToDatabase(): ';
+      if (this._curUser && this._curUser.uid)
+      {
 
       this._db = firebase.database();
       console.log( me + `initialized firebase, db = "${this._db}"`);
@@ -181,7 +183,10 @@ export class PersistenceService
       // let subscription = this._clusterNamesObservable.subscribe(
       //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
       //    ,(err) => this.firebaseError( err) // Doesn't work.
-      // );
+         // );
+      }
+      else
+         console.log( me + 'WARNING: current user not yet initialized; cannot establish references to user-specific data');
    }
 
    /**
@@ -336,6 +341,7 @@ export class PersistenceService
          console.log( me + `User logged in: ${this._curUser} with provider ${aFirebaseUser.providerId}`);
          if (this._curUser.uid)
          {
+            if (! this._db) this._db = firebase.database();
             let uidRef = this._db.ref( `/users/${this._curUser.uid}`);
             console.log( me + `uidRef = ${uidRef}`);
             let userProps = { name: this._curUser.name,
@@ -344,6 +350,7 @@ export class PersistenceService
                               timeZoneOffset: this._curUser.lastLogin.getTimezoneOffset()
                             };
             uidRef.update( userProps); // Performs insert if key doesn't exist, so that's good.
+            this.connectToDatabase();
          }
          else
             console.log( me + `WARNING: no uid for user ${this._curUser.name}`);
