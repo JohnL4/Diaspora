@@ -157,6 +157,7 @@ export class PersistenceService
    /**
     * Make Observables for various items in the Firebase database, from Firebase events.
     */
+   // TODO: Need to only call this when we have a user uid available (i.e., when handling an auth change event).
    public connectToDatabase()
    {
       let me = this.constructor.name + '.connectToDatabase(): ';
@@ -193,17 +194,6 @@ export class PersistenceService
          retval = this._latestUserMap.get( aUid);
       return retval;
    }
-
-//   /**
-//    * Initiates a request to load the filled-in details of the cluster and returns whatever we have now in the cluster map.
-//    * See also {@link #currentCluster} property.
-//    */ 
-//   public getCluster( aCluster: Cluster): Cluster
-//   {
-//      this.loadCluster( aCluster.uniqueName());
-//      let retval = this._latestClusterMap.get( aCluster.uniqueName());
-//      return retval;
-//   }
 
    /**
     * Initiate login to Firebase.
@@ -248,16 +238,6 @@ export class PersistenceService
       return this._userPromise;
    }
    
-//   /**
-//    * Returns a list of "shallow" clusters -- each cluster only contains metadata, not the full cluster data.
-//    */
-//   getClusters(): Cluster[]     // TODO: probably don't need this and can delete.
-//   {
-//      let me = this.constructor.name + ".getClusterNames(): ";
-//      console.log( me + `getClusterNames()`);
-//      return new Array<Cluster>();
-//   }
-
    /**
     * Initiate a request to the back end to load the cluster.
     *
@@ -384,6 +364,10 @@ export class PersistenceService
       this._userPromiseDeferred.reject( aFirebaseAuthError);
    }
 
+   /**
+    * Makes an Observable of DataSnapshots out of a Firebase node, so the app can subscribe to new snapshots as they are
+    * available.
+    */
    private makeDatabaseSnapshotObservable( aNoSqlTreeNodeName: string): Observable<firebase.database.DataSnapshot>
    {
       if (! this._db) this._db = firebase.database();
@@ -403,6 +387,9 @@ export class PersistenceService
       ;
    }
 
+   /**
+    * Records that a FireBase error has occurred.  (Doesn't do a whole lot more than that right now.)
+    */ 
    private firebaseError( anError: Error): void
    {
       let me = "PersistenceService.firebaseError(): "; // this.constructor.name + ".firebaseError(): ";
@@ -445,6 +432,9 @@ export class PersistenceService
       return retval;
    }
 
+   /**
+    * Analogous to {@see #parseMetadata}, returns a Cluster object created from the given snapshot's "xml" property.
+    */
    private parseClusterData( aSnapshot: Object): Cluster
    {
       let me = this.constructor.name + ".parseClusterData(): ";
@@ -465,7 +455,7 @@ export class PersistenceService
       }
       return retval;
    }
-   
+
    private parseUsers( aSnapshot: Object): Map<string,User> {
       let me = this.constructor.name + ".parseUsers(): ";
       let retval = new Map<string,User>();

@@ -141,6 +141,9 @@
            - viewers
            - ".read": /clusters/$clusterName/viewers.contains($uid)
            - ".write": /clusters/$clusterName/editors.contains($uid)
+       - clusterData
+         - $clusterName
+           - xml
 
 *** Use
 
