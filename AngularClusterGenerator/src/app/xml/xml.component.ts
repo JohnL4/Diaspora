@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ClusterSerializerXML } from '../cluster-serializer-xml';
-import { ClusterPersistenceService } from '../cluster-persistence.service';
+import { PersistenceService } from '../persistence.service';
 import { Cluster } from '../cluster';
 import { StarSystem } from '../star-system';
 import { Slipstream } from '../slipstream';
@@ -20,7 +20,7 @@ export class XmlComponent implements OnInit {
    
    @ViewChild( 'parseErrorDisplay') _parseErrorDisplay: ElementRef;
 
-   constructor( /* aCluster: Cluster, */ private _persistenceSvc: ClusterPersistenceService)
+   constructor( /* aCluster: Cluster, */ private _persistenceSvc: PersistenceService)
    {
       // Constructor is called every time we come back to this tab (because of the router?).
       // This means the private _xml member gets reset, so you can't use it to save data when you switch tabs.

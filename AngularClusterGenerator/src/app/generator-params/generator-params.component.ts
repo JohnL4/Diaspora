@@ -3,7 +3,7 @@ import { FormsModule, NgForm, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { Cluster } from '../cluster';
-import { ClusterPersistenceService } from '../cluster-persistence.service';
+import { PersistenceService } from '../persistence.service';
 import { ClusterSerializerXML } from '../cluster-serializer-xml';
 import { uniqueClusterName } from '../utils';
 
@@ -53,7 +53,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    // ------------------------------------------------  Public Methods  ------------------------------------------------
    
-   constructor( /* aCluster: Cluster, */ aRouter: Router, private _renderer: Renderer, private _persistenceSvc: ClusterPersistenceService)
+   constructor( /* aCluster: Cluster, */ aRouter: Router, private _renderer: Renderer, private _persistenceSvc: PersistenceService)
    {
       // this._cluster = aCluster;
       // this.cluster = this._persistenceSvc.currentCluster;

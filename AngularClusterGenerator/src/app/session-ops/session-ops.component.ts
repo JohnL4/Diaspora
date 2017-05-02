@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Cluster } from '../cluster';
-import { ClusterPersistenceService } from '../cluster-persistence.service';
+import { PersistenceService } from '../persistence.service';
 import { User } from '../user';
 
 @Component({
@@ -36,7 +36,7 @@ export class SessionOpsComponent implements OnInit
          });
    }
 
-   constructor( /* private _cluster: Cluster, */ private _persistenceSvc: ClusterPersistenceService) { }
+   constructor( /* private _cluster: Cluster, */ private _persistenceSvc: PersistenceService) { }
 
    ngOnInit()
    {

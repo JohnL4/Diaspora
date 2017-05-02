@@ -19,7 +19,7 @@ import { ASCII_US, uniqueClusterName, minimalEncode, minimalDecode } from './uti
  * See nosql.org to d/b structure.
  */
 @Injectable()
-export class ClusterPersistenceService 
+export class PersistenceService 
 {
    // --------------------------------------------  Public Data, Accessors  --------------------------------------------
    
@@ -405,7 +405,7 @@ export class ClusterPersistenceService
 
    private firebaseError( anError: Error): void
    {
-      let me = "ClusterPersistenceService.firebaseError(): "; // this.constructor.name + ".firebaseError(): ";
+      let me = "PersistenceService.firebaseError(): "; // this.constructor.name + ".firebaseError(): ";
       console.log( me + `firebaseError(): ` + anError.message);
       // if (anError.message.match( /^permission_denied/))
       //    this.login();

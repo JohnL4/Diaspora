@@ -3,7 +3,7 @@ import { Subject } from 'rxjs/Rx';
 
 import { Cluster } from '../cluster';
 import { CytoscapeGenerator } from '../cytoscape-generator';
-import { ClusterPersistenceService } from '../cluster-persistence.service';
+import { PersistenceService } from '../persistence.service';
 import { ClusterSerializerXML } from '../cluster-serializer-xml';
 
 declare var cytoscape: any;
@@ -20,7 +20,7 @@ export class ClusterDetailsComponent implements OnInit {
       return this._persistenceSvc.currentClusterSubject;
    }
    
-   constructor( /* private _cluster: Cluster, */ private _persistenceSvc: ClusterPersistenceService) {   }
+   constructor( /* private _cluster: Cluster, */ private _persistenceSvc: PersistenceService) {   }
 
    ngOnInit()
    {

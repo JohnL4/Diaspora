@@ -10,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 // import { XmlComponent } from './xml/xml.component';
 // import { DotComponent } from './dot/dot.component';
 
-import { ClusterPersistenceService } from './cluster-persistence.service';
+import { PersistenceService } from './persistence.service';
 
 import { Cluster } from './cluster';
 import { ClusterSerializerXML } from './cluster-serializer-xml';
@@ -21,7 +21,7 @@ import { ClusterSerializerXML } from './cluster-serializer-xml';
    styleUrls: ['./app.component.css'],
    providers: [
       //Cluster,
-      ClusterPersistenceService
+      PersistenceService
    ],
 })
 export class AppComponent implements OnInit
@@ -30,7 +30,7 @@ export class AppComponent implements OnInit
 
    private get cluster(): Cluster { return this._persistenceSvc.currentCluster; }
    
-   constructor( /* private _cluster: Cluster, */ private _persistenceSvc: ClusterPersistenceService) { }
+   constructor( /* private _cluster: Cluster, */ private _persistenceSvc: PersistenceService) { }
 
    ngOnInit()
    {
