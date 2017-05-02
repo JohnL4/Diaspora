@@ -106,18 +106,21 @@
 
       =clusterData/owners= can be written to /iff/ user is already present in =owners= list.
 
-      *Rule:*
+      *Rule:* /clusters/$clusterName/editors/$uid exists
       
 ******* Delete
         
       Only owners can delete.  Delete really just removes "share" links.  When last "share" link is removed, cluster is
-      deleted.  So, really, that's two operations: share and delete.
+      deleted.  So, really, that's two operations: share and delete.  
 
-      *Rule:*
+      *Rule:* newData == null && /clusters/$clusterName/editors/$uid exists
 
 ******* Share
         
-      Only owners can change sharing.
+      Only owners can change sharing.  This is done by writing cluster unique name to receiving
+      user's list of clusters.
+
+      *Rule:* newData != null && /users/$targetUid/clusters/$clusterName does not exist.
 
 ****** New structure
 
