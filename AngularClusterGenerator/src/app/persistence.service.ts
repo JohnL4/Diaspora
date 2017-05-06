@@ -105,7 +105,7 @@ export class PersistenceService
    /**
     * List of names of clusters that are visible to the current user.
     */
-   private _visibleClusterNames: BehaviorSubject<string[]>;
+   private _visibleClusters: BehaviorSubject<Observable<Cluster>[]>;
    
    private _clusterMetadata: BehaviorSubject<Cluster[]>;
 
@@ -171,17 +171,21 @@ export class PersistenceService
          this._db = firebase.database();
          console.log( me + `initialized firebase, db = "${this._db}"`);
 
-         this._visibleClusterNames = new BehaviorSubject<string[]>(new Array<string>());
-         this._visibleClusterNames.subscribe( names => this.handleVisibleClusterListChange( names));
+         this._visibleClusters = new BehaviorSubject<Observable<Cluster>[]>(new Array<Observable<Cluster>>());
+         this._visibleClusters.subscribe( clusters => this.handleVisibleClusterListChange( clusters));
          let visibleClusterNamesSubscription
             = this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`)
             .map( s => { let namesObj = s.val();
-                         let names = new Array<string>();
-                         for (let name in namesObj)
-                            names.push( name);
+                         let names = new Array<Observable<Cluster>>();
+                         for (let nm in namesObj)
+                         {
+                            let cluster = new Cluster();
+                            cluster.name = nm;
+                            names.push( new BehaviorSubject<Cluster>( cluster));
+                         }
                          return names;
                        })
-            .multicast( this._visibleClusterNames)
+            .multicast( this._visibleClusters)
             .connect();
          
          // TODO: keep cluster metadata, but build differently.  Subscribe to each cluster separately, and provide next
@@ -213,7 +217,7 @@ export class PersistenceService
     * Will drop subscriptions for deleted clusters and start new ones for new clusters.  Subscriptions for existing
     * clusters will continue unchanged.
     */
-   public handleVisibleClusterListChange( aNamesv: string[]): void
+   public handleVisibleClusterListChange( aClustersv: Observable<Cluster>[]): void
    {
    }
    
