@@ -11,6 +11,12 @@ import { dice, fateThrow, alphaBravo, uniqueClusterNameFromUid } from './utils';
  */
 @Injectable()
 export class Cluster {
+
+   /**
+    * Unique id identifying cluster (so names can be non-unique, which might be important if a user creates a cluster
+    * and shares it with another user who already has a cluster with the same name).
+    */
+   public uid: string;
    
    /**
     * The name of the cluster (mostly for saving and loading).

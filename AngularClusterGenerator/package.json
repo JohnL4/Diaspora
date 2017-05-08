@@ -25,6 +25,7 @@
     "cytoscape": "^2.7.16",
     "firebase": "^3.7.3",
     "rxjs": "^5.1.0",
+    "uuid-version4": "^0.1.2",
     "zone.js": "^0.7.6"
   },
   "devDependencies": {

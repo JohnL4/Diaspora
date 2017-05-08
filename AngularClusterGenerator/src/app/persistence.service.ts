@@ -105,7 +105,13 @@ export class PersistenceService
    /**
     * List of names of clusters that are visible to the current user.
     */
-   private _visibleClusters: BehaviorSubject<Observable<Cluster>[]>;
+   private _visibleClusters: BehaviorSubject<BehaviorSubject<Cluster>[]>;
+
+   /**
+    * Map from cluster unique name to a cluster, decorated as needed for processing ({@see SeenCluster} is the
+    * decoration).
+    */
+   private _clusterObservable: Map<string, SeenCluster> = new Map<string, SeenCluster>();
    
    private _clusterMetadata: BehaviorSubject<Cluster[]>;
 
@@ -159,68 +165,6 @@ export class PersistenceService
       console.log( me + "initialized");
    }
 
-   /**
-    * Establish initial d/b connections. Note that initial connections may result in Observables/Promises which will
-    * result in further connection requests.
-    */
-   public connectToDatabase()
-   {
-      let me = this.constructor.name + '.connectToDatabase(): ';
-      if (this._curUser && this._curUser.uid)
-      {
-         this._db = firebase.database();
-         console.log( me + `initialized firebase, db = "${this._db}"`);
-
-         this._visibleClusters = new BehaviorSubject<Observable<Cluster>[]>(new Array<Observable<Cluster>>());
-         this._visibleClusters.subscribe( clusters => this.handleVisibleClusterListChange( clusters));
-         let visibleClusterNamesSubscription
-            = this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`)
-            .map( s => { let namesObj = s.val();
-                         let names = new Array<Observable<Cluster>>();
-                         for (let nm in namesObj)
-                         {
-                            let cluster = new Cluster();
-                            cluster.name = nm;
-                            names.push( new BehaviorSubject<Cluster>( cluster));
-                         }
-                         return names;
-                       })
-            .multicast( this._visibleClusters)
-            .connect();
-         
-         // TODO: keep cluster metadata, but build differently.  Subscribe to each cluster separately, and provide next
-         // result appropriately.  So... change in xml only, no next observable, but change in metadata ==> next result.
-         // Change in _visbibleClusterNames almost certainly means at least a change in metadata ROWS (insert, delete).
-         this._clusterMetadata = new BehaviorSubject<Cluster[]>(new Array<Cluster>());
-         let clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
-            .map( s => this.parseMetadata( s.val()))
-            .multicast( this._clusterMetadata)
-            .connect();
-
-         this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
-         this._users.subscribe( map => {this._latestUserMap = map;});
-
-         // TODO: make Behavior Subject containing cluster arrays?  Answer: YES, probably a good idea.  Then we wouldn't
-         // need to bother with this "latest" junk, because a BehaviorSubject will always have the latest value.
-
-         // let subscription = this._clusterNamesObservable.subscribe(
-         //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
-         //    ,(err) => this.firebaseError( err) // Doesn't work.
-         // );
-      }
-      else
-         console.log( me + 'WARNING: current user not yet initialized; cannot establish references to user-specific data');
-   }
-
-   /**
-    * Called when the list of names of clusters visible to the current user has changed, with the new list of names.
-    * Will drop subscriptions for deleted clusters and start new ones for new clusters.  Subscriptions for existing
-    * clusters will continue unchanged.
-    */
-   public handleVisibleClusterListChange( aClustersv: Observable<Cluster>[]): void
-   {
-   }
-   
    /**
     * Returns a User object for the given uid. May return null.
     */
@@ -404,6 +348,99 @@ export class PersistenceService
    }
 
    /**
+    * Establish initial d/b connections. Note that initial connections may result in Observables/Promises which will
+    * result in further connection requests.
+    */
+   private connectToDatabase()
+   {
+      let me = this.constructor.name + '.connectToDatabase(): ';
+      if (this._curUser && this._curUser.uid)
+      {
+         this._db = firebase.database();
+         console.log( me + `initialized firebase, db = "${this._db}"`);
+
+         this._visibleClusters = new BehaviorSubject<BehaviorSubject<Cluster>[]>(new Array<BehaviorSubject<Cluster>>());
+         this._visibleClusters.subscribe( clusters => this.handleVisibleClusterListChange( clusters));
+
+         // $uid/clusters is a list of unique names
+         let visibleClusterNamesSubscription
+            = this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`) 
+            .map( s => { let uniqueNamesObj = s.val();
+                         let names = new Array<BehaviorSubject<Cluster>>();
+                         for (let uniqueName in uniqueNamesObj)
+                         {
+                            let cluster = this._clusterObservable[uniqueName].cluster;
+                            if (! cluster)
+                            {
+                               cluster = new Cluster();
+                               cluster.uid = uniqueName;
+                            }
+                            names.push( new BehaviorSubject<Cluster>( cluster));
+                         }
+                         return names;
+                       })
+            .multicast( this._visibleClusters)
+            .connect();
+         
+         // TODO: keep cluster metadata, but build differently.  Subscribe to each cluster separately, and provide next
+         // result appropriately.  So... change in xml only, no next observable, but change in metadata ==> next result.
+         // Change in _visbibleClusterNames almost certainly means at least a change in metadata ROWS (insert, delete).
+         this._clusterMetadata = new BehaviorSubject<Cluster[]>(new Array<Cluster>());
+         let clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
+            .map( s => this.parseMetadata( s.val()))
+            .multicast( this._clusterMetadata)
+            .connect();
+
+         this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
+         this._users.subscribe( map => {this._latestUserMap = map;});
+
+         // TODO: make Behavior Subject containing cluster arrays?  Answer: YES, probably a good idea.  Then we wouldn't
+         // need to bother with this "latest" junk, because a BehaviorSubject will always have the latest value.
+
+         // let subscription = this._clusterNamesObservable.subscribe(
+         //    (snapshot: firebase.database.DataSnapshot) => this.clusterNamesValueChanged( snapshot)
+         //    ,(err) => this.firebaseError( err) // Doesn't work.
+         // );
+      }
+      else
+         console.log( me + 'WARNING: current user not yet initialized; cannot establish references to user-specific data');
+   }
+
+   /**
+    * Called when the list of names of clusters visible to the current user has changed, with the new list of Cluster
+    * subjects.  Will drop subscriptions for deleted clusters and start new ones for new clusters.  Subscriptions for
+    * existing clusters will continue unchanged.
+    */
+   private handleVisibleClusterListChange( aClustersv: BehaviorSubject<Cluster>[]): void
+   {
+      this._clusterObservable.forEach( sc => {sc.seen = false});
+      for (let clusterSubj of aClustersv)
+      {
+         if (this._clusterObservable.has( clusterSubj.value.uid))
+            this._clusterObservable.get( clusterSubj.value.uid).seen = true;
+         else
+         {
+            let sc = new SeenCluster( true, clusterSubj); // TODO: hook up subject to d/b? It's not hooked up yet, right?
+            
+            this._clusterObservable.set( clusterSubj.value.uid, sc);
+         }
+      }
+      let unseenKeys = new Array<string>();
+      this._clusterObservable.forEach( (val,key) =>
+                                       {if (! val.seen) {
+                                          unseenKeys.push( key);
+                                          val.clusterSubject.unsubscribe();
+                                       }
+                                       });
+      for (let key of unseenKeys)
+         this._clusterObservable.delete( key); 
+
+      // At this point, the only piece of data we're guaranteed to have is cluster uid; and that doesn't do any good to
+      // sort on.
+      
+   }
+   
+   /**
     * Makes an Observable of DataSnapshots out of a Firebase node, so the app can subscribe to new snapshots as they are
     * available.
     */
@@ -480,7 +517,7 @@ export class PersistenceService
       let retval: Cluster;
       if (aSnapshot)
       {
-         let snapshot = <ClusterData> aSnapshot; // TODO
+         let snapshot = <ClusterData> aSnapshot; 
          let serializer = new ClusterSerializerXML();
          let errors = serializer.deserialize( snapshot.xml);
          if (errors)
@@ -507,5 +544,12 @@ export class PersistenceService
       console.log( me + `snapshot contains ${retval.size} users`);
       return retval;
    }
-   
+}
+
+/**
+ * A tuple decorating a cluster with a "seen" boolean for processing.
+ */ 
+class SeenCluster
+{
+   constructor( public seen: boolean, public clusterSubject: BehaviorSubject<Cluster>) {}
 }

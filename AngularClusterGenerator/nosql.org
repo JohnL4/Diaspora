@@ -27,6 +27,8 @@
     Looks like we can't represent arrays directly in NoSQL, so we do it by having multiple children
     at a node.
 
+    *(The following is replaced by [[#structure-2][New structure]].)*
+
     #+BEGIN_SRC indented-text
       root:
          users                        
@@ -76,6 +78,14 @@
 
 ****** Requirements (or Operations and Governing Rules)
 
+******* Unique name
+
+        Once created, a cluster's unique name will never change, even if... maybe I should just have
+        a guid.
+
+        Cluster has null uuid on creation.  If null, create during save and never lose.  Change
+        "unique name" to uuid implementation.
+
 ******* Create
         
       Any fool can create (not overwrite).  When they do, they become owners.  (TODO: something about =newdata= vs. old
@@ -123,6 +133,9 @@
       *Rule:* newData != null && /users/$targetUid/clusters/$clusterName does not exist.
 
 ****** New structure
+       :PROPERTIES:
+       :CUSTOM_ID: structure-2
+       :END:
 
        - users
          - $uid
@@ -131,18 +144,17 @@
            - lastLogin
            - (etc.)
            - clusters
-             - $clusterName (possibly unique-ified, for consistency; if not, not unique-ified, since it lives under
-               user)
+             - $clusterUuid
        - clusters (metadata)
-         - $clusterName
-           - (various metadata)
+         - $clusterUuid
+           - (various metadata) (name, last editor, write time, notes)
            - owners
            - editors
            - viewers
-           - ".read": /clusters/$clusterName/viewers.contains($uid)
-           - ".write": /clusters/$clusterName/editors.contains($uid)
+           - ".read": /clusters/$clusterUuid/viewers.contains($uid)
+           - ".write": /clusters/$clusterUuid/editors.contains($uid)
        - clusterData
-         - $clusterName
+         - $clusterUuid
            - xml
 
 *** Use
@@ -150,7 +162,10 @@
     Need to cover two cases:
 
     - generated, not-yet-persisted cluster (no deep link (i.e., parameterized url) possible)
-    - persisted cluster (deep link via url parameterization that causes cluster to be loaded as observable)
+    - persisted cluster (deep link via url parameterization that causes cluster to be loaded as
+      observable)
+
+    
 
 **** Generated Cluster
 

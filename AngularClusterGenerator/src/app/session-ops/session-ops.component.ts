@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { UUIDv4 } from 'uuid-version4';
+
 import { Cluster } from '../cluster';
 import { PersistenceService } from '../persistence.service';
 import { User } from '../user';
@@ -36,11 +38,16 @@ export class SessionOpsComponent implements OnInit
          });
    }
 
+   private _uuid: string;
+   
+   // -------------------------------------------------  constructors  -------------------------------------------------
+
    constructor( /* private _cluster: Cluster, */ private _persistenceSvc: PersistenceService) { }
 
    ngOnInit()
    {
       this.getUser();           // I think this basically hooks up the promise resolution event.
+      this._uuid = UUIDv4.generateUUID();
    }
 
    public login()
