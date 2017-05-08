@@ -421,7 +421,11 @@ export class PersistenceService
          else
          {
             let sc = new SeenCluster( true, clusterSubj); // TODO: hook up subject to d/b? It's not hooked up yet, right?
-            
+            let clusterUid = clusterSubj.value.uid;
+            this.makeDatabaseSnapshotObservable( `/clusters/${clusterUid}`)
+               .map( s => { let sval = s.val(); let c = new Cluster(); c.uid = clusterUid; c.name = sval.name; return c;})
+               .multicast( clusterSubj)
+               .connect();
             this._clusterObservable.set( clusterSubj.value.uid, sc);
          }
       }
