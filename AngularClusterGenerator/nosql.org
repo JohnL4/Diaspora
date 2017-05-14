@@ -27,6 +27,8 @@
     Looks like we can't represent arrays directly in NoSQL, so we do it by having multiple children
     at a node.
 
+**** Old structure
+     
     *(The following is replaced by [[#structure-2][New structure]].)*
 
     #+BEGIN_SRC indented-text
@@ -165,7 +167,39 @@
     - persisted cluster (deep link via url parameterization that causes cluster to be loaded as
       observable)
 
-    
+**** Algorithms
+
+***** Get list of available cluster id from /users/$uid node
+
+      Event: list updated.  This is either a delete or an insert; no other ops are possible (e.g.,
+      data updates, list re-orderings will not generate events here).
+
+      Responses:
+
+****** Insert
+
+       No immediate response.  Insert into uuid-to-cluster map.  Subscribe to data changes on new
+       cluster, which will be handled later (see below).
+
+****** Delete
+
+       Remove entry from uuid-to-cluster map.  Raise "next map" event, with updated map as payload.
+       Handle "next map" by sorting map values on whatever sort criteria there are into a sorted
+       list, and raise "next sorted list" event.  Handle "next sorted list" event by redisplaying
+       list on page.
+
+***** DONE Get data for single cluster
+      CLOSED: [2017-05-14 Sun 16:53]
+      - CLOSING NOTE [2017-05-14 Sun 16:53] \\
+        Answer: cannot get updates only for certain children of a node. It's all or nothing.
+
+      Subscribe to cluster data (for whatever reason, but probably as result of DataSnapshot event
+      for list of cluster uuids available to user (note that this is not the "next map" event).
+
+      Throttle (debounce, 300 msec?) DataSnapshots for single cluster data.  Respond to event by
+      sorting current map and raising "next sorted list" event.  Throttling is because on initial
+      load, we subscribe to a bunch of individual clusters simultaneously (unless we can
+      subscribe to multiple children with one call?  Answer: no.)
 
 **** Generated Cluster
 
