@@ -19,6 +19,8 @@
 .settings/
 *.sublime-workspace
 *~
+# emacs temp files, leading "#" escaped so it won't be a .git comment:
+\#*#
 
 # IDE - VSCode
 .vscode/*

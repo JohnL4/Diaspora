@@ -102,10 +102,17 @@ export class PersistenceService
    //
    private _userPromiseDeferred: {resolve: any, reject: any};
 
+//   /**
+//    * List of names of clusters that are visible to the current user.
+//    */
+//   private _visibleClusters: BehaviorSubject<BehaviorSubject<Cluster>[]>;
+
    /**
-    * List of names of clusters that are visible to the current user.
+    * List of cluster uuids.
     */
-   private _visibleClusters: BehaviorSubject<BehaviorSubject<Cluster>[]>;
+   // NOTE: Can't declare type Uuid and have Typescript flag cases in which a non-Uuid is supplied here.  The type
+   // equivalence doesn't save us.
+   private _visibleClusterUuids: Observable<Array<string>>; 
 
    /**
     * Map from cluster unique name to a cluster, decorated as needed for processing ({@see SeenCluster} is the
@@ -359,28 +366,32 @@ export class PersistenceService
          this._db = firebase.database();
          console.log( me + `initialized firebase, db = "${this._db}"`);
 
-         this._visibleClusters = new BehaviorSubject<BehaviorSubject<Cluster>[]>(new Array<BehaviorSubject<Cluster>>());
-         this._visibleClusters.subscribe( clusters => this.handleVisibleClusterListChange( clusters));
+         // TODO: make this a BehaviorSubject<Map<string,Cluster>>.
+         // this._visibleClusters = new BehaviorSubject<BehaviorSubject<Cluster>[]>(new Array<BehaviorSubject<Cluster>>());
+         // this._visibleClusters.subscribe( clusters => this.handleVisibleClusterListChange( clusters));
 
-         // $uid/clusters is a list of unique names
-         let visibleClusterNamesSubscription
-            = this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`) 
-            .map( s => { let uniqueNamesObj = s.val();
-                         let names = new Array<BehaviorSubject<Cluster>>();
-                         for (let uniqueName in uniqueNamesObj)
-                         {
-                            let cluster = this._clusterObservable[uniqueName].cluster;
-                            if (! cluster)
-                            {
-                               cluster = new Cluster();
-                               cluster.uid = uniqueName;
-                            }
-                            names.push( new BehaviorSubject<Cluster>( cluster));
-                         }
-                         return names;
-                       })
-            .multicast( this._visibleClusters)
-            .connect();
+         this._visibleClusterUuids = this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`)
+            .map( s => s.val()); // Object of cluster uuids
+
+//         // $uid/clusters is a list of unique names
+//         let visibleClusterNamesSubscription
+//            = this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`) 
+//            .map( s => { let uniqueNamesObj = s.val();
+//                         let names = new Array<BehaviorSubject<Cluster>>();
+//                         for (let uniqueName in uniqueNamesObj)
+//                         {
+//                            let cluster = this._clusterObservable[uniqueName].cluster;
+//                            if (! cluster)
+//                            {
+//                               cluster = new Cluster();
+//                               cluster.uid = uniqueName;
+//                            }
+//                            names.push( new BehaviorSubject<Cluster>( cluster));
+//                         }
+//                         return names;
+//                       })
+//            .multicast( this._visibleClusters)
+//            .connect();
          
          // TODO: keep cluster metadata, but build differently.  Subscribe to each cluster separately, and provide next
          // result appropriately.  So... change in xml only, no next observable, but change in metadata ==> next result.
