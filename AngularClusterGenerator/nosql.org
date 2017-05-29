@@ -208,3 +208,29 @@
 **** Persisted Cluster
 
      Make svc.currentCluster observable, hook it up to firebase (UN-hook first).
+* Events
+
+  #+BEGIN_SRC picture
+
+    +-------------+              +---------------------+              
+    | Available   |   <object>   | make a bunch        |              +-------+ \                            
+    | System UIDs |------------->| of new observables, |- - - - - - ->| row 0 |  \
+    +-------------+              | one per row         |              +-------+   \                          
+                                 +---------------------+                           \               +----------+
+                                            |                         +-------+     \              | LIST of  |
+                                                                      | row 1 |      --- merge --->| cluster  |
+                                            |                         +-------+     /              | metadata |
+                                                                                   /               +----------+
+                                            |                         +-------+   /                      
+                                                                      | row 2 |  /                       
+                                            |                         +-------+ /                        
+                                                                                                     
+                                            |                         How to add                         
+                                                                      and delete??
+                                            |                         May mean we 
+                                                                      need Subject    
+                                            |
+                                                          +---------+  (sort)
+                                            \ - - - - - ->| Subject |---------> gack, we need a real diagramming tool
+                                                          +---------+
+  #+END_SRC 
