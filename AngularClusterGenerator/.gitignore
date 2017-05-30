@@ -38,6 +38,7 @@ npm-debug.log
 testem.log
 /typings
 observables.svg
+nosql.html
 
 # e2e
 /e2e/*.js

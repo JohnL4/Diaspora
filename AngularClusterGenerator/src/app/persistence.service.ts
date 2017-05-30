@@ -6,6 +6,7 @@ import * as firebase from "firebase";
 import { Cluster } from './cluster';
 import { ClusterData } from './cluster-data';
 import { ClusterSerializerXML } from './cluster-serializer-xml';
+import { Uid } from './uid';
 import { User } from './user';
 import { ASCII_US, uniqueClusterName, minimalEncode, minimalDecode } from './utils';
 
@@ -114,6 +115,8 @@ export class PersistenceService
    // equivalence doesn't save us.
    private _visibleClusterUuids: Observable<Array<string>>; 
 
+   private _visibleClusterMap: Map<Uid,Observable<Cluster>>;
+   
    /**
     * Map from cluster unique name to a cluster, decorated as needed for processing ({@see SeenCluster} is the
     * decoration).
@@ -365,6 +368,9 @@ export class PersistenceService
       {
          this._db = firebase.database();
          console.log( me + `initialized firebase, db = "${this._db}"`);
+
+         if (this._visibleClusterMap == null)
+            this._visibleClusterMap = new Map<Uid,Observable<Cluster>>();
 
          // TODO: make this a BehaviorSubject<Map<string,Cluster>>.
          // this._visibleClusters = new BehaviorSubject<BehaviorSubject<Cluster>[]>(new Array<BehaviorSubject<Cluster>>());
