@@ -12,6 +12,8 @@ import { dice, fateThrow, alphaBravo, uniqueClusterNameFromUid } from './utils';
 @Injectable()
 export class Cluster {
 
+   // -------------------------------------------  Data Members, Properties  -------------------------------------------
+   
    /**
     * Unique id identifying cluster (so names can be non-unique, which might be important if a user creates a cluster
     * and shares it with another user who already has a cluster with the same name).
@@ -53,8 +55,6 @@ export class Cluster {
     */
    public usesHighLowSlipstreams: boolean;
    
-   public constructor( ) {}
-
    /**
     * The number of systems in this cluster. Setting this value will cause the cluster to be regenerated.
     */
@@ -91,6 +91,26 @@ export class Cluster {
       }
    }
 
+   // -------------------------------------------------  Constructors  -------------------------------------------------
+
+   /**
+    * @param anObject - an Object that might have properties that match Cluster.
+    */  
+   public constructor( anObject?: Object)
+   {
+      if (anObject)
+      {
+         if (anObject["uid"])
+            this.uid = anObject["uid"];
+         if (anObject["name"])
+            this.name = anObject["name"];
+         if (anObject["lastAuthor"])
+            this.lastAuthor = anObject["lastAuthor"];
+      }
+   }
+
+   // ---------------------------------------------------  Mathods  ----------------------------------------------------
+   
 //   /**
 //    * Add a StarSystem to the cluster.  Use this instead of building a temporary array and setting it via "systems".
 //    */

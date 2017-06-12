@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs/Rx';
+import { Observable, Observer, BehaviorSubject, Subscription } from 'rxjs/Rx';
 
 import * as firebase from "firebase";
 
@@ -57,7 +57,7 @@ export class PersistenceService
    }
 
    /**
-    * Map from cluster name to cluster meadata (e.g., last edited by/when, notes, etc.)
+    * List cluster meadata objects sorted in the correct order (e.g., last edited by/when, notes, etc.).
     */
    public get clusterMetadata(): Observable<Cluster[]> { return this._clusterMetadata; }
 
@@ -109,11 +109,12 @@ export class PersistenceService
 //   private _visibleClusters: BehaviorSubject<BehaviorSubject<Cluster>[]>;
 
    /**
-    * List of cluster uuids.
+    * Observable<Object>, in which each object has a property (probably a boolean, but could be an int) whose name
+    * is the UID of a cluster and whose value is irrelevant.
     */
-   // NOTE: Can't declare type Uuid and have Typescript flag cases in which a non-Uuid is supplied here.  The type
-   // equivalence doesn't save us.
-   private _visibleClusterUuids: Observable<Array<string>>; 
+   // NOTE: Can't declare type Uuid as alias for string and have Typescript flag cases in which a non-Uuid is supplied here.  
+   // The type equivalence doesn't save us.
+   private _visibleClusterUuids: Observable<Object>; 
 
    private _visibleClusterMap: Map<Uid,Observable<Cluster>>;
    
@@ -123,14 +124,13 @@ export class PersistenceService
     */
    private _clusterObservable: Map<string, SeenCluster> = new Map<string, SeenCluster>();
    
-   private _clusterMetadata: BehaviorSubject<Cluster[]>;
+   private _clusterMetadata: BehaviorSubject<Cluster[]> = new BehaviorSubject<Cluster[]>(new Array<Cluster>());
+
 
    private _currentGeneratedCluster: BehaviorSubject<Cluster>;
-
    private _currentGeneratedClusterSubscription: Subscription;
    
    private _currentPersistedCluster: BehaviorSubject<Cluster>;
-
    private _currentPersistedClusterSubscription: Subscription;
    
    private _curUser: User;
@@ -376,8 +376,10 @@ export class PersistenceService
          // this._visibleClusters = new BehaviorSubject<BehaviorSubject<Cluster>[]>(new Array<BehaviorSubject<Cluster>>());
          // this._visibleClusters.subscribe( clusters => this.handleVisibleClusterListChange( clusters));
 
-         this._visibleClusterUuids = this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`)
-            .map( s => s.val()); // Object of cluster uuids
+         /* this._visibleClusterUuids = */ this.makeDatabaseSnapshotObservable( `/users/${this._curUser.uid}/clusters`)
+            .map( s => <Object> s.val()) // Object of cluster uuids
+            .subscribe( uidObject => this.handleVisibleClusterListChange( uidObject))
+            ;
 
 //         // $uid/clusters is a list of unique names
 //         let visibleClusterNamesSubscription
@@ -402,7 +404,6 @@ export class PersistenceService
          // TODO: keep cluster metadata, but build differently.  Subscribe to each cluster separately, and provide next
          // result appropriately.  So... change in xml only, no next observable, but change in metadata ==> next result.
          // Change in _visbibleClusterNames almost certainly means at least a change in metadata ROWS (insert, delete).
-         this._clusterMetadata = new BehaviorSubject<Cluster[]>(new Array<Cluster>());
          let clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
             .map( s => this.parseMetadata( s.val()))
             .multicast( this._clusterMetadata)
@@ -428,29 +429,31 @@ export class PersistenceService
     * subjects.  Will drop subscriptions for deleted clusters and start new ones for new clusters.  Subscriptions for
     * existing clusters will continue unchanged.
     */
-   private handleVisibleClusterListChange( aClustersv: BehaviorSubject<Cluster>[]): void
+   private handleVisibleClusterListChange( aClusterUidsObject: Object): void
    {
       this._clusterObservable.forEach( sc => {sc.seen = false});
-      for (let clusterSubj of aClustersv)
+      for (let clusterUid in aClusterUidsObject)
       {
-         if (this._clusterObservable.has( clusterSubj.value.uid))
-            this._clusterObservable.get( clusterSubj.value.uid).seen = true;
+         if (this._clusterObservable.has( clusterUid))
+            this._clusterObservable.get( clusterUid).seen = true;
          else
          {
-            let sc = new SeenCluster( true, clusterSubj); // TODO: hook up subject to d/b? It's not hooked up yet, right?
-            let clusterUid = clusterSubj.value.uid;
-            this.makeDatabaseSnapshotObservable( `/clusters/${clusterUid}`)
+            let newCluster = new Cluster();
+            newCluster.uid = clusterUid;
+            // let clusterSubject = new BehaviorSubject<Cluster>( newCluster);
+            let sc = new SeenCluster( true, newCluster);
+            sc.clusterSubscription = this.makeDatabaseSnapshotObservable( `/clusters/${clusterUid}`)
                .map( s => { let sval = s.val(); let c = new Cluster(); c.uid = clusterUid; c.name = sval.name; return c;})
-               .multicast( clusterSubj)
-               .connect();
-            this._clusterObservable.set( clusterSubj.value.uid, sc);
+               .subscribe( c => this.updateAndPublishClusterMap( c))
+               ;
+            this._clusterObservable.set( clusterUid, sc);
          }
       }
       let unseenKeys = new Array<string>();
       this._clusterObservable.forEach( (val,key) =>
                                        {if (! val.seen) {
                                           unseenKeys.push( key);
-                                          val.clusterSubject.unsubscribe();
+                                          val.clusterSubscription.unsubscribe();
                                        }
                                        });
       for (let key of unseenKeys)
@@ -459,6 +462,15 @@ export class PersistenceService
       // At this point, the only piece of data we're guaranteed to have is cluster uid; and that doesn't do any good to
       // sort on.
       
+   }
+
+   /**
+    * Updates map of visible clusters (uid --> cluster) and publishes the updated map via mapSubject.next().
+    * @param aCluster 
+    */   
+   private updateAndPublishClusterMap( aCluster: Cluster): void
+   {
+
    }
    
    /**
@@ -572,5 +584,6 @@ export class PersistenceService
  */ 
 class SeenCluster
 {
-   constructor( public seen: boolean, public clusterSubject: BehaviorSubject<Cluster>) {}
+   public clusterSubscription: Subscription;
+   constructor( public seen: boolean, public cluster: Cluster) {}
 }
