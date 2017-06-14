@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer, BehaviorSubject, Subscription } from 'rxjs/Rx';
 
-import * as firebase from "firebase";
+import * as firebase from 'firebase';
 
 import { Cluster } from './cluster';
 import { ClusterData } from './cluster-data';
@@ -116,7 +116,8 @@ export class PersistenceService
    // The type equivalence doesn't save us.
    private _visibleClusterUuids: Observable<Object>; 
 
-   private _visibleClusterMap: Map<Uid,Observable<Cluster>>;
+   private _visibleClusterMap: Map<Uid, Cluster>;
+   private _visibleClusterMapSubject: BehaviorSubject<Map<Uid, Cluster>>;
    
    /**
     * Map from cluster unique name to a cluster, decorated as needed for processing ({@see SeenCluster} is the
@@ -158,7 +159,7 @@ export class PersistenceService
       console.log( me);
       if (this._initialized)    // Probably not threadsafe, but I'll think about that tomorrow.  After all, tomorrow is another day.
       {
-         console.log( me + "already initialized");
+         console.log( me + 'already initialized');
          return;
       }
 
@@ -370,7 +371,13 @@ export class PersistenceService
          console.log( me + `initialized firebase, db = "${this._db}"`);
 
          if (this._visibleClusterMap == null)
-            this._visibleClusterMap = new Map<Uid,Observable<Cluster>>();
+            this._visibleClusterMap = new Map<Uid, Cluster>();
+         if (this._visibleClusterMapSubject == null)
+         {
+            this._visibleClusterMapSubject = new BehaviorSubject<Map<Uid, Cluster>>( this._visibleClusterMap);
+            this._visibleClusterMapSubject.debounceTime( 300)
+               .subscribe( m => this.sortMetadata( m));
+         }
 
          // TODO: make this a BehaviorSubject<Map<string,Cluster>>.
          // this._visibleClusters = new BehaviorSubject<BehaviorSubject<Cluster>[]>(new Array<BehaviorSubject<Cluster>>());
@@ -404,10 +411,12 @@ export class PersistenceService
          // TODO: keep cluster metadata, but build differently.  Subscribe to each cluster separately, and provide next
          // result appropriately.  So... change in xml only, no next observable, but change in metadata ==> next result.
          // Change in _visbibleClusterNames almost certainly means at least a change in metadata ROWS (insert, delete).
-         let clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
+         const clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
             .map( s => this.parseMetadata( s.val()))
-            .multicast( this._clusterMetadata)
-            .connect();
+            .multicast( this._clusterMetadata) // Uses the given Subject to create an Observable that can be subscribed
+                                               //   to multiple times w/out re-triggering the sequence.
+            .connect();                        // Actually starts the base Observable running, with updates to the
+                                               //   subject.
 
          this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
          this._users.subscribe( map => {this._latestUserMap = map;});
@@ -428,35 +437,36 @@ export class PersistenceService
     * Called when the list of names of clusters visible to the current user has changed, with the new list of Cluster
     * subjects.  Will drop subscriptions for deleted clusters and start new ones for new clusters.  Subscriptions for
     * existing clusters will continue unchanged.
+    *
+    * @param aClusterUidsObject DataSnapshot value whose properties are the currently visible cluster uuids.
     */
    private handleVisibleClusterListChange( aClusterUidsObject: Object): void
    {
-      this._clusterObservable.forEach( sc => {sc.seen = false});
-      for (let clusterUid in aClusterUidsObject)
+      this._clusterObservable.forEach( sc => {sc.seen = false; });
+      for (const clusterUid in aClusterUidsObject)
       {
          if (this._clusterObservable.has( clusterUid))
             this._clusterObservable.get( clusterUid).seen = true;
          else
          {
-            let newCluster = new Cluster();
+            const newCluster = new Cluster();
             newCluster.uid = clusterUid;
             // let clusterSubject = new BehaviorSubject<Cluster>( newCluster);
-            let sc = new SeenCluster( true, newCluster);
-            sc.clusterSubscription = this.makeDatabaseSnapshotObservable( `/clusters/${clusterUid}`)
-               .map( s => { let sval = s.val(); let c = new Cluster(); c.uid = clusterUid; c.name = sval.name; return c;})
+            const clusterSubscription = this.makeDatabaseSnapshotObservable( `/clusters/${clusterUid}`)
+               .map( s => { const sval = s.val(); const c = new Cluster(); c.uid = clusterUid; c.name = sval.name; return c; })
                .subscribe( c => this.updateAndPublishClusterMap( c))
                ;
-            this._clusterObservable.set( clusterUid, sc);
+            const sc = new SeenCluster( true, newCluster, clusterSubscription);
          }
       }
-      let unseenKeys = new Array<string>();
+      const unseenKeys = new Array<string>();
       this._clusterObservable.forEach( (val,key) =>
                                        {if (! val.seen) {
                                           unseenKeys.push( key);
                                           val.clusterSubscription.unsubscribe();
                                        }
                                        });
-      for (let key of unseenKeys)
+      for (const key of unseenKeys)
          this._clusterObservable.delete( key); 
 
       // At this point, the only piece of data we're guaranteed to have is cluster uid; and that doesn't do any good to
@@ -468,9 +478,29 @@ export class PersistenceService
     * Updates map of visible clusters (uid --> cluster) and publishes the updated map via mapSubject.next().
     * @param aCluster 
     */   
+   // Will honor every event by updating the map and calling subject.next(newMap).  However, said subject will be 
+   // throttled before being sorted into a list for display.
    private updateAndPublishClusterMap( aCluster: Cluster): void
    {
+      this._visibleClusterMap.set( aCluster.uid, aCluster);
+      this._visibleClusterMapSubject.next( this._visibleClusterMap);
+   }
 
+   /**
+    * Sort given map into a list of cluster metadata objects and raise an event to cause them to be displayed.
+    * @param aClusterMetadataMap 
+    */
+   private sortMetadata( aClusterMetadataMap: Map<Uid, Cluster>)
+   {
+      const metadataList = new Array<Cluster>();
+      aClusterMetadataMap.forEach( (cluster: Cluster, uid: Uid) => metadataList.push( cluster));
+      metadataList.sort( (a,b) => 
+            {
+                  if (a.name < b.name) return -1;
+                  else if (a.name == b.name) return 0;
+                  else return 1;
+            });
+      this._clusterMetadata.next( metadataList);
    }
    
    /**
@@ -582,8 +612,13 @@ export class PersistenceService
 /**
  * A tuple decorating a cluster with a "seen" boolean for processing.
  */ 
-class SeenCluster
+class SeenCluster 
 {
-   public clusterSubscription: Subscription;
-   constructor( public seen: boolean, public cluster: Cluster) {}
+      /**
+       * 
+       * @param seen True iff cluster has been seen during processing
+       * @param cluster The cluster itself
+       * @param clusterSubscription Subscription to cluster updates
+       */
+   constructor( public seen: boolean, public cluster: Cluster, public clusterSubscription: Subscription) {}
 }
