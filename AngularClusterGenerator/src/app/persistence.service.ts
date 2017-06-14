@@ -394,7 +394,7 @@ export class PersistenceService
          {
             this._visibleClusterMapSubject = new BehaviorSubject<Map<Uid, Cluster>>( this._visibleClusterMap);
             this._visibleClusterMapSubject.debounceTime( 300)
-               .subscribe( m => this.sortMetadata( m));
+               .subscribe( m => this.sortAndPublishMetadata( m));
          }
 
          // TODO: make this a BehaviorSubject<Map<string,Cluster>>.
@@ -429,12 +429,12 @@ export class PersistenceService
          // TODO: keep cluster metadata, but build differently.  Subscribe to each cluster separately, and provide next
          // result appropriately.  So... change in xml only, no next observable, but change in metadata ==> next result.
          // Change in _visbibleClusterNames almost certainly means at least a change in metadata ROWS (insert, delete).
-         const clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
-            .map( s => this.parseMetadata( s.val()))
-            .multicast( this._clusterMetadata) // Uses the given Subject to create an Observable that can be subscribed
-                                               //   to multiple times w/out re-triggering the sequence.
-            .connect();                        // Actually starts the base Observable running, with updates to the
-                                               //   subject.
+      //    const clusterMetadataSubscription = this.makeDatabaseSnapshotObservable( '/clusters')
+      //       .map( s => this.parseMetadata( s.val()))
+      //       .multicast( this._clusterMetadata) // Uses the given Subject to create an Observable that can be subscribed
+      //                                          //   to multiple times w/out re-triggering the sequence.
+      //       .connect();                        // Actually starts the base Observable running, with updates to the
+      //                                          //   subject.
 
          this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
          this._users.subscribe( map => {this._latestUserMap = map;});
@@ -517,7 +517,7 @@ export class PersistenceService
     * Sort given map into a list of cluster metadata objects and raise an event to cause them to be displayed.
     * @param aClusterMetadataMap 
     */
-   private sortMetadata( aClusterMetadataMap: Map<Uid, Cluster>)
+   private sortAndPublishMetadata( aClusterMetadataMap: Map<Uid, Cluster>)
    {
       const metadataList = new Array<Cluster>();
       aClusterMetadataMap.forEach( (cluster: Cluster, uid: Uid) => metadataList.push( cluster));
@@ -564,39 +564,42 @@ export class PersistenceService
       //    this.login();
    }
 
-   /**
-    * Returns a map from cluster name to cluster metadata (e.g., last edited by/when, notes), which map is created from
-    * the given d/b snapshot.
-    */
-   private parseMetadata( aSnapshot: Object): Cluster[]
-   {
-      const me = this.constructor.name + ".parseMetadata(): ";
-      this._latestClusterMap = new Map<string, Cluster>();
-      const retval = Array<Cluster>();
-      for (const key in aSnapshot)
-      {
-         // let keyTuple = minimalDecode( JSON.parse( key));
-         let keyTuple = decodeURIComponent( key);
-         let [name,uid] = keyTuple.split( ASCII_US, 2);
-         name = minimalDecode( name);
-         let clusterObj = <Cluster> aSnapshot[key]; // Note: just casting an Object (which is what I think aSnapshot[key]
-                                                 // is, since Firebase knows nothing about our class hierarchy) to
-                                                 // Cluster does not actually MAKE the thing a Cluster, it just
-                                                 // satisfies TypeScript's demand for type "congruence".
-         // clusterObj.lastAuthor = uid;
-         // clusterObj.name = name;
+//    /**
+//     * Returns a map from cluster name to cluster metadata (e.g., last edited by/when, notes), which map is created from
+//     * the given d/b snapshot.
+//     */
+//    private parseMetadata( aSnapshot: Object): Cluster[]
+//    {
+//       const me = this.constructor.name + ".parseMetadata(): ";
+//       this._latestClusterMap = new Map<string, Cluster>();
+//       const retval = Array<Cluster>();
+//       for (const key in aSnapshot)
+//       {
+//          if (aSnapshot.hasOwnProperty( key))
+//          {
+//             // let keyTuple = minimalDecode( JSON.parse( key));
+//             const keyTuple = decodeURIComponent( key);
+//             let [name, uid] = keyTuple.split( ASCII_US, 2);
+//             name = minimalDecode( name);
+//             const clusterObj = <Cluster> aSnapshot[key]; // Note: just casting an Object (which is what I think aSnapshot[key]
+//                                                       // is, since Firebase knows nothing about our class hierarchy) to
+//                                                       // Cluster does not actually MAKE the thing a Cluster, it just
+//                                                       // satisfies TypeScript's demand for type "congruence".
+//             // clusterObj.lastAuthor = uid;
+//             // clusterObj.name = name;
 
-         let cluster = new Cluster();
-         cluster.lastChanged = clusterObj.lastChanged;
-         cluster.lastAuthor = uid;
-         cluster.name = name;
+//             const cluster = new Cluster();
+//             cluster.lastChanged = clusterObj.lastChanged;
+//             cluster.lastAuthor = uid;
+//             cluster.name = name;
 
-         retval.push( cluster); 
-         this._latestClusterMap.set( key, cluster);
-      }
-      console.log( me + `aSnapshot contains ${retval.length} clusters`);
-      return retval;
-   }
+//             retval.push( cluster); 
+//             this._latestClusterMap.set( key, cluster);
+//          }
+//       }
+//       console.log( me + `aSnapshot contains ${retval.length} clusters`);
+//       return retval;
+//    }
 
    /**
     * Analogous to {@see #parseMetadata}, returns a Cluster object created from the given snapshot's "xml" property.
