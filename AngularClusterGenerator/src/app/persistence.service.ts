@@ -471,7 +471,17 @@ export class PersistenceService
             newCluster.uid = clusterUid;
             // let clusterSubject = new BehaviorSubject<Cluster>( newCluster);
             const clusterSubscription = this.makeDatabaseSnapshotObservable( `/clusters/${clusterUid}`)
-               .map( s => { const sval = s.val(); const c = new Cluster(); c.uid = clusterUid; c.name = sval.name; return c; })
+               .map( s => 
+               { 
+                     const sval = s.val(); 
+                     const c = new Cluster(); 
+                     c.uid = clusterUid; 
+                     c.name = sval.name; 
+                     c.lastAuthor = sval.lastAuthor;
+                     c.lastChanged = sval.lastChanged;
+                     c.notes = sval.notes;
+                     return c; 
+                  })
                .subscribe( c => this.updateAndPublishClusterMap( c))
                ;
             const sc = new SeenCluster( true, newCluster, clusterSubscription);
@@ -489,7 +499,6 @@ export class PersistenceService
 
       // At this point, the only piece of data we're guaranteed to have is cluster uid; and that doesn't do any good to
       // sort on.
-      
    }
 
    /**
