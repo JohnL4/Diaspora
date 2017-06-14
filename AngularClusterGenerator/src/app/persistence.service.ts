@@ -123,7 +123,7 @@ export class PersistenceService
     * Map from cluster unique name to a cluster, decorated as needed for processing ({@see SeenCluster} is the
     * decoration).
     */
-   private _clusterObservable: Map<string, SeenCluster> = new Map<string, SeenCluster>();
+   private _seenClusterMap: Map<string, SeenCluster> = new Map<string, SeenCluster>();
    
    private _clusterMetadata: BehaviorSubject<Cluster[]> = new BehaviorSubject<Cluster[]>(new Array<Cluster>());
 
@@ -267,20 +267,28 @@ export class PersistenceService
     *
     * @param aUniqueName Same as that for {@see #loadCluster}.
     */
-   public deleteCluster( aUniqueName: string): void
+   public deleteCluster(aUniqueName: string): void
    {
+      if (!this._curUser)
+         return;
       const me = this.constructor.name + '.deleteCluster(): ';
-      const uniqueName = encodeURIComponent( aUniqueName);
-      console.log( me + `deleting ${uniqueName}`);
+      // const uniqueName = encodeURIComponent( aUniqueName);
+      console.log(me + `deleting ${aUniqueName}`);
       if (this._currentGeneratedClusterSubscription)
       {
+         console.log(me + 'unsubscribing');
          this._currentPersistedClusterSubscription.unsubscribe();
          this._currentPersistedClusterSubscription = null;
       }
 
-      if (! this._db) this._db = firebase.database();
-      this._db.ref( `/clusters/${uniqueName}`).remove();
-      this._db.ref( `/clusterData/${uniqueName}`).remove();
+      if (!this._db) this._db = firebase.database();
+
+      const updates = Object.create( null);
+      updates[`/users/${this._curUser.uid}/clusters/${aUniqueName}`] = null;
+      updates[`/clusters/${aUniqueName}`] = null;
+      updates[`/clusterData/${aUniqueName}`] = null;
+
+      this._db.ref().update( updates);
    }
    
    public saveCluster( aCluster: Cluster): void
@@ -460,42 +468,47 @@ export class PersistenceService
     */
    private handleVisibleClusterListChange( aClusterUidsObject: Object): void
    {
-      this._clusterObservable.forEach( sc => {sc.seen = false; });
+      // We're using the _seenClusterMap to manage subscriptions (new ones and unsubscribing from deleted clusters).
+      this._seenClusterMap.forEach( sc => {sc.seen = false; });
       for (const clusterUid in aClusterUidsObject)
       {
-         if (this._clusterObservable.has( clusterUid))
-            this._clusterObservable.get( clusterUid).seen = true;
+         if (this._seenClusterMap.has( clusterUid))
+            this._seenClusterMap.get( clusterUid).seen = true;
          else
          {
-            const newCluster = new Cluster();
-            newCluster.uid = clusterUid;
+            // const newCluster = new Cluster();
+            // newCluster.uid = clusterUid;
             // let clusterSubject = new BehaviorSubject<Cluster>( newCluster);
             const clusterSubscription = this.makeDatabaseSnapshotObservable( `/clusters/${clusterUid}`)
                .map( s => 
                { 
-                     const sval = s.val(); 
-                     const c = new Cluster(); 
-                     c.uid = clusterUid; 
-                     c.name = sval.name; 
-                     c.lastAuthor = sval.lastAuthor;
-                     c.lastChanged = sval.lastChanged;
-                     c.notes = sval.notes;
+                     const sval = s.val(); // sval == null ==> cluster has been deleted
+                     const c = new Cluster( sval); 
+                     c.uid = clusterUid; // Note that cluster uid is not part of the snapshot object, but is instead the
+                                         // root of the snapshot object.
                      return c; 
                   })
                .subscribe( c => this.updateAndPublishClusterMap( c))
                ;
-            const sc = new SeenCluster( true, newCluster, clusterSubscription);
+            const sc = new SeenCluster( true, /* newCluster, */ clusterSubscription);
+            this._seenClusterMap.set( clusterUid, sc);
          }
       }
       const unseenKeys = new Array<string>();
-      this._clusterObservable.forEach( (val, key) =>
+      this._seenClusterMap.forEach( (val, key) =>
                                        {if (! val.seen) {
                                           unseenKeys.push( key);
                                           val.clusterSubscription.unsubscribe();
                                        }
                                        });
       for (const key of unseenKeys)
-         this._clusterObservable.delete( key); 
+      {
+         if (this._visibleClusterMap.has( key))
+            this._visibleClusterMap.delete( key);
+         this._seenClusterMap.delete( key); 
+      }
+      if (unseenKeys.length)
+         this._visibleClusterMapSubject.next( this._visibleClusterMap);
 
       // At this point, the only piece of data we're guaranteed to have is cluster uid; and that doesn't do any good to
       // sort on.
@@ -653,5 +666,5 @@ class SeenCluster
        * @param cluster The cluster itself
        * @param clusterSubscription Subscription to cluster updates
        */
-   constructor( public seen: boolean, public cluster: Cluster, public clusterSubscription: Subscription) {}
+   constructor( public seen: boolean, /* public cluster: Cluster, */ public clusterSubscription: Subscription) {}
 }

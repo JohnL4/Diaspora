@@ -95,8 +95,8 @@ export class Cluster {
 
    /**
     * @param anObject - an Object that might have properties that match Cluster.
-    */  
-   public constructor( anObject?: Object)
+    */
+   public constructor(anObject?: Object)
    {
       if (anObject)
       {
@@ -106,6 +106,10 @@ export class Cluster {
             this.name = anObject['name'];
          if (anObject['lastAuthor'])
             this.lastAuthor = anObject['lastAuthor'];
+         if (anObject['lastChanged'])
+            this.lastChanged = anObject['lastChanged'];
+         if (anObject['notes'])
+            this.notes = anObject['notes'];
       }
    }
 

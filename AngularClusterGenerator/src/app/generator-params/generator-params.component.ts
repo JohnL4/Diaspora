@@ -17,7 +17,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    validationMessages = {
       'numSystems': {
          'required': "A number of systems is required",
-         'allowedNumericValues': "Value must be one of the allowed numeric values",
+         'allowedNumericValues': 'Value must be one of the allowed numeric values',
          'pattern': "Value must be an integer"
       }
    };
@@ -41,7 +41,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    private get cluster(): Cluster { return this._persistenceSvc.currentCluster; }
    
    private _router: Router;
-   private _highLowHelpShowing: boolean = false;
+   private _highLowHelpShowing = false;
    
    private get clusterMetadata() { return this._persistenceSvc.clusterMetadata; }
 
@@ -102,24 +102,24 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
             if (! this._serializer)
                this._serializer = new ClusterSerializerXML();
             this._serializer.cluster = this.cluster;
-            let clusterXml = this._serializer.serialize();
+            const clusterXml = this._serializer.serialize();
             console.log( `generateCluster(): before setting, localStorage has ${localStorage.length} items`);
             localStorage.setItem( 'cluster', clusterXml);
             console.log( `generateCluster(): after setting, localStorage has ${localStorage.length} items`);
-            for (let key in localStorage)
+            for (const key in localStorage)
                console.log( `\tkey: ${key}`);
          }
       }
       else
-         console.log( "form invalid; not generating cluster");
+         console.log( 'form invalid; not generating cluster');
       // alert( "generateCluster() done");
    }
 
    public loadCluster( aCluster: Cluster): void
    {
-      let me = this.constructor.name + ".loadCluster(): ";
+      const me = this.constructor.name + '.loadCluster(): ';
       console.log( me + `cluster = ${aCluster.toString()} (constructor = ${aCluster.constructor.name})`);
-      let uniqueName = aCluster.uniqueName();
+      const uniqueName = aCluster.uniqueName();
       console.log( me + `cluster unique name (encoded) = >${encodeURIComponent( uniqueName)}<`);
       this._persistenceSvc.loadCluster( aCluster.uniqueName()); // TODO: probably better to just do this in the details
                                                                 // screen, which will help w/the deep linking.
@@ -128,8 +128,8 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    
    public deleteCluster( aCluster: Cluster): void
    {
-      let me = this.constructor.name + ".deleteCluster(): ";
-      let uniqueName = aCluster.uniqueName();
+      const me = this.constructor.name + '.deleteCluster(): ';
+      const uniqueName = aCluster.uniqueName();
       this._persistenceSvc.deleteCluster( uniqueName);
    }
    
@@ -139,7 +139,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       this.numSystems = this.cluster
          && this.cluster.numSystems
          && this.cluster.numSystems.toString()
-         || "";
+         || '';
       this._useHighLowSlipstreams = this.cluster && this.cluster.usesHighLowSlipstreams;
    }
 
@@ -154,7 +154,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    gotoDetails()
    {
-      let me = this.constructor.name + ".gotoDetails(): ";
+      const me = this.constructor.name + '.gotoDetails(): ';
       let uniqueName: string;
       // Note: loading is happening asynchronously, so it doesn't do any good to ask the cluster its name; it probably
       // hasn't been loaded yet.
@@ -163,7 +163,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
          uniqueName = this._requestedClusterName;
       else
       {
-         console.log( me + "Cluster has no name, therefore, no unique name.");
+         console.log( me + 'Cluster has no name, therefore, no unique name.');
          uniqueName = null;
       }
       if (uniqueName)
@@ -229,7 +229,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
             {
                switch (failedValidator)
                {
-               case "allowedNumericValues":
+               case 'allowedNumericValues':
                   this.formErrors[field] += `${messages[failedValidator]} (${control.errors[failedValidator].allowedValues}); `;
                   break;
                // case "pattern":
