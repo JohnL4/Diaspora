@@ -58,14 +58,14 @@ export class Cluster {
    /**
     * The number of systems in this cluster. Setting this value will cause the cluster to be regenerated.
     */
-   public get numSystems(): number { return this.systemMap == null ? 0 : this.systemMap.size }
+   public get numSystems(): number { return this.systemMap == null ? 0 : this.systemMap.size; }
 
    /**
     * Systems in cluster, sorted in id order. 
     */
    public get systems(): Array<StarSystem>
    {
-      let sysv = new Array<StarSystem>();
+      const sysv = new Array<StarSystem>();
       this.systemMap.forEach(function( v: StarSystem, k: string, m: Map<string,StarSystem>) { sysv.push( v); });
       sysv.sort( function( sa: StarSystem, sb: StarSystem)
                  {
@@ -100,12 +100,12 @@ export class Cluster {
    {
       if (anObject)
       {
-         if (anObject["uid"])
-            this.uid = anObject["uid"];
-         if (anObject["name"])
-            this.name = anObject["name"];
-         if (anObject["lastAuthor"])
-            this.lastAuthor = anObject["lastAuthor"];
+         if (anObject['uid'])
+            this.uid = anObject['uid'];
+         if (anObject['name'])
+            this.name = anObject['name'];
+         if (anObject['lastAuthor'])
+            this.lastAuthor = anObject['lastAuthor'];
       }
    }
 
@@ -121,7 +121,7 @@ export class Cluster {
 
    public uniqueName(): string
    {
-      let me = this.constructor.name + ".uniqueName(): ";
+      const me = this.constructor.name + '.uniqueName(): ';
       console.log( me);
       return uniqueClusterNameFromUid( this, this.lastAuthor);
    }
@@ -148,18 +148,19 @@ export class Cluster {
     */
    generate( aNumSystems: number, aUseHighLowSlipstreams: boolean)
    {
-      let me = this.constructor.name + ".generate(): ";
+      const me = this.constructor.name + '.generate(): ';
+      this.uid = null;
       this.name = null;
       this.usesHighLowSlipstreams = aUseHighLowSlipstreams;
-      let sysv = new Array<StarSystem>(); // Temporary, rather than constantly rebuilding, sorted (by id), because IE 11 is stoopid.
-      let slipstreamGuaranteeMet : boolean = false;
+      const sysv = new Array<StarSystem>(); // Temporary, rather than constantly rebuilding, sorted (by id), because IE 11 is stoopid.
+      let slipstreamGuaranteeMet = false;
       
       this.systemMap = new Map<string,StarSystem>();
       
       // Systems
       for (let i = 0; i < aNumSystems; i++)
       {
-         let sys = new StarSystem(
+         const sys = new StarSystem(
             alphaBravo( i + 1), // Id
             alphaBravo( i + 1), // Name, same as id, initially.
             fateThrow(),        // Technology
@@ -173,21 +174,21 @@ export class Cluster {
 
       if (! slipstreamGuaranteeMet)
       {
-         console.log( me + "Fulfilling slipstream guarantee.");
+         console.log( me + 'Fulfilling slipstream guarantee.');
          let minAttrSum = (3 * 4) + 1;
          let maxAttrSum = (3 * -4) - 1;
          let minIx: number[]; // Indices of systems with lowest and highest attribute sums.
          let maxIx: number[];
          for (let i = 0; i < aNumSystems; i++)
          {
-            let sum = sysv[i].tech + sysv[i].environment + sysv[i].resources;
+            const sum = sysv[i].tech + sysv[i].environment + sysv[i].resources;
             if (sum < minAttrSum)
             {
                minAttrSum = sum;
                minIx = new Array<number>();
                minIx.push( i);
             }
-            else if (sum == minAttrSum)
+            else if (sum === minAttrSum)
                minIx.push( i);
             if (sum > maxAttrSum)
             {
@@ -195,11 +196,12 @@ export class Cluster {
                maxIx = new Array<number>();
                maxIx.push( i);
             }
-            else if (sum == maxAttrSum)
+            else if (sum === maxAttrSum)
                maxIx.push( i);
          }
-         let worstIx = minIx[ Math.floor(Math.random() * minIx.length)];
-         let bestIx = maxIx[ Math.floor(Math.random() * maxIx.length)];
+         const worstIx = minIx[ Math.floor(Math.random() * minIx.length)];
+         const bestIx = maxIx[ Math.floor(Math.random() * maxIx.length)];
+         // tslint:disable-next-line:max-line-length
          console.log( me + `Worst systems: ${minIx} (picked ${worstIx}: ${sysv[worstIx].id}); Best systems: ${maxIx} (picked ${bestIx}: ${sysv[bestIx].id})`);
          this.systemMap.get(sysv[worstIx].id).tech = 2;
          this.systemMap.get(sysv[bestIx].id).tech = 2;
@@ -209,9 +211,9 @@ export class Cluster {
       this.slipstreams = new Array<Slipstream>();
       for (let i = 0; i < aNumSystems - 1; i++)
       {
-         this.addNewSlipstream( sysv[i], sysv[i+1], this.usesHighLowSlipstreams);
+         this.addNewSlipstream( sysv[i], sysv[i + 1], this.usesHighLowSlipstreams);
 
-         let t = fateThrow();
+         const t = fateThrow();
          if (t >= 0)
             this.connectToUnconnectedSystem( i, sysv);
          if (t > 0)
@@ -228,8 +230,8 @@ export class Cluster {
       let j = aStartIx + 1;
       for (; j < this.numSystems; j++)
       {
-         let connections = aSysv[j].slipstreams;
-         if (! connections || connections.length == 0)
+         const connections = aSysv[j].slipstreams;
+         if (! connections || connections.length === 0)
             break;        // Found an unconnectd system.
       }
       if (j < this.numSystems)
@@ -248,10 +250,10 @@ export class Cluster {
       
       if (aUseHighLow)
       {
-         leave = (dice(1,2) == 1) ? SlipknotPosition.LOW : SlipknotPosition.HIGH;
-         arrive = (dice(1,2) == 1) ? SlipknotPosition.LOW : SlipknotPosition.HIGH;
+         leave = (dice(1, 2) === 1) ? SlipknotPosition.LOW : SlipknotPosition.HIGH;
+         arrive = (dice(1, 2) === 1) ? SlipknotPosition.LOW : SlipknotPosition.HIGH;
       }
-      let ss = new Slipstream( aFrom, aTo, leave, arrive);
+      const ss = new Slipstream( aFrom, aTo, leave, arrive);
       this.slipstreams.push( ss);
       aFrom.slipstreams.push( ss);
       aTo.slipstreams.push( ss);

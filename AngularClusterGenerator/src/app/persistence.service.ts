@@ -75,11 +75,11 @@ export class PersistenceService
    private _latestClusterMap: Map<string, Cluster>;
    
    private _firebaseConfig = {
-            apiKey: "AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E",
-            authDomain: "diaspora-21544.firebaseapp.com",
-            databaseURL: "https://diaspora-21544.firebaseio.com",
-            storageBucket: "diaspora-21544.appspot.com",
-            messagingSenderId: "222484722746"
+            apiKey: 'AIzaSyBiNVpydoOUGJiIavCB3f8qvB6ARYSy_1E',
+            authDomain: 'diaspora-21544.firebaseapp.com',
+            databaseURL: 'https://diaspora-21544.firebaseio.com',
+            storageBucket: 'diaspora-21544.appspot.com',
+            messagingSenderId: '222484722746'
       };
 
    // private _ui: any;            // Firebase ui
@@ -89,8 +89,8 @@ export class PersistenceService
 
    private _userPromise: Promise<User>;
 
-   private _users: Observable<Map<string,User>>;
-   private _latestUserMap: Map<string,User>;
+   private _users: Observable<Map<string, User>>;
+   private _latestUserMap: Map<string, User>;
    
    // On "deferred" promises: this is for the situation in which, when we create the promise ("new Promise(...)"), we do
    // not start the asynchronous/blocking work that will result in promise fulfillment.  Instead, that work has either
@@ -136,7 +136,7 @@ export class PersistenceService
    
    private _curUser: User;
    
-   private _initialized: boolean = false;
+   private _initialized = false;
 
    private _xmlSerializer: ClusterSerializerXML;
    
@@ -144,7 +144,7 @@ export class PersistenceService
    
    constructor( )
    {
-      const me = this.constructor.name + '.ctor(): '
+      const me = this.constructor.name + '.ctor(): ';
       console.log( me + `=============================================================================================`);
    }
 
@@ -173,7 +173,7 @@ export class PersistenceService
       firebase.auth().onAuthStateChanged( this.authStateChanged.bind( this), this.authError.bind( this));
 
       this._initialized = true;
-      console.log( me + "initialized");
+      console.log( me + 'initialized');
    }
 
    /**
@@ -192,11 +192,11 @@ export class PersistenceService
     */
    public login(): void
    {
-      const me =  this.constructor.name + ".login(): ";
+      const me =  this.constructor.name + '.login(): ';
       console.log( me);
       if (! this._authProvider)
          this._authProvider = new firebase.auth.GoogleAuthProvider();
-      console.log( me + "signing in with redirect");
+      console.log( me + 'signing in with redirect');
       // alert( "signing in w/redirect");
       firebase.auth().signInWithRedirect( this._authProvider);
       // alert( "about to process redirect result");
@@ -215,11 +215,11 @@ export class PersistenceService
 
    public logout()
    {
-      const me = this.constructor.name + ".logout(): ";
+      const me = this.constructor.name + '.logout(): ';
       // alert( "logging out");
       console.log( me);
       firebase.auth().signOut().then( function() {
-         console.log( "signout successful");
+         console.log( 'signout successful');
       }).catch( function( anError: Error) {
          console.log( `signout error: ${anError.message}`);
       });
@@ -237,7 +237,7 @@ export class PersistenceService
     */
    public loadCluster( aUniqueName: string): void
    {
-      const me = this.constructor.name + ".loadCluster(): ";
+      const me = this.constructor.name + '.loadCluster(): ';
       // let uniqueName = JSON.stringify( minimalEncode( aUniqueName));
       const uniqueName = encodeURIComponent( aUniqueName);
       console.log( me + `loading ${uniqueName}`);
@@ -267,9 +267,9 @@ export class PersistenceService
     *
     * @param aUniqueName Same as that for {@see #loadCluster}.
     */
-   public deleteCluster( aUniqueName: string):void
+   public deleteCluster( aUniqueName: string): void
    {
-      const me = this.constructor.name + ".deleteCluster(): ";
+      const me = this.constructor.name + '.deleteCluster(): ';
       const uniqueName = encodeURIComponent( aUniqueName);
       console.log( me + `deleting ${uniqueName}`);
       if (this._currentGeneratedClusterSubscription)
@@ -328,7 +328,7 @@ export class PersistenceService
     */
    public getClusterXml(): string
    {
-      return "";
+      return '';
    }
 
    // -----------------------------------------------  Private Methods  ------------------------------------------------
@@ -437,7 +437,7 @@ export class PersistenceService
       //                                          //   subject.
 
          this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
-         this._users.subscribe( map => {this._latestUserMap = map;});
+         this._users.subscribe( map => {this._latestUserMap = map; });
 
          // TODO: make Behavior Subject containing cluster arrays?  Answer: YES, probably a good idea.  Then we wouldn't
          // need to bother with this "latest" junk, because a BehaviorSubject will always have the latest value.
@@ -488,7 +488,7 @@ export class PersistenceService
          }
       }
       const unseenKeys = new Array<string>();
-      this._clusterObservable.forEach( (val,key) =>
+      this._clusterObservable.forEach( (val, key) =>
                                        {if (! val.seen) {
                                           unseenKeys.push( key);
                                           val.clusterSubscription.unsubscribe();
@@ -521,10 +521,10 @@ export class PersistenceService
    {
       const metadataList = new Array<Cluster>();
       aClusterMetadataMap.forEach( (cluster: Cluster, uid: Uid) => metadataList.push( cluster));
-      metadataList.sort( (a,b) => 
+      metadataList.sort( (a, b) => 
             {
                   if (a.name < b.name) return -1;
-                  else if (a.name == b.name) return 0;
+                  else if (a.name === b.name) return 0;
                   else return 1;
             });
       this._clusterMetadata.next( metadataList);
@@ -558,7 +558,7 @@ export class PersistenceService
     */ 
    private firebaseError( anError: Error): void
    {
-      const me = "PersistenceService.firebaseError(): "; // this.constructor.name + ".firebaseError(): ";
+      const me = 'PersistenceService.firebaseError(): '; // this.constructor.name + ".firebaseError(): ";
       console.log( me + `firebaseError(): ` + anError.message);
       // if (anError.message.match( /^permission_denied/))
       //    this.login();
@@ -606,7 +606,7 @@ export class PersistenceService
     */
    private parseClusterData( aSnapshot: Object): Cluster
    {
-      const me = this.constructor.name + ".parseClusterData(): ";
+      const me = this.constructor.name + '.parseClusterData(): ';
       let retval: Cluster;
       if (aSnapshot)
       {
@@ -619,20 +619,23 @@ export class PersistenceService
       }
       else
       {
-         console.log( me + "NOTE: data snapshot is null, so no cluster");
+         console.log( me + 'NOTE: data snapshot is null, so no cluster');
          retval = null;
       }
       return retval;
    }
 
-   private parseUsers( aSnapshot: Object): Map<string,User> {
-      const me = this.constructor.name + ".parseUsers(): ";
-      const retval = new Map<string,User>();
+   private parseUsers( aSnapshot: Object): Map<string, User> {
+      const me = this.constructor.name + '.parseUsers(): ';
+      const retval = new Map<string, User>();
       for (const uid in aSnapshot)
       {
-         let user = aSnapshot[uid];
-         user.uid = uid;
-         retval.set(uid, user);
+         if (aSnapshot.hasOwnProperty(uid))
+         {
+            const user = aSnapshot[uid];
+            user.uid = uid;
+            retval.set(uid, user);
+         }
       }
       console.log( me + `snapshot contains ${retval.size} users`);
       return retval;
