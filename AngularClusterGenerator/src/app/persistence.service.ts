@@ -144,7 +144,7 @@ export class PersistenceService
    
    constructor( )
    {
-      let me = this.constructor.name + '.ctor(): '
+      const me = this.constructor.name + '.ctor(): '
       console.log( me + `=============================================================================================`);
    }
 
@@ -155,7 +155,7 @@ export class PersistenceService
     */
    public init(): void
    {
-      let me = this.constructor.name + '.init(): ';
+      const me = this.constructor.name + '.init(): ';
       console.log( me);
       if (this._initialized)    // Probably not threadsafe, but I'll think about that tomorrow.  After all, tomorrow is another day.
       {
@@ -192,7 +192,7 @@ export class PersistenceService
     */
    public login(): void
    {
-      let me =  this.constructor.name + ".login(): ";
+      const me =  this.constructor.name + ".login(): ";
       console.log( me);
       if (! this._authProvider)
          this._authProvider = new firebase.auth.GoogleAuthProvider();
@@ -215,7 +215,7 @@ export class PersistenceService
 
    public logout()
    {
-      let me = this.constructor.name + ".logout(): ";
+      const me = this.constructor.name + ".logout(): ";
       // alert( "logging out");
       console.log( me);
       firebase.auth().signOut().then( function() {
@@ -237,9 +237,9 @@ export class PersistenceService
     */
    public loadCluster( aUniqueName: string): void
    {
-      let me = this.constructor.name + ".loadCluster(): ";
+      const me = this.constructor.name + ".loadCluster(): ";
       // let uniqueName = JSON.stringify( minimalEncode( aUniqueName));
-      let uniqueName = encodeURIComponent( aUniqueName);
+      const uniqueName = encodeURIComponent( aUniqueName);
       console.log( me + `loading ${uniqueName}`);
       if (this._currentPersistedCluster || this._currentPersistedClusterSubscription)
       {
@@ -269,8 +269,8 @@ export class PersistenceService
     */
    public deleteCluster( aUniqueName: string):void
    {
-      let me = this.constructor.name + ".deleteCluster(): ";
-      let uniqueName = encodeURIComponent( aUniqueName);
+      const me = this.constructor.name + ".deleteCluster(): ";
+      const uniqueName = encodeURIComponent( aUniqueName);
       console.log( me + `deleting ${uniqueName}`);
       if (this._currentGeneratedClusterSubscription)
       {
@@ -286,18 +286,36 @@ export class PersistenceService
    public saveCluster( aCluster: Cluster): void
    {
       // let uniqueName = JSON.stringify( minimalEncode( uniqueClusterName( aCluster, this._curUser)));
-      let uniqueName = encodeURIComponent( uniqueClusterName( aCluster, this._curUser));
-      let dbRef = this._db.ref();
-      let updates = Object.create( null);
+      // const uniqueName = encodeURIComponent( uniqueClusterName( aCluster, this._curUser));
+      let uniqueName: string;
+      if (aCluster.uid)
+         uniqueName = aCluster.uid;
+      else
+      {
+         uniqueName = uniqueClusterName( aCluster, this._curUser);
+         aCluster.uid = uniqueName; // Assumed to be a straight UUId.
+      }
+      const dbRef = this._db.ref();
+      const updates = Object.create( null);
 
-      let clusterProps = { lastChanged: new Date( Date.now()) };
+      // Clusters visible to current user: this one that we're saving, for sure.
+      updates[`/users/${this._curUser.uid}/clusters/${aCluster.uid}`] = true;
+
+      // Metadata
+      const clusterProps = { 
+            name: aCluster.name, 
+            lastAuthor: this._curUser.uid,
+            lastChanged: new Date( Date.now()), 
+            notes: aCluster.notes ? aCluster.notes : ''
+      };
       updates[`/clusters/${uniqueName}`] = clusterProps;
-
+      
+      // XML & other "full" cluster data
       this._xmlSerializer.cluster = aCluster;
-      let xml = this._xmlSerializer.serialize();
-      let owners = Object.create( null);
+      const xml = this._xmlSerializer.serialize();
+      const owners = Object.create( null); // TODO: do we need this?
       owners[ `${this._curUser.uid}`] = 1;
-      let clusterDataProps = { xml: xml,
+      const clusterDataProps = { xml: xml,
                                owners: owners
                              };
       updates[`/clusterData/${uniqueName}`] = clusterDataProps;
@@ -317,7 +335,7 @@ export class PersistenceService
    
    private authStateChanged( aFirebaseUser): void
    {
-      let me = this.constructor.name + '.authStateChanged(): ';
+      const me = this.constructor.name + '.authStateChanged(): ';
       // let user: User;
       if (aFirebaseUser)
       {
@@ -329,9 +347,9 @@ export class PersistenceService
          if (this._curUser.uid)
          {
             if (! this._db) this._db = firebase.database();
-            let uidRef = this._db.ref( `/users/${this._curUser.uid}`);
+            const uidRef = this._db.ref( `/users/${this._curUser.uid}`);
             console.log( me + `uidRef = ${uidRef}`);
-            let userProps = { name: this._curUser.name,
+            const userProps = { name: this._curUser.name,
                               email: this._curUser.email,
                               lastLogin: this._curUser.lastLogin.toISOString(),
                               timeZoneOffset: this._curUser.lastLogin.getTimezoneOffset()
@@ -353,7 +371,7 @@ export class PersistenceService
 
    private authError( aFirebaseAuthError): void
    {
-      let me = this.constructor.name + '.authError(): ';
+      const me = this.constructor.name + '.authError(): ';
       console.log( me + `auth error: ${aFirebaseAuthError.message}`);
       this._userPromiseDeferred.reject( aFirebaseAuthError);
    }
@@ -364,7 +382,7 @@ export class PersistenceService
     */
    private connectToDatabase()
    {
-      let me = this.constructor.name + '.connectToDatabase(): ';
+      const me = this.constructor.name + '.connectToDatabase(): ';
       if (this._curUser && this._curUser.uid)
       {
          this._db = firebase.database();
@@ -510,8 +528,8 @@ export class PersistenceService
    private makeDatabaseSnapshotObservable( aNoSqlTreeNodeName: string): Observable<firebase.database.DataSnapshot>
    {
       if (! this._db) this._db = firebase.database();
-      let dbRef = this._db.ref( aNoSqlTreeNodeName);
-      let retval = Observable.fromEventPattern(
+      const dbRef = this._db.ref( aNoSqlTreeNodeName);
+      const retval = Observable.fromEventPattern(
          (function addHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
             // Need to explicitly bind to firebaseError here because there's no easy way (that I can tell) to
             // generate/catch errors using the Observable subscription.
@@ -531,7 +549,7 @@ export class PersistenceService
     */ 
    private firebaseError( anError: Error): void
    {
-      let me = "PersistenceService.firebaseError(): "; // this.constructor.name + ".firebaseError(): ";
+      const me = "PersistenceService.firebaseError(): "; // this.constructor.name + ".firebaseError(): ";
       console.log( me + `firebaseError(): ` + anError.message);
       // if (anError.message.match( /^permission_denied/))
       //    this.login();
@@ -543,10 +561,10 @@ export class PersistenceService
     */
    private parseMetadata( aSnapshot: Object): Cluster[]
    {
-      let me = this.constructor.name + ".parseMetadata(): ";
+      const me = this.constructor.name + ".parseMetadata(): ";
       this._latestClusterMap = new Map<string, Cluster>();
-      let retval = Array<Cluster>();
-      for (let key in aSnapshot)
+      const retval = Array<Cluster>();
+      for (const key in aSnapshot)
       {
          // let keyTuple = minimalDecode( JSON.parse( key));
          let keyTuple = decodeURIComponent( key);
@@ -576,13 +594,13 @@ export class PersistenceService
     */
    private parseClusterData( aSnapshot: Object): Cluster
    {
-      let me = this.constructor.name + ".parseClusterData(): ";
+      const me = this.constructor.name + ".parseClusterData(): ";
       let retval: Cluster;
       if (aSnapshot)
       {
-         let snapshot = <ClusterData> aSnapshot; 
-         let serializer = new ClusterSerializerXML();
-         let errors = serializer.deserialize( snapshot.xml);
+         const snapshot = <ClusterData> aSnapshot; 
+         const serializer = new ClusterSerializerXML();
+         const errors = serializer.deserialize( snapshot.xml);
          if (errors)
             console.log( me + `ERRORS:\n\t${errors}`);
          retval = serializer.cluster;
@@ -596,9 +614,9 @@ export class PersistenceService
    }
 
    private parseUsers( aSnapshot: Object): Map<string,User> {
-      let me = this.constructor.name + ".parseUsers(): ";
-      let retval = new Map<string,User>();
-      for (let uid in aSnapshot)
+      const me = this.constructor.name + ".parseUsers(): ";
+      const retval = new Map<string,User>();
+      for (const uid in aSnapshot)
       {
          let user = aSnapshot[uid];
          user.uid = uid;
