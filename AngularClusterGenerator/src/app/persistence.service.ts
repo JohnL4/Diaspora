@@ -239,10 +239,10 @@ export class PersistenceService
    {
       const me = this.constructor.name + '.loadCluster(): ';
       // let uniqueName = JSON.stringify( minimalEncode( aUniqueName));
-      const uniqueName = encodeURIComponent( aUniqueName);
-      console.log( me + `loading ${uniqueName}`);
-      if (this._currentPersistedCluster || this._currentPersistedClusterSubscription)
-      {
+      // const uniqueName = encodeURIComponent( aUniqueName);
+      console.log( me + `loading ${aUniqueName}`);
+      // if (this._currentPersistedCluster || this._currentPersistedClusterSubscription)
+      // {
          if (this._currentPersistedClusterSubscription)
             this._currentPersistedClusterSubscription.unsubscribe();
          if (this._currentGeneratedClusterSubscription)
@@ -254,10 +254,10 @@ export class PersistenceService
             this._currentGeneratedCluster = null;
          
          // TODO: unsubscribe or whatever needs to be done (the above is just a guess).
-      }
+      // }
       this._currentPersistedCluster = new BehaviorSubject<Cluster>( new Cluster());
-      this._currentPersistedClusterSubscription = this.makeDatabaseSnapshotObservable( `/clusterData/${uniqueName}`)
-         .map( s => this.parseClusterData( s.val()))
+      this._currentPersistedClusterSubscription = this.makeDatabaseSnapshotObservable( `/clusterData/${aUniqueName}`)
+         .map( s => this.parseClusterData( aUniqueName, s.val()))
          .multicast( this._currentPersistedCluster)
          .connect();
    }
@@ -617,7 +617,7 @@ export class PersistenceService
    /**
     * Analogous to {@see #parseMetadata}, returns a Cluster object created from the given snapshot's "xml" property.
     */
-   private parseClusterData( aSnapshot: Object): Cluster
+   private parseClusterData( aUid: Uid, aSnapshot: Object): Cluster
    {
       const me = this.constructor.name + '.parseClusterData(): ';
       let retval: Cluster;
@@ -629,6 +629,7 @@ export class PersistenceService
          if (errors)
             console.log( me + `ERRORS:\n\t${errors}`);
          retval = serializer.cluster;
+         retval.uid = aUid;
       }
       else
       {

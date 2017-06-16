@@ -24,7 +24,7 @@ export class ClusterDetailsComponent implements OnInit {
 
    ngOnInit()
    {
-      let me = this.constructor.name + `.ngOnInit(): `;
+      const me = this.constructor.name + `.ngOnInit(): `;
       console.log( me);
 
       // Can't figure out how to get cytoscape-cola in here.
@@ -45,12 +45,12 @@ export class ClusterDetailsComponent implements OnInit {
       let me = this.constructor.name + `.layoutCytoscape(): `;
       if (this._persistenceSvc.currentCluster)
       {
-         let cygen = new CytoscapeGenerator( this._persistenceSvc.currentCluster);
+         const cygen = new CytoscapeGenerator( this._persistenceSvc.currentCluster);
          cygen.ensureStyles();
-         let graphElements: Array<any> = cygen.getElements(); // this.elementsGraph( this._cluster);
-         let styles: Array<any> = cygen.getStyles();
-         let cyDiv = document.getElementById( 'cytoscapeDiv');
-         let cy = cytoscape({
+         const graphElements: Array<any> = cygen.getElements(); // this.elementsGraph( this._cluster);
+         const styles: Array<any> = cygen.getStyles();
+         const cyDiv = document.getElementById( 'cytoscapeDiv');
+         const cy = cytoscape({
             container: cyDiv,
             elements: graphElements,
             style: styles
@@ -61,6 +61,6 @@ export class ClusterDetailsComponent implements OnInit {
          // alert( me + `done`);
       }
       else
-         console.log( me + "NOTE: no cluster, so no CytoScape layout");
+         console.log( me + 'NOTE: no cluster, so no CytoScape layout');
    }
 }
