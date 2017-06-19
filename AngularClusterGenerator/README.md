@@ -1,3 +1,8 @@
+# DEVELOPMENT MOVED TO NEW REPOSITORY "DIASPORA-NG"
+
+I am moving development of this Angular web app to its own repository, `Diaspora-ng` (q.v.).
+After checking in this update, you should see no more updates to this subfolder in this "Diaspora" repository.
+
 # AngularClusterGenerator
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.0-rc.4.
