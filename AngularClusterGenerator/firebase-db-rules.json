@@ -1,0 +1,35 @@
+// Firebase realtime database security rules.
+{
+    "rules": {
+        "clusters": {
+            "$clusterUid": {
+                ".read": "root.child('users').child( auth.uid).child('clusters').hasChild($clusterUid)",
+		// Insert new data or update existing data current user already owns
+                ".write": "! data.exists() || root.child('users').child( auth.uid).child('clusters').hasChild($clusterUid)"
+            }
+        },
+        "clusterData": {
+            "$clusterUid": {
+                ".read": "root.child('users').child( auth.uid).child('clusters').hasChild($clusterUid)",
+		// Insert new data or update existing data current user already owns
+                ".write": "! data.exists() || root.child('users').child( auth.uid).child('clusters').hasChild($clusterUid)"
+            }
+        },
+        "users": {
+            "$userUid": {
+ 	  	".read": "auth.uid === $userUid",
+  	  	".write": "auth.uid === $userUid"          
+            }
+        },
+        "clusterNames": {
+ 	    ".read": "auth != null",
+	    ".write": "auth != null"            
+        },
+        "ruleTest": {
+            ".read": false,
+            "node1": {
+                ".read": true
+            }
+        }
+    }
+}
