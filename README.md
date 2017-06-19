@@ -3,6 +3,11 @@ Diaspora
 
 Diaspora tools
 
+Angular Web app to generate clusters
+------------------------------------
+
+In the `AngularClusterGenerator` directory.  This is where most of my effort recently has gone.
+
 cluster-gen
 -----------
 
