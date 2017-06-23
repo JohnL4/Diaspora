@@ -46,7 +46,7 @@ let _alphaBravo: string[] =
       "Romeo",
       "Sierra",
       "Tango",
-      "Uniform",
+      'Uniform',
       "Victor",
       "Whiskey",
       "X-ray",
@@ -72,10 +72,10 @@ export function alphaBravo( i: number): string
  */
 export function uniqueClusterName( aCluster: Cluster, aUser: User): string
 {
-   let uid = aUser ? aUser.uid : "";
+   let uid = aUser ? aUser.uid : '';
    if (! uid)
       uid = "";
-   let retval = uniqueClusterNameFromUid( aCluster, uid);
+   const retval = uniqueClusterNameFromUid( aCluster, uid);
    return retval;
 }
 
@@ -84,8 +84,12 @@ export function uniqueClusterName( aCluster: Cluster, aUser: User): string
  */
 export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): string
 {
-   let me = "utils.uniqueClusterNameFromUid(): ";
-   let retval = UUIDv4.generateUUID();
+   const me = 'utils.uniqueClusterNameFromUid(): ';
+   let retval: string;
+   if (aCluster.uid)
+      retval = aCluster.uid;
+   else
+      retval = UUIDv4.generateUUID();
    return retval;
 }
 
@@ -96,31 +100,31 @@ export function uniqueClusterNameFromUid( aCluster: Cluster, aUserUid: string): 
  */
 export function minimalEncode( aString: string): string
 {
-   let retval = aString.replace(
-      new RegExp("[\"'<&/\x1F]", "gi"),
+   const retval = aString.replace(
+      new RegExp('[\"\'<&/\x1F]', 'gi'),
       function( aMatch: string, anOffset: number, theWholeString: string)
       {
          let innerRetval: string;
          console.log( `aMatch: ${aMatch}`);
          switch (aMatch)
          {
-         case "\"":
-            innerRetval = "&quot;";
+         case '\"':
+            innerRetval = '&quot;';
             break;
-         case "'":
-            innerRetval = "&apos;";
+         case '\'':
+            innerRetval = '&apos;';
             break;
-         case "<":
-            innerRetval = "&lt;";
+         case '<':
+            innerRetval = '&lt;';
             break;
-         case "&":
-            innerRetval = "&amp;";
+         case '&':
+            innerRetval = '&amp;';
             break;
-         case "/":
-            innerRetval = "&sol;";
+         case '/':
+            innerRetval = '&sol;';
             break;
-         case "\x1F":
-            innerRetval = "%1F";
+         case '\x1F':
+            innerRetval = '%1F';
             break;
          default:
             innerRetval = aMatch;
@@ -135,30 +139,30 @@ export function minimalEncode( aString: string): string
  */
 export function minimalDecode( aString: string): string
 {
-   let retval = aString.replace(
-      new RegExp( "&(quot|apos|lt|amp|sol);|%1F", "gi"),
+   const retval = aString.replace(
+      new RegExp( '&(quot|apos|lt|amp|sol);|%1F', 'gi'),
       function( aMatch: string, aP1: string, anOffset: number, theWholeString: string)
       {
          let innerRetval: string;
          switch (aMatch)
          {
-         case "&quot;":
-            innerRetval = "\"";
+         case '&quot;':
+            innerRetval = '\"';
             break;
-         case "&apos;":
-            innerRetval = "'";
+         case '&apos;':
+            innerRetval = '\'';
             break;
-         case "&lt;":
-            innerRetval = "<";
+         case '&lt;':
+            innerRetval = '<';
             break;
-         case "&amp;":
-            innerRetval = "&";
+         case '&amp;':
+            innerRetval = '&';
             break;
-         case "&sol;":
-            innerRetval = "/";
+         case '&sol;':
+            innerRetval = '/';
             break;
-         case "%1F":
-            innerRetval = "\x1F";
+         case '%1F':
+            innerRetval = '\x1F';
             break;
          default:
             innerRetval = aMatch;

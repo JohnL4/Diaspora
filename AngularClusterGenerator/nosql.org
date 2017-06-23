@@ -151,10 +151,13 @@
          - $clusterUuid
            - (various metadata) (name, last editor, write time, notes)
            - owners
+             - $userUid: true
            - editors
+             - $userUid: true
            - viewers
-           - ".read": /clusters/$clusterUuid/viewers.contains($uid)
-           - ".write": /clusters/$clusterUuid/editors.contains($uid)
+             - $userUid: true
+           - ".read": /clusters/$clusterUuid/viewers.contains($uid) # For cluster (meta-)data
+           - ".write": /clusters/$clusterUuid/editors.contains($uid) # For cluster (meta-)data
        - clusterData
          - $clusterUuid
            - xml
