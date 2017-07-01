@@ -14,7 +14,8 @@ import { User } from '../user';
 export class SessionOpsComponent implements OnInit
 {
    public user: User;
-   
+   public uuid: string;
+      
    private get cluster(): Cluster { return this._persistenceSvc.currentClusterSubject.value; }
    public get clusterName(): string { return this.cluster.name};
    public set clusterName( aName: string)
@@ -38,8 +39,6 @@ export class SessionOpsComponent implements OnInit
          });
    }
 
-   private _uuid: string;
-   
    // -------------------------------------------------  constructors  -------------------------------------------------
 
    constructor( /* private _cluster: Cluster, */ private _persistenceSvc: PersistenceService) { }
@@ -47,7 +46,7 @@ export class SessionOpsComponent implements OnInit
    ngOnInit()
    {
       this.getUser();           // I think this basically hooks up the promise resolution event.
-      this._uuid = UUIDv4.generateUUID();
+      this.uuid = UUIDv4.generateUUID();
    }
 
    public login()

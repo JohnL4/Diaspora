@@ -8,6 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
+  <link rel="stylesheet" href="assets/loader-style.css">
+
     <!-- Leading "." on url seems to be important.  Also, a symlink doesn't work. -->
     <!-- NOTE: Use .angular-cli.json to specify "external" assets, so you don't have to copy stuff around from node_modules.
     <link rel="stylesheet" href="./assets/bootstrap/dist/css/bootstrap.css">
@@ -16,6 +18,45 @@
 
 </head>
 <body>
-  <app-root>Loading...</app-root>
+<app-root>
+   <p>Loading...</p>
+   <!-- Loader from https://codepen.io/jonitrythall/pen/GpVryK -->
+   <div class="loader-div">
+      <svg class="loader">
+         <filter id="blur">
+            <fegaussianblur in="SourceGraphic" stddeviation="2"></fegaussianblur>
+         </filter>
+         <circle cx="75" cy="75" r="60" fill="transparent" stroke="#F4F519" stroke-width="6" stroke-linecap="round" stroke-dasharray="385"
+            stroke-dashoffset="385" filter="url(#blur)"></circle>
+      </svg>
+      <svg class="loader loader-2">
+         <circle cx="75" cy="75" r="60" fill="transparent" stroke="#DE2FFF" stroke-width="6" stroke-linecap="round" stroke-dasharray="385"
+            stroke-dashoffset="385" filter="url(#blur)"></circle>
+      </svg>
+      <svg class="loader loader-3">
+         <circle cx="75" cy="75" r="60" fill="transparent" stroke="#FF5932" stroke-width="6" stroke-linecap="round" stroke-dasharray="385"
+            stroke-dashoffset="385" filter="url(#blur)"></circle>
+      </svg>
+      <svg class="loader loader-4">
+         <circle cx="75" cy="75" r="60" fill="transparent" stroke="#E97E42" stroke-width="6" stroke-linecap="round" stroke-dasharray="385"
+            stroke-dashoffset="385" filter="url(#blur)"></circle>
+      </svg>
+      <svg class="loader loader-5">
+         <circle cx="75" cy="75" r="60" fill="transparent" stroke="gray" stroke-width="6" stroke-linecap="round" filter="url(#blur)"></circle>
+      </svg>
+      <svg class="loader loader-6">
+         <circle cx="75" cy="75" r="60" fill="transparent" stroke="#00DCA3" stroke-width="6" stroke-linecap="round" stroke-dasharray="385"
+            stroke-dashoffset="385" filter="url(#blur)"></circle>
+      </svg>
+      <svg class="loader loader-7">
+         <circle cx="75" cy="75" r="60" fill="transparent" stroke="purple" stroke-width="6" stroke-linecap="round" stroke-dasharray="385"
+            stroke-dashoffset="385" filter="url(#blur)"></circle>
+      </svg>
+      <svg class="loader loader-8">
+         <circle cx="75" cy="75" r="60" fill="transparent" stroke="#AAEA33" stroke-width="6" stroke-linecap="round" stroke-dasharray="385"
+            stroke-dashoffset="385" filter="url(#blur)"></circle>
+      </svg>
+   </div>
+</app-root>
 </body>
 </html>

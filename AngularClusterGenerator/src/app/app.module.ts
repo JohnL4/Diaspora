@@ -12,6 +12,7 @@ import { GeneratorParamsComponent } from './generator-params/generator-params.co
 import { TabsComponent } from './tabs/tabs.component';
 import { XmlComponent } from './xml/xml.component';
 import { SessionOpsComponent } from './session-ops/session-ops.component';
+import { AboutComponent } from './about/about.component';
 
 @NgModule({
    declarations: [
@@ -21,6 +22,7 @@ import { SessionOpsComponent } from './session-ops/session-ops.component';
       TabsComponent,
       XmlComponent,
        SessionOpsComponent,
+       AboutComponent,
    ],
    imports: [
       BrowserModule,
@@ -52,6 +54,10 @@ import { SessionOpsComponent } from './session-ops/session-ops.component';
          {
             path: 'session-ops',
             component: SessionOpsComponent
+         },
+         {
+            path: 'about',
+            component: AboutComponent
          }
       ])
    ],

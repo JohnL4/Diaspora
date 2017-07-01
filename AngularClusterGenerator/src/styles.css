@@ -13,3 +13,22 @@ table.table.cluster-details th, table.table.cluster-details td {
     vertical-align: middle;
     /* border: 1px solid red; */
 }
+
+.explication {
+   margin-left: 5%;
+}
+
+.explication h2, h3 {
+   margin-left: -5%;
+}
+
+/*
+.explication h4 {
+   margin-left: -5%;
+}
+*/
+
+.explication dd {
+   margin-left: 4%;
+   margin-bottom: 1em;
+}

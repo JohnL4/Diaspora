@@ -58,7 +58,7 @@
                   (repeated)
     #+END_SRC
 
-**** Security
+**** Security (incl. new structure)
 
      - Viewers :: Read permissions
      - Editors :: Write permissions, but only to data, not lists of users
@@ -147,6 +147,9 @@
            - (etc.)
            - clusters
              - $clusterUuid
+       - usersPublic
+         - $uid (read: authenticated; write: $uid === auth.uid)
+           - name
        - clusters (metadata)
          - $clusterUuid
            - (various metadata) (name, last editor, write time, notes)

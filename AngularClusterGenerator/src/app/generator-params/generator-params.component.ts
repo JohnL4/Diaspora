@@ -27,9 +27,9 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    };
 
    /** User's input, not necessarily valid. */
-   private numSystems: string; // = "6";
+   public numSystems: string; // = "6";
    
-   private _useHighLowSlipstreams: boolean;
+   public useHighLowSlipstreams: boolean;
 
    private _serializer: ClusterSerializerXML;
 
@@ -41,9 +41,10 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    private get cluster(): Cluster { return this._persistenceSvc.currentCluster; }
    
    private _router: Router;
-   private _highLowHelpShowing = false;
+
+   public highLowHelpShowing = false;
    
-   private get clusterMetadata() { return this._persistenceSvc.clusterMetadata; }
+   public get clusterMetadata() { return this._persistenceSvc.clusterMetadata; }
 
    /**
     * The name of the cluster that has been requested by some user gesture (either generate a new cluster, in which case
@@ -60,7 +61,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
       this._router = aRouter;
       if (this.cluster)
       {
-         this._useHighLowSlipstreams = this.cluster && this.cluster.usesHighLowSlipstreams;
+         this.useHighLowSlipstreams = this.cluster && this.cluster.usesHighLowSlipstreams;
          if (this.cluster.numSystems)
             this.numSystems = this.cluster.numSystems.toString();
       }
@@ -87,16 +88,17 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
 
    public generateCluster()
    {
-      // console.log( "generateCluster()");
+      const me = this.constructor.name + '.generateCluster(): ';
+      console.log( me + `numSystems = ${this.numSystems}`);
       if (this.parmsForm.form.valid)
       {
          this._requestedClusterName = null;
-         
-         // Note that we don't simply new up a new Cluster, because the injector is managing the one we were passed.
-         // Instead, we modify the existing one in place.  (NOTE: now that we've gotten rid of the injected Cluster, we
-         // don't have to do it this way.)
-         this.cluster.generate( Number( this.numSystems), this._useHighLowSlipstreams);
 
+         this._persistenceSvc.ensureCluster();
+         console.log( me + `generating cluster w/id ${this.cluster.id}`);
+         this.cluster.generate( Number( this.numSystems), this.useHighLowSlipstreams);
+         console.log( me + `Generated cluster (w/id ${this.cluster.id}) containing ${this.cluster.systemMap}`);
+         
          if (localStorage)
          {
             if (! this._serializer)
@@ -140,7 +142,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
          && this.cluster.numSystems
          && this.cluster.numSystems.toString()
          || '';
-      this._useHighLowSlipstreams = this.cluster && this.cluster.usesHighLowSlipstreams;
+      this.useHighLowSlipstreams = this.cluster && this.cluster.usesHighLowSlipstreams;
    }
 
    onSubmit()
@@ -175,7 +177,7 @@ export class GeneratorParamsComponent implements OnInit, AfterViewInit, AfterVie
    showHighLowHelp()
    {
       // console.log( "showHighLowHelp()");
-      this._highLowHelpShowing = ! this._highLowHelpShowing;
+      this.highLowHelpShowing = ! this.highLowHelpShowing;
       return false;
    }
    

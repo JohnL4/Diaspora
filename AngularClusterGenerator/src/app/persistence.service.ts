@@ -151,6 +151,22 @@ export class PersistenceService
    // ------------------------------------------------  Public Methods  ------------------------------------------------
    
    /**
+    * Ensure that this service actually has a cluster (which may be en empty dumy).
+    */
+   public ensureCluster(): void
+   {
+      if (this.currentCluster)
+      {
+         // Do nothing
+      }
+      else
+      {
+         // Just make one up!
+         this._currentGeneratedCluster = new BehaviorSubject( new Cluster());
+      }
+   }
+
+   /**
     * Initialize firebase and hook up AuthStateChanged event.
     */
    public init(): void
@@ -192,25 +208,7 @@ export class PersistenceService
     */
    public login(): void
    {
-      const me =  this.constructor.name + '.login(): ';
-      console.log( me);
-      if (! this._authProvider)
-         this._authProvider = new firebase.auth.GoogleAuthProvider();
-      console.log( me + 'signing in with redirect');
-      // alert( "signing in w/redirect");
-      firebase.auth().signInWithRedirect( this._authProvider);
-      // alert( "about to process redirect result");
-      firebase.auth().getRedirectResult().then( (function( result: firebase.auth.UserCredential) {
-         if (result.credential) {
-            this._googleAccessToken = result.credential;
-            console.log( me + `accessToken = "${this._googleAccessToken}`);
-         }
-         this._user = result.user;
-         console.log( me + `logged in user "${this._user}"`);
-         // alert( "login done");
-      }).bind( this)).catch( (function( error: Error) {
-         console.log( `${me} ${error.message}`)}).bind( this));
-      console.log( me + 'done');
+      this._loginWithPopup();
    }
 
    public logout()
@@ -341,6 +339,53 @@ export class PersistenceService
 
    // -----------------------------------------------  Private Methods  ------------------------------------------------
    
+   private _loginWithPopup(): void
+   {
+      const me = this.constructor.name + '._loginWithPopup(): ';
+      if (! this._authProvider)
+         this._authProvider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup( this._authProvider).then(function (result)
+      {
+         // This gives you a Google Access Token. You can use it to access the Google API.
+         var token = result.credential.accessToken;
+         // The signed-in user info.
+         var user = result.user;
+         // ...
+      }).catch(function (error: any)
+      {
+         // Handle Errors here.
+         var errorCode = error.code;
+         var errorMessage = error.message;
+         // The email of the user's account used.
+         var email = error.email;
+         // The firebase.auth.AuthCredential type that was used.
+         var credential = error.credential;
+         alert( me + `Error: code = ${errorCode}; msg = ${errorMessage}\nemail = ${email}; credential = ${credential}`);
+      });
+   }
+
+   private _loginWithRedirect(): void
+   {
+      const me =  this.constructor.name + '.login(): ';
+      console.log( me);
+      if (! this._authProvider)
+         this._authProvider = new firebase.auth.GoogleAuthProvider();
+      console.log( me + 'signing in');
+      firebase.auth().signInWithRedirect( this._authProvider);
+      // alert( "about to process redirect result");
+      firebase.auth().getRedirectResult().then( (function( result: firebase.auth.UserCredential) {
+         if (result.credential) {
+            this._googleAccessToken = result.credential;
+            console.log( me + `accessToken = "${this._googleAccessToken}`);
+         }
+         this._user = result.user;
+         console.log( me + `logged in user "${this._user}"`);
+         // alert( "login done");
+      }).bind( this)).catch( (function( error: Error) {
+         console.log( `${me} ${error.message}`)}).bind( this));
+      console.log( me + 'done');
+   }
+
    private authStateChanged( aFirebaseUser): void
    {
       const me = this.constructor.name + '.authStateChanged(): ';
@@ -355,15 +400,23 @@ export class PersistenceService
          if (this._curUser.uid)
          {
             if (! this._db) this._db = firebase.database();
-            const uidRef = this._db.ref( `/users/${this._curUser.uid}`);
-            console.log( me + `uidRef = ${uidRef}`);
-            const userProps = { name: this._curUser.name,
-                              email: this._curUser.email,
-                              lastLogin: this._curUser.lastLogin.toISOString(),
-                              timeZoneOffset: this._curUser.lastLogin.getTimezoneOffset()
-                            };
-            uidRef.update( userProps); // Performs insert if key doesn't exist, so that's good.
-            this.connectToDatabase();
+            const dbRef = this._db.ref();
+            console.log( me + `dbRef = ${dbRef}`);
+            // userPublicProps: publicly-readable data for a user
+            const userPublicProps = { name: this._curUser.name }
+            // userProps: private data for a user.
+            // const userProps = { email: this._curUser.email,
+            //                   lastLogin: this._curUser.lastLogin.toISOString(),
+            //                   timeZoneOffset: this._curUser.lastLogin.getTimezoneOffset()
+            //                 };
+            const updates = Object.create( null);
+            updates[`/usersPublic/${this._curUser.uid}`]= userPublicProps;
+            updates[`/users/${this._curUser.uid}/email`] = this._curUser.email;
+            updates[`/users/${this._curUser.uid}/lastLogin`] = this._curUser.lastLogin;
+            updates[`/users/${this._curUser.uid}/timeZoneOffset`] = this._curUser.lastLogin.getTimezoneOffset();
+            dbRef.update( updates); // Performs insert if key doesn't exist, so that's good.
+
+            this.connectToDatabase(); // Now go get the clusters available to the current user.
          }
          else
             console.log( me + `WARNING: no uid for user ${this._curUser.name}`);
@@ -444,7 +497,7 @@ export class PersistenceService
       //       .connect();                        // Actually starts the base Observable running, with updates to the
       //                                          //   subject.
 
-         this._users = this.makeDatabaseSnapshotObservable( '/users').map( s => this.parseUsers( s.val()));
+         this._users = this.makeDatabaseSnapshotObservable( '/usersPublic').map( s => this.parseUsers( s.val()));
          this._users.subscribe( map => {this._latestUserMap = map; });
 
          // TODO: make Behavior Subject containing cluster arrays?  Answer: YES, probably a good idea.  Then we wouldn't
@@ -468,6 +521,8 @@ export class PersistenceService
     */
    private handleVisibleClusterListChange( aClusterUidsObject: Object): void
    {
+      const me = this.constructor.name + '.handleVisibleClusterListChange(): ';
+      console.log( me);
       // We're using the _seenClusterMap to manage subscriptions (new ones and unsubscribing from deleted clusters).
       this._seenClusterMap.forEach( sc => {sc.seen = false; });
       for (const clusterUid in aClusterUidsObject)
@@ -522,6 +577,8 @@ export class PersistenceService
    // throttled before being sorted into a list for display.
    private updateAndPublishClusterMap( aCluster: Cluster): void
    {
+      const me = this.constructor.name + '.updateAndPublishClusterMap(): ';
+      console.log( me);
       this._visibleClusterMap.set( aCluster.uid, aCluster);
       this._visibleClusterMapSubject.next( this._visibleClusterMap);
    }
@@ -532,6 +589,8 @@ export class PersistenceService
     */
    private sortAndPublishMetadata( aClusterMetadataMap: Map<Uid, Cluster>)
    {
+      const me = this.constructor.name + '.sortAndPublishMetadata(): ';
+      console.log( me);
       const metadataList = new Array<Cluster>();
       aClusterMetadataMap.forEach( (cluster: Cluster, uid: Uid) => metadataList.push( cluster));
       metadataList.sort( (a, b) => 
@@ -540,6 +599,7 @@ export class PersistenceService
                   else if (a.name === b.name) return 0;
                   else return 1;
             });
+      console.log( me + `metadataList has ${metadataList.length} items`);
       this._clusterMetadata.next( metadataList);
    }
    
@@ -551,7 +611,7 @@ export class PersistenceService
    {
       if (! this._db) this._db = firebase.database();
       const dbRef = this._db.ref( aNoSqlTreeNodeName);
-      const retval = Observable.fromEventPattern(
+      const retval = <Observable<firebase.database.DataSnapshot>> Observable.fromEventPattern(
          (function addHandler( h: (a: firebase.database.DataSnapshot, b?: string) => any) {
             // Need to explicitly bind to firebaseError here because there's no easy way (that I can tell) to
             // generate/catch errors using the Observable subscription.
