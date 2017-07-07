@@ -1,6 +1,7 @@
 package com.how_hard_can_it_be.FirebaseAdmin;
 
 import java.io.FileInputStream;
+import java.util.concurrent.Semaphore;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -17,6 +18,8 @@ import com.google.firebase.database.ValueEventListener;
  */
 public class App 
 {
+   private static Semaphore semaphore = new Semaphore( 0);
+   
    public static void main( String[] args) throws InterruptedException
    {
       try
@@ -35,7 +38,7 @@ public class App
       {
          System.err.println( "Error: " + exc.toString());
       }
-      Thread.sleep( 10000);
+      semaphore.acquire();
       System.out.println( "(Firebase admin done.)");
    }
 
@@ -52,11 +55,13 @@ public class App
          {
             Object value = aSnapshot.getValue();
             System.out.println( "\tgot value " + value);
+            semaphore.release();
          }
 
          public void onCancelled( DatabaseError aDbError)
          {
             System.err.println( "Cancelled.  " + aDbError);
+            semaphore.release();
          }
       };
       kids.addValueEventListener( listener);
