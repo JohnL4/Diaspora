@@ -64,6 +64,7 @@ public class App
             semaphore.release();
          }
       };
-      kids.addValueEventListener( listener);
+      kids.addListenerForSingleValueEvent( listener);
+//      kids.addValueEventListener( listener);
    }
 }
