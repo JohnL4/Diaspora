@@ -1,6 +1,7 @@
 package com.how_hard_can_it_be.FirebaseAdmin;
 
 import java.io.FileInputStream;
+import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
@@ -35,7 +36,8 @@ public class App
 
          FirebaseApp.initializeApp( options);
 
-         dumpClusterMetadata();
+//         dumpClusterMetadata();
+         transformClusterMetadata();
          semaphore.acquire();
       }
       catch (Exception exc)
@@ -82,4 +84,83 @@ public class App
       kids.addListenerForSingleValueEvent( listener);
 //      kids.addValueEventListener( listener);
    }
+
+   private static void transformClusterMetadata()
+   {
+      final String me = App.class.getName() + ".transformClusterMetadata()";
+      System.out.println( me);
+      
+      DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+      final DatabaseReference kids = dbRef.child( "/clusters");
+
+      ValueEventListener listener = new ValueEventListener() {
+
+         private int _callCount = 0;
+         
+         public void onCancelled( DatabaseError aDbError)
+         {
+            System.err.println( me + "Cancelled.  " + aDbError);
+            semaphore.release();
+         }
+
+         public void onDataChange( DataSnapshot aSnapshot)
+         {
+            if (_callCount++ < 1)
+            {
+               try
+               {
+                  HashMap<String, Object> clusterUidToMetadataMap = (HashMap<String, Object>) aSnapshot.getValue();
+                  HashMap<String, Object> rewrittenClusterUidToMetadataMap = new HashMap<String, Object>();
+                  for (String uid : clusterUidToMetadataMap.keySet())
+                  {
+                     // Transform "/clusters/uid/<metadata>" to
+                     // "/clusters/uid/metadata/<metadata>"
+                     Object metadataObj = clusterUidToMetadataMap.get( uid);
+                     System.out.printf( "\t%s\n", uid);
+                     try
+                     {
+                        HashMap<String, Object> metadata = (HashMap<String, Object>) metadataObj;
+                        if (metadata.containsKey( "metadata"))
+                        {
+                           System.out.printf( "\t\tremove extraneous metadata\n");
+                           metadata.remove( "metadata");
+                        }
+                        // There's probably a better way to do this with
+                        // Streams, but it's more than I want to spend time on
+                        // right now.
+                        StringBuffer sb = new StringBuffer();
+                        for (String key : metadata.keySet())
+                        {
+                           sb.append( sb.length() > 0 ? ", " : "").append( key);
+                        }
+                        System.out.printf( "\t\twill proceed with metadata object containing %d keys (%s)\n",
+                              metadata.keySet().size(), sb);
+                        HashMap<String,Object> newMetadataMap = new HashMap<>();
+                        newMetadataMap.put("metadata", metadata);
+                        rewrittenClusterUidToMetadataMap.put( uid, newMetadataMap);
+                     }
+                     catch (Exception exc)
+                     {
+                        System.out.printf( "\t\tcast exception: %s\n", exc.toString());
+                     }
+                  }
+                  System.out.printf( "New clusters object: %s\n", rewrittenClusterUidToMetadataMap);
+                  kids.setValue( rewrittenClusterUidToMetadataMap);
+               }
+               catch (Exception exc)
+               {
+                  System.err.println( exc.toString());
+               }
+            }
+            else
+            {
+               Object snapshotObj = aSnapshot.getValue();
+               System.out.printf( "Called more than once; releasing semaphore.  Received value is %s\n", snapshotObj);
+               semaphore.release();
+            }
+         }
+      };      
+      kids.addValueEventListener( listener);
+   }
+
 }
