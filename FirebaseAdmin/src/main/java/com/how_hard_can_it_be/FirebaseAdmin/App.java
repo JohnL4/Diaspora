@@ -37,7 +37,6 @@ public class App
 
          FirebaseApp.initializeApp( options);
 
-//         dumpClusterMetadata();
          transformClusterMetadata();
 //         __semaphore.acquire();
       }
@@ -49,50 +48,13 @@ public class App
       System.exit( 0);
    }
 
-   private static void dumpClusterMetadata()
-   {
-      System.out.println( "Cluster metadata:");
-
-      DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-      DatabaseReference kids = dbRef.child( "/clusters");
-
-      ValueEventListener listener = new ValueEventListener() {
-
-         public void onDataChange( DataSnapshot aSnapshot)
-         {
-            try
-            {
-               HashMap<String, Object> clusterUidToMetadataMap = (HashMap<String, Object>) aSnapshot.getValue();
-               for (String uid : clusterUidToMetadataMap.keySet())
-               {
-                  Object metadata = clusterUidToMetadataMap.get( uid);
-                  System.out.println( "\tgot value " + uid + ": " + metadata);
-               }
-            }
-            catch (Exception exc)
-            {
-               System.err.println( exc.toString());
-            }
-            __semaphore.release();
-         }
-
-         public void onCancelled( DatabaseError aDbError)
-         {
-            System.err.println( "Cancelled.  " + aDbError);
-            __semaphore.release();
-         }
-      };
-      kids.addListenerForSingleValueEvent( listener);
-//      kids.addValueEventListener( listener);
-   }
-
    private static void transformClusterMetadata() throws InterruptedException
    {
-      final String me = App.class.getName() + ".transformClusterMetadata()";
+      final String me = App.class.getName() + ".transformClusterMetadata(): ";
       System.out.println( me);
       
       DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-      final DatabaseReference kids = dbRef.child( "/clusters");
+      DatabaseReference kids = dbRef.child( "clusters");
 
       ValueEventListener listener = new ValueEventListener() {
 
@@ -135,8 +97,21 @@ public class App
       {
          rewriteMetadata();
          System.out.printf( "New clusters object: %s\n", __rewrittenClusterUidToMetadataMap);
-         kids.setValue( __rewrittenClusterUidToMetadataMap);
-         __semaphore.acquire(); // Wait again for (hopefully) a data change event.
+         // Note: using a completion handler seems to be important; otherwise the program seems to end too early
+         // and data somehow doesn't get finalized.
+         kids.setValue( __rewrittenClusterUidToMetadataMap, new DatabaseReference.CompletionListener() {
+
+            @Override
+            public void onComplete( DatabaseError aDbError, DatabaseReference aDbRef)
+            {
+               if (aDbError == null)
+                  System.out.printf( "Data saved successfully.\n");
+               else
+                  System.out.printf( "D/b error: %s - %s\n", aDbError.getCode(), aDbError.getMessage());
+               __semaphore.release();
+            }
+         });
+         __semaphore.acquire(2); // Wait again for (hopefully) a data change event.
       }
    }
 
