@@ -1,7 +1,6 @@
 package com.how_hard_can_it_be.FirebaseAdmin;
 
 import java.io.FileInputStream;
-import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
@@ -20,7 +19,9 @@ import com.google.firebase.database.ValueEventListener;
  */
 public class App 
 {
-   private static Semaphore semaphore = new Semaphore( 0);
+   private static Semaphore __semaphore = new Semaphore( 0);
+   private static HashMap<String, Object> __clusterUidToMetadataMap;
+   private static HashMap<String, Object> __rewrittenClusterUidToMetadataMap = new HashMap<String, Object>();
    
    public static void main( String[] args) throws InterruptedException
    {
@@ -38,7 +39,7 @@ public class App
 
 //         dumpClusterMetadata();
          transformClusterMetadata();
-         semaphore.acquire();
+//         __semaphore.acquire();
       }
       catch (Exception exc)
       {
@@ -72,20 +73,20 @@ public class App
             {
                System.err.println( exc.toString());
             }
-            semaphore.release();
+            __semaphore.release();
          }
 
          public void onCancelled( DatabaseError aDbError)
          {
             System.err.println( "Cancelled.  " + aDbError);
-            semaphore.release();
+            __semaphore.release();
          }
       };
       kids.addListenerForSingleValueEvent( listener);
 //      kids.addValueEventListener( listener);
    }
 
-   private static void transformClusterMetadata()
+   private static void transformClusterMetadata() throws InterruptedException
    {
       final String me = App.class.getName() + ".transformClusterMetadata()";
       System.out.println( me);
@@ -100,7 +101,7 @@ public class App
          public void onCancelled( DatabaseError aDbError)
          {
             System.err.println( me + "Cancelled.  " + aDbError);
-            semaphore.release();
+            __semaphore.release();
          }
 
          public void onDataChange( DataSnapshot aSnapshot)
@@ -109,43 +110,7 @@ public class App
             {
                try
                {
-                  HashMap<String, Object> clusterUidToMetadataMap = (HashMap<String, Object>) aSnapshot.getValue();
-                  HashMap<String, Object> rewrittenClusterUidToMetadataMap = new HashMap<String, Object>();
-                  for (String uid : clusterUidToMetadataMap.keySet())
-                  {
-                     // Transform "/clusters/uid/<metadata>" to
-                     // "/clusters/uid/metadata/<metadata>"
-                     Object metadataObj = clusterUidToMetadataMap.get( uid);
-                     System.out.printf( "\t%s\n", uid);
-                     try
-                     {
-                        HashMap<String, Object> metadata = (HashMap<String, Object>) metadataObj;
-                        if (metadata.containsKey( "metadata"))
-                        {
-                           System.out.printf( "\t\tremove extraneous metadata\n");
-                           metadata.remove( "metadata");
-                        }
-                        // There's probably a better way to do this with
-                        // Streams, but it's more than I want to spend time on
-                        // right now.
-                        StringBuffer sb = new StringBuffer();
-                        for (String key : metadata.keySet())
-                        {
-                           sb.append( sb.length() > 0 ? ", " : "").append( key);
-                        }
-                        System.out.printf( "\t\twill proceed with metadata object containing %d keys (%s)\n",
-                              metadata.keySet().size(), sb);
-                        HashMap<String,Object> newMetadataMap = new HashMap<>();
-                        newMetadataMap.put("metadata", metadata);
-                        rewrittenClusterUidToMetadataMap.put( uid, newMetadataMap);
-                     }
-                     catch (Exception exc)
-                     {
-                        System.out.printf( "\t\tcast exception: %s\n", exc.toString());
-                     }
-                  }
-                  System.out.printf( "New clusters object: %s\n", rewrittenClusterUidToMetadataMap);
-                  kids.setValue( rewrittenClusterUidToMetadataMap);
+                  __clusterUidToMetadataMap = (HashMap<String, Object>) aSnapshot.getValue();
                }
                catch (Exception exc)
                {
@@ -156,11 +121,60 @@ public class App
             {
                Object snapshotObj = aSnapshot.getValue();
                System.out.printf( "Called more than once; releasing semaphore.  Received value is %s\n", snapshotObj);
-               semaphore.release();
             }
+            __semaphore.release();
          }
       };      
       kids.addValueEventListener( listener);
+      __semaphore.acquire(); // Wait for listener to release the semaphore.
+      if (__clusterUidToMetadataMap == null)
+      {
+         // Do nothing
+      }
+      else
+      {
+         rewriteMetadata();
+         System.out.printf( "New clusters object: %s\n", __rewrittenClusterUidToMetadataMap);
+         kids.setValue( __rewrittenClusterUidToMetadataMap);
+         __semaphore.acquire(); // Wait again for (hopefully) a data change event.
+      }
+   }
+
+   private static void rewriteMetadata()
+   {
+      for (String uid : __clusterUidToMetadataMap.keySet())
+      {
+         // Transform "/clusters/uid/<metadata>" to
+         // "/clusters/uid/metadata/<metadata>"
+         Object metadataObj = __clusterUidToMetadataMap.get( uid);
+         System.out.printf( "\t%s\n", uid);
+         try
+         {
+            HashMap<String, Object> metadata = (HashMap<String, Object>) metadataObj;
+            if (metadata.containsKey( "metadata"))
+            {
+               System.out.printf( "\t\tremove extraneous metadata\n");
+               metadata.remove( "metadata");
+            }
+            // There's probably a better way to do this with
+            // Streams, but it's more than I want to spend time on
+            // right now.
+            StringBuffer sb = new StringBuffer();
+            for (String key : metadata.keySet())
+            {
+               sb.append( sb.length() > 0 ? ", " : "").append( key);
+            }
+            System.out.printf( "\t\twill proceed with metadata object containing %d keys (%s)\n",
+                  metadata.keySet().size(), sb);
+            HashMap<String,Object> newMetadataMap = new HashMap<>();
+            newMetadataMap.put("metadata", metadata);
+            __rewrittenClusterUidToMetadataMap.put( uid, newMetadataMap);
+         }
+         catch (Exception exc)
+         {
+            System.out.printf( "\t\tcast exception: %s\n", exc.toString());
+         }
+      }
    }
 
 }
