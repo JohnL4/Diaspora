@@ -111,7 +111,8 @@ public class App
                __semaphore.release();
             }
          });
-         __semaphore.acquire(2); // Wait again for (hopefully) a data change event.
+         __semaphore.acquire(2); // Wait again for (hopefully) a data change event.  Note that we should get 
+                                 // TWO semaphores: one from a data-change event, and one from the completion handler.
       }
    }
 
