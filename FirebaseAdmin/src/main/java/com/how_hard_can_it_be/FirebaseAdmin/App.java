@@ -1,6 +1,7 @@
 package com.how_hard_can_it_be.FirebaseAdmin;
 
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
 import com.google.firebase.FirebaseApp;
@@ -24,6 +25,8 @@ public class App
    {
       try
       {
+//         System.out.println(  "Classpath = " + System.getProperties().getProperty( "java.class.path"));
+         
          FileInputStream serviceAccount = new FileInputStream( "diaspora-dev-firebase-adminsdk-voul2-9fc9e89711.json");
 
          FirebaseOptions options = new FirebaseOptions.Builder()
@@ -33,13 +36,14 @@ public class App
          FirebaseApp.initializeApp( options);
 
          dumpClusterMetadata();
+         semaphore.acquire();
       }
       catch (Exception exc)
       {
          System.err.println( "Error: " + exc.toString());
       }
-      semaphore.acquire();
       System.out.println( "(Firebase admin done.)");
+      System.exit( 0);
    }
 
    private static void dumpClusterMetadata()
@@ -53,8 +57,19 @@ public class App
 
          public void onDataChange( DataSnapshot aSnapshot)
          {
-            Object value = aSnapshot.getValue();
-            System.out.println( "\tgot value " + value);
+            try
+            {
+               HashMap<String, Object> clusterUidToMetadataMap = (HashMap<String, Object>) aSnapshot.getValue();
+               for (String uid : clusterUidToMetadataMap.keySet())
+               {
+                  Object metadata = clusterUidToMetadataMap.get( uid);
+                  System.out.println( "\tgot value " + uid + ": " + metadata);
+               }
+            }
+            catch (Exception exc)
+            {
+               System.err.println( exc.toString());
+            }
             semaphore.release();
          }
 
