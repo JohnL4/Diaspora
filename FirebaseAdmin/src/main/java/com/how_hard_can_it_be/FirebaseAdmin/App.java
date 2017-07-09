@@ -70,7 +70,14 @@ public class App
          }
          else if (env.equals( "prod"))
          {
-            
+            FileInputStream serviceAccount = new FileInputStream(
+                  "diaspora-21544-firebase-adminsdk-ak9wa-54c386f740.json");
+
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                  .setCredential( FirebaseCredentials.fromCertificate( serviceAccount))
+                  .setDatabaseUrl( "https://diaspora-21544.firebaseio.com").build();
+
+            FirebaseApp.initializeApp( options);
          }
          
          transformClusterMetadata();
