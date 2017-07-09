@@ -4,6 +4,12 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseCredentials;
@@ -14,7 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 /**
- * Hello world!
+ * Firebase d/b migration utility; will probably have code modified for every new transformation.
  *
  */
 public class App 
@@ -29,14 +35,38 @@ public class App
       {
 //         System.out.println(  "Classpath = " + System.getProperties().getProperty( "java.class.path"));
          
-         FileInputStream serviceAccount = new FileInputStream( "diaspora-dev-firebase-adminsdk-voul2-9fc9e89711.json");
+         Option envOpt = Option.builder()
+               .longOpt( "env")
+               .required()
+               .hasArg()
+               .desc( "environment: prod or dev")
+               .build();
 
-         FirebaseOptions options = new FirebaseOptions.Builder()
-               .setCredential( FirebaseCredentials.fromCertificate( serviceAccount))
-               .setDatabaseUrl( "https://diaspora-dev.firebaseio.com/").build();
+         Options opts = new Options();
+         opts.addOption( envOpt);
+         CommandLineParser cmdLineParser = new DefaultParser();
+         CommandLine cmd = cmdLineParser.parse( opts, args);
+         
+         String env = cmd.getOptionValue( "env");
+         
+         if (env.equals( "dev"))
+         {
+            FileInputStream serviceAccount = new FileInputStream(
+                  "diaspora-dev-firebase-adminsdk-voul2-9fc9e89711.json");
 
-         FirebaseApp.initializeApp( options);
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                  .setCredential( FirebaseCredentials.fromCertificate( serviceAccount))
+                  .setDatabaseUrl( "https://diaspora-dev.firebaseio.com/").build();
 
+            FirebaseApp.initializeApp( options);
+         }
+         else if (env.equals( "prod"))
+         {
+            
+         }
+         else
+            throw new Exception( "--env option must be either 'prod' or 'dev'");
+         
          transformClusterMetadata();
 //         __semaphore.acquire();
       }
