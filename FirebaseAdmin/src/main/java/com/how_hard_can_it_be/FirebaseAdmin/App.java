@@ -48,6 +48,14 @@ public class App
          CommandLine cmd = cmdLineParser.parse( opts, args);
          
          String env = cmd.getOptionValue( "env");
+
+         // Separate argument-checking from argument-using.  Check ALL args first.
+         if (env.equals( "dev") || env.equals( "prod"))
+         {
+            // Do nothing, we're good.
+         }
+         else
+            throw new Exception( "--env option must be either 'prod' or 'dev'");
          
          if (env.equals( "dev"))
          {
@@ -64,8 +72,6 @@ public class App
          {
             
          }
-         else
-            throw new Exception( "--env option must be either 'prod' or 'dev'");
          
          transformClusterMetadata();
 //         __semaphore.acquire();
