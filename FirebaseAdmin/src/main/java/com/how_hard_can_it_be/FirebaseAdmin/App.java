@@ -88,36 +88,50 @@ public class App
          }
       };      
       kids.addValueEventListener( listener);
-      __semaphore.acquire(); // Wait for listener to release the semaphore.
+      __semaphore.acquire(); // Wait for listener to release the semaphore.  This means the data has been read.
       if (__clusterUidToMetadataMap == null)
       {
          // Do nothing
       }
       else
       {
-         rewriteMetadata();
-         System.out.printf( "New clusters object: %s\n", __rewrittenClusterUidToMetadataMap);
-         // Note: using a completion handler seems to be important; otherwise the program seems to end too early
-         // and data somehow doesn't get finalized.
-         kids.setValue( __rewrittenClusterUidToMetadataMap, new DatabaseReference.CompletionListener() {
+         boolean needsRewrite = rewriteMetadata();
+         if (needsRewrite)
+         {
+            System.out.printf( "New clusters object: %s\n", __rewrittenClusterUidToMetadataMap);
+            // Note: using a completion handler seems to be important; otherwise the program seems to end too early
+            // and data somehow doesn't get finalized.
+            kids.setValue( __rewrittenClusterUidToMetadataMap, new DatabaseReference.CompletionListener() {
 
-            @Override
-            public void onComplete( DatabaseError aDbError, DatabaseReference aDbRef)
-            {
-               if (aDbError == null)
-                  System.out.printf( "Data saved successfully.\n");
-               else
-                  System.out.printf( "D/b error: %s - %s\n", aDbError.getCode(), aDbError.getMessage());
-               __semaphore.release();
-            }
-         });
-         __semaphore.acquire(2); // Wait again for (hopefully) a data change event.  Note that we should get 
-                                 // TWO semaphores: one from a data-change event, and one from the completion handler.
+               @Override
+               public void onComplete( DatabaseError aDbError, DatabaseReference aDbRef)
+               {
+                  if (aDbError == null)
+                     System.out.printf( "Data saved successfully.\n");
+                  else
+                     System.out.printf( "D/b error: %s - %s\n", aDbError.getCode(), aDbError.getMessage());
+                  __semaphore.release();
+               }
+            });
+            __semaphore.acquire( 2); // Wait again for (hopefully) a data change event. Note that we should get TWO
+                                     // semaphores: one from a data-change event, and one from the completion handler.
+                                     // Note that it's entirely possible that the first event comes from a LOCAL
+                                     // in-memory copy of the d/b, and if we exit the program at that point, we may be
+                                     // cutting of transmission to the server. Which is why it can look like a
+                                     // successful update happened, but nothing happens on the server.
+         }
+         else
+            System.out.printf( "No rewrite needed.\n");
       }
    }
 
-   private static void rewriteMetadata()
+   /**
+    * Rewrite cluster metadata in {@link #__clusterUidToMetadataMap} to {@link #__rewrittenClusterUidToMetadataMap},
+    * returning true if rewritten data needs to actually be written out (i.e., is NOT a no-op).
+    */
+   private static boolean rewriteMetadata()
    {
+      boolean retval = false;
       for (String uid : __clusterUidToMetadataMap.keySet())
       {
          // Transform "/clusters/uid/<metadata>" to
@@ -127,10 +141,20 @@ public class App
          try
          {
             HashMap<String, Object> metadata = (HashMap<String, Object>) metadataObj;
-            if (metadata.containsKey( "metadata"))
+            HashMap<String,Object> metadataMember = (HashMap<String,Object>) metadata.get( "metadata");
+            if (metadataMember == null)
+            {
+               metadataMember = new HashMap<>();
+               retval = true; // We're going to write at least one "metadata" member.
+            }
+            else
             {
                System.out.printf( "\t\tremove extraneous metadata\n");
                metadata.remove( "metadata");
+               // At this point, we have a metadata object in hand from the metadata map, but we still want
+               // to remove it to keep from cluttering things up.  We'll copy the rest of the metadata into
+               // this metadata object, possibly overwriting what's already there, but that's ok, because
+               // we assume the source metadata is more up-to-date than what's being overwritten.
             }
             // There's probably a better way to do this with
             // Streams, but it's more than I want to spend time on
@@ -139,18 +163,22 @@ public class App
             for (String key : metadata.keySet())
             {
                sb.append( sb.length() > 0 ? ", " : "").append( key);
+               metadataMember.put( key, metadata.get( key));
+               retval = true;   // We're going to erase at least one old piece of metadata from its source location.
             }
-            System.out.printf( "\t\twill proceed with metadata object containing %d keys (%s)\n",
-                  metadata.keySet().size(), sb);
+            System.out.printf( "\t\tmetadataMember has %d total keys, with the following imported from parent cluster: [%s]\n",
+                  metadataMember.keySet().size(), sb);
             HashMap<String,Object> newMetadataMap = new HashMap<>();
-            newMetadataMap.put("metadata", metadata);
-            __rewrittenClusterUidToMetadataMap.put( uid, newMetadataMap);
+            newMetadataMap.put("metadata", metadataMember);
+            __rewrittenClusterUidToMetadataMap.put( uid, newMetadataMap); // "/clusters/$uid/metadata" --> metadataMember
          }
          catch (Exception exc)
          {
-            System.out.printf( "\t\tcast exception: %s\n", exc.toString());
+            System.out.printf( "\t\tException: %s\n", exc.toString());
+            retval = false; // State unknown -- don't write anything out.
          }
       }
+      return retval;
    }
 
 }
