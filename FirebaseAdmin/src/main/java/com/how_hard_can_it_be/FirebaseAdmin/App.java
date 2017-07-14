@@ -80,7 +80,8 @@ public class App
             FirebaseApp.initializeApp( options);
          }
          
-         transformClusterMetadata();
+         pushClusterXmlDownAndRenameClusterOwners();
+//         transformClusterMetadata();
 //         __semaphore.acquire();
       }
       catch (Exception exc)
@@ -91,6 +92,84 @@ public class App
       System.exit( 0);
    }
 
+   /**
+    * Push the clusterData "xml" node down into a "data" node and rename the "owners" node to "editors".
+    * @throws InterruptedException 
+    */
+   private static void pushClusterXmlDownAndRenameClusterOwners() throws InterruptedException
+   {
+      final String me = App.class.getName() + ".pushClusterXmlDownAndRenameClusterOwners(): ";
+      
+      
+      
+      DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+      DatabaseReference clusterData = dbRef.child( "clusterData");
+      
+      ClusterDataListener listener = new ClusterDataListener( __semaphore);
+      clusterData.addListenerForSingleValueEvent( listener);
+      __semaphore.acquire(); // Wait for listener to release the semaphore.  This means the data has been read.
+      HashMap<String,Object> rewrittenClusterDataMap = new HashMap<>();
+      boolean needsRewrite = rewriteClusterData( listener.clusterDataMap, rewrittenClusterDataMap);
+      if (needsRewrite)
+      {
+         clusterData.setValue( rewrittenClusterDataMap, new DatabaseReference.CompletionListener() {
+
+            @Override
+            public void onComplete( DatabaseError aDbError, DatabaseReference aDbRef)
+            {
+               if (aDbError == null)
+                  System.out.printf( "Data saved successfully.\n");
+               else
+                  System.out.printf( "D/b error: %s - %s\n", aDbError.getCode(), aDbError.getMessage());
+               __semaphore.release();
+            }
+         });
+      }
+      else
+         System.out.printf( "No rewrite needed\n");
+      __semaphore.acquire();
+   }
+
+   /**
+    * Does what {@link #pushClusterXmlDownAndRenameClusterOwners()} says it will do.  Note that only "owners" and "xml"
+    * will get handled; everything else will get dropped (but, at the time this is written, that's all there is).
+    * @param aClusterDataMap
+    * @param aRewrittenClusterDataMap
+    * @return
+    */
+   private static boolean rewriteClusterData( HashMap<String, Object> aClusterDataMap,
+         HashMap<String, Object> aRewrittenClusterDataMap)
+   {
+      boolean retval = false;
+      for (String uid : aClusterDataMap.keySet())
+      {
+         HashMap<String, Object> oldSingleClusterDataMap = (HashMap<String, Object>) aClusterDataMap.get( uid);
+         if (oldSingleClusterDataMap.containsKey( "data")
+               && oldSingleClusterDataMap.containsKey( "editors"))
+         {
+            // No change needed; just copy old node into new node.
+            aRewrittenClusterDataMap.put( uid, oldSingleClusterDataMap);
+         }
+         else
+         {
+            HashMap<String, Object> newSingleClusterDataMap = new HashMap<>();
+            String xml = (String) oldSingleClusterDataMap.get( "xml");
+            Object owners = oldSingleClusterDataMap.get( "owners");
+            HashMap<String, Object> newDataMap = new HashMap<>();
+            newDataMap.put( "xml", xml);
+            newSingleClusterDataMap.put( "editors", owners);
+            newSingleClusterDataMap.put( "data", newDataMap);
+            aRewrittenClusterDataMap.put( uid, newSingleClusterDataMap);
+            retval = true; // Something got rewritten
+         }
+      }
+      return retval;
+   }
+
+   /**
+    * Push cluster metadata down into a "metadata" node below the clusters/$uid node.
+    * @throws InterruptedException
+    */
    private static void transformClusterMetadata() throws InterruptedException
    {
       final String me = App.class.getName() + ".transformClusterMetadata(): ";
