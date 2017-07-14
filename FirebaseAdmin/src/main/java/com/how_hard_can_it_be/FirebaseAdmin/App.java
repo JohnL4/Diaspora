@@ -145,7 +145,7 @@ public class App
       {
          HashMap<String, Object> oldSingleClusterDataMap = (HashMap<String, Object>) aClusterDataMap.get( uid);
          if (oldSingleClusterDataMap.containsKey( "data")
-               && oldSingleClusterDataMap.containsKey( "editors"))
+               && oldSingleClusterDataMap.containsKey( "writers"))
          {
             // No change needed; just copy old node into new node.
             aRewrittenClusterDataMap.put( uid, oldSingleClusterDataMap);
@@ -157,7 +157,7 @@ public class App
             Object owners = oldSingleClusterDataMap.get( "owners");
             HashMap<String, Object> newDataMap = new HashMap<>();
             newDataMap.put( "xml", xml);
-            newSingleClusterDataMap.put( "editors", owners);
+            newSingleClusterDataMap.put( "writers", owners);
             newSingleClusterDataMap.put( "data", newDataMap);
             aRewrittenClusterDataMap.put( uid, newSingleClusterDataMap);
             retval = true; // Something got rewritten
