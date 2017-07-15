@@ -80,8 +80,9 @@ public class App
             FirebaseApp.initializeApp( options);
          }
          
-         pushClusterXmlDownAndRenameClusterOwners();
-//         transformClusterMetadata();
+//       transformClusterMetadata();
+//       pushClusterXmlDownAndRenameClusterOwners();
+         copyWritersIntoReaders();
 //         __semaphore.acquire();
       }
       catch (Exception exc)
@@ -93,14 +94,75 @@ public class App
    }
 
    /**
+    * Copy /clusterData/$uid/writers into /clusterData/$uid/readers (w/out overwriting any readers that
+    * are already present).
+    * @throws InterruptedException 
+    */
+   private static void copyWritersIntoReaders() throws InterruptedException
+   {
+      final String me = App.class.getName() + ".copyWritersIntoReaders(): ";
+      DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+      DatabaseReference clusterData = dbRef.child( "clusterData");
+      
+      ClusterDataListener listener = new ClusterDataListener( __semaphore);
+      clusterData.addListenerForSingleValueEvent( listener);
+      __semaphore.acquire(); // Wait for listener to release the semaphore.  This means the data has been read.
+      HashMap<String,Object> rewrittenClusterDataMap = new HashMap<>();
+      boolean needsRewrite = rewriteClusterDataCopyingWritersToReaders( listener.clusterDataMap, rewrittenClusterDataMap);
+      if (needsRewrite)
+      {
+         clusterData.setValue( rewrittenClusterDataMap, new StandardDbCompletionListener( __semaphore));
+         __semaphore.acquire();
+      }
+      else
+         System.out.printf(  "No rewrite required.\n");
+   }
+
+   /**
+    * Does what {@link #copyWritersIntoReaders()} says it does.
+    * @param aClusterDataMap
+    * @param aRewrittenClusterDataMap
+    * @return
+    */
+   private static boolean rewriteClusterDataCopyingWritersToReaders( HashMap<String, Object> aClusterDataMap,
+         HashMap<String, Object> aRewrittenClusterDataMap)
+   {
+      boolean retval = false; // Rewrite not needed.
+      for (String uid : aClusterDataMap.keySet())
+      {
+         HashMap<String, Object> singleClusterDataMap = (HashMap<String, Object>) aClusterDataMap.get( uid);
+         HashMap<String, Object> writers = (HashMap<String, Object>) singleClusterDataMap.get( "writers");
+         HashMap<String, Boolean> readers = (HashMap<String, Boolean>) singleClusterDataMap.get( "readers");
+         if (writers == null)
+         {
+            // Nothing to do; no writers to copy.
+            System.err.printf( "Warning: no writers for %s\n", uid);
+         }
+         else
+         {
+            if (readers == null)
+            {
+               readers = new HashMap<>();
+               singleClusterDataMap.put( "readers", readers);
+            }
+            aRewrittenClusterDataMap.put( uid, singleClusterDataMap);
+            for (String writerUid : writers.keySet())
+            {
+               readers.put( writerUid, true);
+               retval = true;
+            }
+         }
+      }
+      return retval;
+   }
+
+   /**
     * Push the clusterData "xml" node down into a "data" node and rename the "owners" node to "editors".
     * @throws InterruptedException 
     */
    private static void pushClusterXmlDownAndRenameClusterOwners() throws InterruptedException
    {
       final String me = App.class.getName() + ".pushClusterXmlDownAndRenameClusterOwners(): ";
-      
-      
       
       DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
       DatabaseReference clusterData = dbRef.child( "clusterData");
